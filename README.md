@@ -121,6 +121,29 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
     return `${diff} jours`
   }
 
+  const getColor = (teamName: string) => {
+    const name = teamName.toLowerCase()
+    if (name.includes('red bull')) return '#3671C6'
+    if (name.includes('mclaren')) return '#FF8000'
+    if (name.includes('ferrari')) return '#E8002D'
+    if (name.includes('mercedes')) return '#27F4D2'
+    if (name.includes('aston')) return '#229971'
+    if (name.includes('alpine')) return '#FF87BC'
+    if (name.includes('williams')) return '#64C4FF'
+    if (name.includes('rb') || name.includes('racing bulls')) return '#6692FF'
+    if (name.includes('haas')) return '#B6BABD'
+    if (name.includes('sauber') || name.includes('kick')) return '#52E252'
+    return '#3f3f46'
+  }
+
+  const nationalityFR: Record<string, string> = {
+    Dutch: 'Néerlandais', British: 'Britannique', Monegasque: 'Monégasque',
+    Australian: 'Australien', Spanish: 'Espagnol', French: 'Français',
+    Thai: 'Thaïlandais', German: 'Allemand', Italian: 'Italien',
+    Finnish: 'Finlandais', Mexican: 'Mexicain', Canadian: 'Canadien',
+    American: 'Américain', Chinese: 'Chinois', Japanese: 'Japonais', Danish: 'Danois'
+  }
+
   const handleTrackMove = (clientX: number, clientY: number, rect: DOMRect) => {
     if (!isActive) return
     const x = (clientX - rect.left) / rect.width
@@ -248,18 +271,9 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
     }
 
     if (subPage === 'standings') {
-      const driverInfo: Record<string, { photo: string; bio: string }> = {
-        max_verstappen: { photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/M/MAXVER01_Max_Verstappen/maxver01.png', bio: 'Champion du monde en titre. Pilote extrêmement rapide et agressif, dominant avec Red Bull depuis plusieurs saisons.' },
-        norris: { photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LANNOR01_Lando_Norris/lannor01.png', bio: 'Très régulier et rapide. L’un des meilleurs pilotes de la grille, souvent en lutte pour les podiums.' },
-        leclerc: { photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/C/CHALEC01_Charles_Leclerc/chalec01.png', bio: 'Pilote Ferrari très rapide en qualifications. Capable de grandes performances, parfois malchanceux en course.' },
-        piastri: { photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/O/OSCPIA01_Oscar_Piastri/oscpia01.png', bio: 'Jeune pilote très talentueux. Montre une grande maturité et une vitesse impressionnante.' },
-        hamilton: { photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LEWHAM01_Lewis_Hamilton/lewham01.png', bio: 'Septuple champion du monde. L’un des plus grands pilotes de l’histoire de la Formule 1.' },
-        russell: { photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/G/GEORUS01_George_Russell/georus01.png', bio: 'Pilote Mercedes régulier et intelligent. Capable de bonnes performances en course.' },
-        alonso: { photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/F/FERALO01_Fernando_Alonso/feralo01.png', bio: 'Double champion du monde. Expérience énorme et toujours très compétitif malgré son âge.' },
-      }
-
       if (selectedDriver) {
-        const info = driverInfo[selectedDriver.Driver.driverId] || { photo: '', bio: 'Pilote de Formule 1 en compétition pour le championnat.' }
+        const teamName = selectedDriver.Constructors[0]?.name || ''
+        const nat = nationalityFR[selectedDriver.Driver.nationality] || selectedDriver.Driver.nationality
         return (
           <div className="min-h-screen bg-black text-white">
             <header className="flex items-center justify-between px-6 py-5 border-b border-zinc-900">
@@ -269,18 +283,20 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
             </header>
             <div className="px-6 py-8 max-w-md mx-auto space-y-6">
               <div className="text-center">
-                <img src={info.photo || 'https://media.formula1.com/d_driver_fallback_image.png'} alt={selectedDriver.Driver.familyName} className="w-28 h-28 rounded-full object-cover object-top mx-auto mb-4 border-2 border-zinc-800" onError={(e) => (e.currentTarget.src = 'https://media.formula1.com/d_driver_fallback_image.png')} />
+                <div className="w-28 h-28 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl font-black text-white" style={{ backgroundColor: getColor(teamName) }}>
+                  {selectedDriver.Driver.familyName.charAt(0)}
+                </div>
                 <h1 className="text-2xl font-black">{selectedDriver.Driver.givenName} {selectedDriver.Driver.familyName}</h1>
-                <p className="text-sm text-zinc-500 mt-1">{selectedDriver.Constructors[0]?.name}</p>
+                <p className="text-sm text-zinc-500 mt-1">{teamName}</p>
               </div>
               <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4">
-                <p className="text-sm leading-relaxed text-zinc-300">{info.bio}</p>
+                <p className="text-sm leading-relaxed text-zinc-300">Pilote de Formule 1 en compétition pour le championnat.</p>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-[11px] text-zinc-500">Points</p><p className="text-xl font-semibold mt-1">{selectedDriver.points}</p></div>
                 <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-[11px] text-zinc-500">Victoires</p><p className="text-xl font-semibold mt-1">{selectedDriver.wins}</p></div>
                 <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-[11px] text-zinc-500">Position</p><p className="text-xl font-semibold mt-1">{selectedDriver.position}</p></div>
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-[11px] text-zinc-500">Nationalité</p><p className="text-xl font-semibold mt-1">{selectedDriver.Driver.nationality}</p></div>
+                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-[11px] text-zinc-500">Nationalité</p><p className="text-xl font-semibold mt-1">{nat}</p></div>
               </div>
             </div>
           </div>
@@ -288,6 +304,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
       }
 
       if (selectedConstructor) {
+        const nat = nationalityFR[selectedConstructor.Constructor.nationality] || selectedConstructor.Constructor.nationality
         return (
           <div className="min-h-screen bg-black text-white">
             <header className="flex items-center justify-between px-6 py-5 border-b border-zinc-900">
@@ -296,14 +313,12 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
               <div className="w-12" />
             </header>
             <div className="px-6 py-8 max-w-md mx-auto space-y-6">
-              <div className="text-center">
-                <h1 className="text-2xl font-black">{selectedConstructor.Constructor.name}</h1>
-              </div>
+              <h1 className="text-2xl font-black text-center">{selectedConstructor.Constructor.name}</h1>
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-[11px] text-zinc-500">Points</p><p className="text-xl font-semibold mt-1">{selectedConstructor.points}</p></div>
                 <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-[11px] text-zinc-500">Victoires</p><p className="text-xl font-semibold mt-1">{selectedConstructor.wins}</p></div>
                 <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-[11px] text-zinc-500">Position</p><p className="text-xl font-semibold mt-1">{selectedConstructor.position}</p></div>
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-[11px] text-zinc-500">Nationalité</p><p className="text-xl font-semibold mt-1">{selectedConstructor.Constructor.nationality}</p></div>
+                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-[11px] text-zinc-500">Nationalité</p><p className="text-xl font-semibold mt-1">{nat}</p></div>
               </div>
             </div>
           </div>
@@ -326,15 +341,17 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
               {standingsTab === 'drivers' ? (
                 liveStandings.length === 0 ? <p className="text-center text-zinc-500 text-sm">Chargement...</p> :
                 liveStandings.map((d, i) => {
-                  const info = driverInfo[d.Driver.driverId]
+                  const teamName = d.Constructors[0]?.name || ''
                   return (
                     <button key={d.Driver.driverId} onClick={() => setSelectedDriver(d)} className="w-full flex items-center justify-between bg-zinc-950/40 border border-zinc-900/80 rounded-2xl px-5 py-4 text-left hover:border-zinc-700 transition">
                       <div className="flex items-center gap-4">
                         <span className="text-sm font-medium text-zinc-600 w-6">{i + 1}</span>
-                        <img src={info?.photo || 'https://media.formula1.com/d_driver_fallback_image.png'} alt={d.Driver.familyName} className="w-10 h-10 rounded-full object-cover object-top" onError={(e) => (e.currentTarget.src = 'https://media.formula1.com/d_driver_fallback_image.png')} />
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: getColor(teamName) }}>
+                          {d.Driver.familyName.charAt(0)}
+                        </div>
                         <div>
                           <p className="text-sm font-medium">{d.Driver.givenName} {d.Driver.familyName}</p>
-                          <p className="text-[11px] text-zinc-500">{d.Constructors[0]?.name}</p>
+                          <p className="text-[11px] text-zinc-500">{teamName}</p>
                         </div>
                       </div>
                       <div className="text-right">
