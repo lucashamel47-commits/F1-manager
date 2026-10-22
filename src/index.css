@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+@keyframes headlight-left {
+  0% { transform: translateX(-160%) scale(0.5); opacity: 0; filter: blur(10px); }
+  18% { opacity: 1; filter: blur(3px); }
+  70% { filter: blur(2px); }
+  100% { transform: translateX(180%) scale(1.05); opacity: 0; filter: blur(14px); }
+}
+
+@keyframes headlight-right {
+  0% { transform: translateX(-140%) scale(0.45); opacity: 0; filter: blur(12px); }
+  22% { opacity: 1; filter: blur(4px); }
+  75% { filter: blur(2.5px); }
+  100% { transform: translateX(200%) scale(1.1); opacity: 0; filter: blur(16px); }
+}
+
+.headlight-l { animation: headlight-left 1.05s cubic-bezier(0.22, 0.61, 0.36, 1) forwards; }
+.headlight-r { animation: headlight-right 1.05s cubic-bezier(0.22, 0.61, 0.36, 1) forwards; }
+
+@keyframes rain {
+  0% { transform: translateY(-10vh); opacity: 0.4; }
+  100% { transform: translateY(110vh); opacity: 0.15; }
+}
+
+.rain-drop {
+  animation: rain linear infinite;
+}
+
+@keyframes splash {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0.15);
+    opacity: 0;
+  }
+}
+
+.splash {
+  animation: splash 0.65s ease-out forwards;
+}
+
+@keyframes confetti {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+.animate-confetti {
+  animation: confetti 1.6s ease-out forwards;
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+  display: flex;
+  width: max-content;
+}
+html, body, #root {
+  background: #000;
+  min-height: 100%;
+}
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.4s forwards;
+}
+@keyframes wind {
+  0% { transform: translateX(0); opacity: 0.2; }
+  50% { opacity: 0.6; }
+  100% { transform: translateX(40%); opacity: 0.2; }
+}
+.animate-wind {
+  animation: wind linear infinite;
+}
+@keyframes wind {
+  0% { transform: translateX(-120%); opacity: 0.6; }
+  100% { transform: translateX(120%); opacity: 0.2; }
+}
+.animate-wind {
+  animation: wind 2.2s linear infinite;
+}
+@keyframes wind-flow {
+  0% { transform: translateX(-100%) skewX(-12deg); opacity: 0.3; }
+  100% { transform: translateX(100%) skewX(-12deg); opacity: 0.1; }
+}
+
+.wind-line {
+  position: absolute;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+  animation: wind-flow 1.8s linear infinite;
+  pointer-events: none;
+}
+@keyframes wind-stream {
+  0% { transform: translateX(-120%); opacity: 0; }
+  20% { opacity: 0.8; }
+  80% { opacity: 0.8; }
+  100% { transform: translateX(120%); opacity: 0; }
+}
+
+.wind-stream {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+  animation: wind-stream 2.2s linear infinite;
+  pointer-events: none;
+  filter: blur(0.5px);
+}
+@keyframes wind-stream {
+  0% { transform: translateX(-120%); opacity: 0; }
+  20% { opacity: 0.8; }
+  80% { opacity: 0.8; }
+  100% { transform: translateX(120%); opacity: 0; }
+}
+
+.wind-stream {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+  animation: wind-stream 2.2s linear infinite;
+  pointer-events: none;
+  filter: blur(0.5px);
+}
