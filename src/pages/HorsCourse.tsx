@@ -388,192 +388,169 @@ if (subPage === 'stats-constructors') {
   if (selectedTeamStats) {
     const name = selectedTeamStats.Constructor.name.toLowerCase()
     let carImage = '/cars/redbull.jpeg'
+    let teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/red-bull-racing-logo.png'
     let teamColor = '#3671C6'
     let fournisseur = 'Red Bull Ford'
-    let noteMoteur = 'Premier moteur maison de Red Bull (DM01), développé en partenariat avec Ford. Première conception interne complète pour l’écurie.'
+    let noteMoteur = 'Premier moteur maison de Red Bull (DM01), développé avec Ford. L’écurie conçoit pour la première fois son propre groupe motopropulseur.'
+    let noteAero = 'Red Bull va chercher à maximiser l’efficacité en ligne droite avec les ailes actives, tout en gardant un bon appui dans les virages rapides.'
     let officialSite = 'https://www.redbullracing.com'
 
     if (name.includes('ferrari')) {
       carImage = '/cars/ferrari.jpeg'
+      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/ferrari-logo.png'
       teamColor = '#E8002D'
       fournisseur = 'Ferrari'
-      noteMoteur = 'Moteur conçu et développé entièrement à Maranello. Fournisseur également de Haas et Cadillac.'
+      noteMoteur = 'Moteur entièrement développé à Maranello. Ferrari fournit aussi Haas et Cadillac.'
+      noteAero = 'Ferrari devra adapter son concept aéro pour bien gérer le passage entre mode virage et mode ligne droite.'
       officialSite = 'https://www.ferrari.com/en-EN/formula1'
     } else if (name.includes('mercedes')) {
       carImage = '/cars/mercedes.jpeg'
+      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/mercedes-logo.png'
       teamColor = '#27F4D2'
       fournisseur = 'Mercedes'
-      noteMoteur = 'Mercedes fournit McLaren, Williams et Alpine en plus de son équipe usine.'
+      noteMoteur = 'Mercedes fournit McLaren, Williams et Alpine. Référence en gestion de l’énergie et fiabilité.'
+      noteAero = 'Mercedes va chercher à tirer le meilleur parti des ailes actives sur les circuits à longues lignes droites.'
       officialSite = 'https://www.mercedesamgf1.com'
     } else if (name.includes('mclaren')) {
       carImage = '/cars/mclaren.jpeg'
+      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/mclaren-logo.png'
       teamColor = '#FF8000'
       fournisseur = 'Mercedes'
-      noteMoteur = 'Client Mercedes depuis 2021. Contrat prolongé jusqu’en 2030.'
+      noteMoteur = 'Client Mercedes depuis 2021. Partenariat prolongé jusqu’en 2030.'
+      noteAero = 'McLaren va chercher à maximiser les zones de freinage et les virages rapides.'
       officialSite = 'https://www.mclaren.com/racing'
     } else if (name.includes('aston')) {
       carImage = '/cars/aston.jpeg'
+      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/aston-martin-logo.png'
       teamColor = '#229971'
       fournisseur = 'Honda'
-      noteMoteur = 'Partenariat exclusif avec Honda dès 2026. Retour officiel du motoriste japonais.'
+      noteMoteur = 'Partenariat exclusif avec Honda à partir de 2026. Honda revient avec un moteur entièrement nouveau.'
+      noteAero = 'Aston Martin devra adapter son concept aéro au nouveau moteur Honda.'
       officialSite = 'https://www.astonmartinf1.com'
     } else if (name.includes('williams')) {
       carImage = '/cars/williams.jpeg'
+      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/williams-logo.png'
       teamColor = '#64C4FF'
       fournisseur = 'Mercedes'
-      noteMoteur = 'Client Mercedes. Bénéficie de la même unité de puissance que l’équipe usine.'
+      noteMoteur = 'Client Mercedes. Williams bénéficie de la puissance et de la fiabilité du constructeur allemand.'
+      noteAero = 'Williams espère réduire l’écart grâce aux ailes actives sur les longues lignes droites.'
       officialSite = 'https://www.williamsf1.com'
     } else if (name.includes('alpine')) {
       carImage = '/cars/alpine.jpeg'
+      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/alpine-logo.png'
       teamColor = '#FF87BC'
       fournisseur = 'Mercedes'
-      noteMoteur = 'Passage de Renault à Mercedes en 2026.'
+      noteMoteur = 'Alpine passe chez Mercedes en 2026. Un changement majeur qui permet de se concentrer sur le châssis.'
+      noteAero = 'Le passage à Mercedes va permettre à Alpine de mieux travailler sur les ailes actives.'
       officialSite = 'https://www.alpinecars.com/en/formula-1'
     } else if (name.includes('haas')) {
       carImage = '/cars/haas.jpeg'
+      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/haas-f1-team-logo.png'
       teamColor = '#B6BABD'
       fournisseur = 'Ferrari'
-      noteMoteur = 'Client Ferrari. Utilise le même groupe motopropulseur que Maranello.'
+      noteMoteur = 'Client Ferrari. Haas utilise le même groupe motopropulseur que Ferrari.'
+      noteAero = 'Haas va chercher à maximiser les zones de dépassement avec le nouveau règlement.'
       officialSite = 'https://www.haasf1team.com'
-    } else if (name.includes('audi') || name.includes('sauber') || name.includes('kick')) {
+    } else if (name.includes('audi')) {
+      carImage = '/cars/audi.jpeg'
+      teamLogo = 'https://upload.wikimedia.org/wikipedia/commons/a/aa/Audi.png'
+      teamColor = '#BB0A30'
+      fournisseur = 'Audi'
+      noteMoteur = 'Audi développe son propre moteur pour sa première saison en Formule 1. Un projet ambitieux pour la marque allemande.'
+      noteAero = 'Audi devra rapidement maîtriser les ailes actives et le mode dépassement dès sa première année.'
+      officialSite = 'https://www.audi.com'
+    } else if (name.includes('sauber') || name.includes('kick')) {
       carImage = '/cars/sauber.jpeg'
+      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/kick-sauber-logo.png'
       teamColor = '#52E252'
       fournisseur = 'Audi'
-      noteMoteur = 'Sauber devient l’équipe Audi. Audi développe son propre moteur pour sa première saison.'
+      noteMoteur = 'Sauber devient Audi. L’équipe prépare la transition vers la marque allemande.'
+      noteAero = 'Sauber travaille sur l’adaptation aux nouvelles règles aérodynamiques de 2026.'
       officialSite = 'https://www.sauber-group.com'
+    } else if (name.includes('cadillac')) {
+      carImage = '/cars/cadillac.jpeg'
+      teamLogo = 'https://cdn.brandfetch.io/cadillac.com/logo'
+      teamColor = '#FFD700'
+      fournisseur = 'Ferrari'
+      noteMoteur = 'Cadillac utilise un moteur Ferrari pour ses débuts en Formule 1. L’équipe américaine arrive avec un projet ambitieux.'
+      noteAero = 'Cadillac devra rapidement maîtriser les ailes actives pour être compétitive dès sa première saison.'
+      officialSite = 'https://www.cadillac.com'
     } else if (name.includes('racing bulls') || name.includes('rb')) {
       carImage = '/cars/racingbulls.jpeg'
+      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/rb-logo.png'
       teamColor = '#6692FF'
       fournisseur = 'Red Bull Ford'
       noteMoteur = 'Utilise le même groupe motopropulseur que Red Bull Racing.'
+      noteAero = 'Racing Bulls profite des connaissances de Red Bull en aérodynamique.'
       officialSite = 'https://www.visacashapprb.com'
     }
 
     const youtube = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(selectedTeamStats.Constructor.name + ' F1 2026')
 
-    const sections = [
-      {
-        id: 'classement',
-        title: 'Classement',
-        subtitle: 'Données temps réel',
-        content: (
-          <div className="space-y-5 text-sm">
-            <div className="flex justify-between items-center py-1"><span className="text-zinc-400">Position</span><span className="font-medium">{selectedTeamStats.position}</span></div>
-            <div className="flex justify-between items-center py-1"><span className="text-zinc-400">Points</span><span className="font-medium">{selectedTeamStats.points}</span></div>
-            <div className="flex justify-between items-center py-1"><span className="text-zinc-400">Victoires</span><span className="font-medium">{selectedTeamStats.wins || '0'}</span></div>
-            <p className="text-xs text-zinc-500 pt-2">Mis à jour via l’API Ergast.</p>
-          </div>
-        )
-      },
-      {
-        id: 'moteur',
-        title: 'Groupe motopropulseur',
-        subtitle: 'Règlement 2026',
-        content: (
-          <div className="space-y-5 text-sm">
-            <div className="flex justify-between py-1"><span className="text-zinc-400">Fournisseur</span><span className="font-medium">{fournisseur}</span></div>
-            <div className="flex justify-between py-1"><span className="text-zinc-400">Puissance totale</span><span className="font-medium">~1 000 ch</span></div>
-            <div className="flex justify-between py-1"><span className="text-zinc-400">Moteur thermique</span><span className="font-medium">~400 kW (536 ch)</span></div>
-            <div className="flex justify-between py-1"><span className="text-zinc-400">Moteur électrique</span><span className="font-medium">350 kW (469 ch)</span></div>
-            <div className="flex justify-between py-1"><span className="text-zinc-400">Récupération max</span><span className="font-medium">8,5 MJ / tour</span></div>
-            <div className="flex justify-between py-1"><span className="text-zinc-400">Carburant</span><span className="font-medium">100 % durable</span></div>
-            <div className="pt-5 mt-2 border-t border-white/5 space-y-3">
-              <p className="text-sm text-zinc-300 leading-relaxed">{noteMoteur}</p>
-              <p className="text-xs text-zinc-500 leading-relaxed">Le MGU-H a été supprimé. L’énergie est principalement récupérée au freinage. Le moteur électrique représente près de 50 % de la puissance totale.</p>
-            </div>
-          </div>
-        )
-      },
-      {
-        id: 'aero',
-        title: 'Aérodynamique',
-        subtitle: 'Ailes actives',
-        content: (
-          <div className="space-y-5 text-sm">
-            <div className="flex justify-between py-1"><span className="text-zinc-400">Mode Virage</span><span className="font-medium">Appui maximum</span></div>
-            <div className="flex justify-between py-1"><span className="text-zinc-400">Mode Ligne droite</span><span className="font-medium">−55 % de traînée</span></div>
-            <div className="flex justify-between py-1"><span className="text-zinc-400">Réduction d’appui</span><span className="font-medium">−30 %</span></div>
-            <p className="text-sm text-zinc-300 pt-5 mt-2 border-t border-white/5 leading-relaxed">Les ailes avant et arrière s’ouvrent automatiquement en ligne droite pour réduire la traînée, puis se ferment dans les virages pour maximiser l’appui.</p>
-          </div>
-        )
-      },
-      {
-        id: 'depassement',
-        title: 'Mode Dépassement',
-        subtitle: 'Remplace le DRS',
-        content: (
-          <div className="space-y-5 text-sm">
-            <div className="flex justify-between py-1"><span className="text-zinc-400">Activation</span><span className="font-medium">À moins d’1 seconde</span></div>
-            <div className="flex justify-between py-1"><span className="text-zinc-400">Bonus énergie</span><span className="font-medium">+0,5 MJ</span></div>
-            <div className="flex justify-between py-1"><span className="text-zinc-400">Puissance électrique</span><span className="font-medium">Jusqu’à 350 kW</span></div>
-            <p className="text-sm text-zinc-300 pt-5 mt-2 border-t border-white/5 leading-relaxed">Le pilote qui suit peut déployer plus de puissance électrique plus longtemps. La voiture de tête voit sa puissance électrique diminuer au-dessus de 290 km/h.</p>
-          </div>
-        )
-      },
-      {
-        id: 'dimensions',
-        title: 'Dimensions',
-        subtitle: 'Voiture 2026',
-        content: (
-          <div className="space-y-5 text-sm">
-            <div className="flex justify-between py-1"><span className="text-zinc-400">Poids minimum</span><span className="font-medium">768 kg</span></div>
-            <div className="flex justify-between py-1"><span className="text-zinc-400">Empattement</span><span className="font-medium">3 400 mm</span></div>
-            <div className="flex justify-between py-1"><span className="text-zinc-400">Largeur</span><span className="font-medium">1 900 mm</span></div>
-            <div className="flex justify-between py-1"><span className="text-zinc-400">Pneus avant</span><span className="font-medium">275 mm</span></div>
-            <div className="flex justify-between py-1"><span className="text-zinc-400">Pneus arrière</span><span className="font-medium">375 mm</span></div>
-            <p className="text-sm text-zinc-300 pt-5 mt-2 border-t border-white/5 leading-relaxed">Les voitures sont 30 kg plus légères, 200 mm plus courtes et 100 mm plus étroites que la génération précédente.</p>
-          </div>
-        )
-      }
-    ]
-
     return (
       <div className="min-h-screen bg-black text-white">
         <header className="flex items-center justify-between px-6 py-5 border-b border-zinc-900">
-          <button onClick={() => setSelectedTeamStats(null)} className="text-sm text-zinc-400">← Retour</button>
-          <p className="text-[11px] tracking-[0.3em] uppercase text-zinc-500">{selectedTeamStats.Constructor.name}</p>
+          <button onClick={() => setSelectedTeamStats(null)} className="text-sm text-zinc-500">← Retour</button>
+          <p className="text-xs tracking-[0.3em] uppercase text-zinc-600">{selectedTeamStats.Constructor.name}</p>
           <div className="w-12" />
         </header>
 
-        <div className="px-6 pb-20 max-w-md mx-auto">
-          <div className="relative rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-950 h-64 flex items-center justify-center mb-10">
-            <img src={carImage} alt="" className="w-full h-full object-contain" />
+        <div className="px-6 pb-24 max-w-md mx-auto">
+          <div className="flex justify-center mb-5">
+            <img src={teamLogo} alt="" className="h-12 object-contain" />
           </div>
 
-          <div className="space-y-3">
-            {sections.map((s) => {
-              const isOpen = openSection === s.id
-              return (
-                <div 
-                  key={s.id} 
-                  className="rounded-2xl bg-zinc-950/40 overflow-hidden"
-                  style={{ borderLeft: `4px solid ${teamColor}`, borderTop: '1px solid #27272a', borderRight: '1px solid #27272a', borderBottom: '1px solid #27272a' }}
-                >
-                  <button
-                    onClick={() => setOpenSection(isOpen ? null : s.id)}
-                    className="w-full text-left px-5 py-4 flex items-center justify-between"
-                  >
-                    <div>
-                      <p className="font-medium text-[15px]">{s.title}</p>
-                      <p className="text-xs text-zinc-500 mt-0.5">{s.subtitle}</p>
-                    </div>
-                    <span className={`text-zinc-500 text-lg transition-transform ${isOpen ? 'rotate-45' : ''}`}>+</span>
-                  </button>
-                  {isOpen && (
-                    <div className="px-5 pb-6 pt-3 border-t border-zinc-800">
-                      {s.content}
-                    </div>
-                  )}
+          <div className="relative rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-950 h-64 flex items-center justify-center mb-8">
+            <img src={carImage} alt="" className="max-w-full max-h-full object-contain" />
+          </div>
+
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-zinc-900 bg-zinc-950/40 p-5">
+              <p className="text-xs tracking-widest uppercase text-zinc-600 mb-4">Classement</p>
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className="text-2xl font-medium">{selectedTeamStats.position}</p>
+                  <p className="text-xs text-zinc-500 mt-1">Position</p>
                 </div>
-              )
-            })}
+                <div>
+                  <p className="text-2xl font-medium">{selectedTeamStats.points}</p>
+                  <p className="text-xs text-zinc-500 mt-1">Points</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-medium">{selectedTeamStats.wins || '0'}</p>
+                  <p className="text-xs text-zinc-500 mt-1">Victoires</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-zinc-900 bg-zinc-950/40 p-5">
+              <p className="text-xs tracking-widest uppercase text-zinc-600 mb-4">Groupe motopropulseur</p>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between"><span className="text-zinc-500">Fournisseur</span><span>{fournisseur}</span></div>
+                <div className="flex justify-between"><span className="text-zinc-500">Puissance totale</span><span>~1 000 ch</span></div>
+                <div className="flex justify-between"><span className="text-zinc-500">Moteur thermique</span><span>~400 kW</span></div>
+                <div className="flex justify-between"><span className="text-zinc-500">Moteur électrique</span><span>350 kW</span></div>
+                <div className="flex justify-between"><span className="text-zinc-500">Récupération max</span><span>8,5 MJ / tour</span></div>
+              </div>
+              <p className="text-sm text-zinc-400 mt-5 leading-relaxed">{noteMoteur}</p>
+            </div>
+
+            <div className="rounded-2xl border border-zinc-900 bg-zinc-950/40 p-5">
+              <p className="text-xs tracking-widest uppercase text-zinc-600 mb-4">Aérodynamique</p>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between"><span className="text-zinc-500">Mode Virage</span><span>Appui maximum</span></div>
+                <div className="flex justify-between"><span className="text-zinc-500">Mode Ligne droite</span><span>−55 % de traînée</span></div>
+                <div className="flex justify-between"><span className="text-zinc-500">Mode Dépassement</span><span>À moins d’1 seconde</span></div>
+              </div>
+              <p className="text-sm text-zinc-400 mt-5 leading-relaxed">{noteAero}</p>
+            </div>
           </div>
 
-          <div className="space-y-3 pt-10">
-            <a href={officialSite} target="_blank" rel="noopener noreferrer" className="block w-full text-center py-3.5 bg-zinc-900 border border-zinc-800 rounded-xl text-sm font-medium">
+          <div className="space-y-3 pt-8">
+            <a href={officialSite} target="_blank" rel="noopener noreferrer" className="block w-full text-center py-3.5 bg-zinc-900/50 border border-zinc-800 rounded-xl text-sm text-zinc-300">
               Site officiel
             </a>
-            <a href={youtube} target="_blank" rel="noopener noreferrer" className="block w-full text-center py-3.5 bg-zinc-900 border border-zinc-800 rounded-xl text-sm font-medium">
+            <a href={youtube} target="_blank" rel="noopener noreferrer" className="block w-full text-center py-3.5 bg-zinc-900/50 border border-zinc-800 rounded-xl text-sm text-zinc-300">
               Actualités YouTube
             </a>
           </div>
@@ -585,14 +562,17 @@ if (subPage === 'stats-constructors') {
   return (
     <div className="min-h-screen bg-black text-white">
       <header className="flex items-center justify-between px-6 py-5 border-b border-zinc-900">
-        <button onClick={() => setSubPage('home')} className="text-sm text-zinc-400">← Retour</button>
-        <p className="text-xs tracking-widest uppercase text-zinc-500">Constructeurs</p>
+        <button onClick={() => setSubPage('home')} className="text-sm text-zinc-500">← Retour</button>
+        <p className="text-xs tracking-widest uppercase text-zinc-600">Constructeurs</p>
         <div className="w-12" />
       </header>
-      <div className="px-6 py-8 max-w-md mx-auto space-y-2">
+      <div className="px-6 py-6 max-w-md mx-auto space-y-1.5">
         {liveConstructors.map((t) => (
-          <button key={t.Constructor.constructorId} onClick={() => setSelectedTeamStats(t)} className="w-full text-left bg-zinc-950/40 border border-zinc-900 rounded-2xl px-5 py-4 hover:border-zinc-700 transition">
-            <p className="text-sm font-medium">{t.Constructor.name}</p>
+          <button key={t.Constructor.constructorId} onClick={() => setSelectedTeamStats(t)} className="w-full text-left bg-zinc-950/30 border border-zinc-900/60 rounded-xl px-4 py-3 hover:bg-zinc-900/50 transition">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium">{t.Constructor.name}</p>
+              <p className="text-xs text-zinc-500">{t.points} pts</p>
+            </div>
           </button>
         ))}
       </div>
