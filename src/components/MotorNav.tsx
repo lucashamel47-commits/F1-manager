@@ -50,13 +50,13 @@ export default function MotorNav({ active, onNavigate, onExit, onBack, crumb }: 
           ))}
         </nav>
       </div>
-      <nav className="md:hidden flex overflow-x-auto border-t border-zinc-900 px-2 [scrollbar-width:none]" aria-label="Navigation principale">
+      <nav className="md:hidden flex overflow-x-auto border-t border-zinc-900 px-1 [scrollbar-width:none]" aria-label="Navigation principale">
         {items.map((it) => (
           <button
             key={it.key}
             onClick={() => onNavigate(it.key)}
             aria-current={active === it.key ? 'page' : undefined}
-            className={`shrink-0 flex-1 px-2 min-h-11 text-[11px] font-bold uppercase tracking-wide border-b-4 whitespace-nowrap ${
+            className={`flex-auto px-1.5 min-h-11 text-[10px] min-[420px]:text-[11px] font-bold uppercase tracking-normal border-b-4 whitespace-nowrap ${
               active === it.key ? 'border-red-600 text-white' : 'border-transparent text-zinc-400'
             }`}
           >

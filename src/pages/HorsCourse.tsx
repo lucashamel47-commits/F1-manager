@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import MotorNav, { SectionTitle, type NavKey } from '../components/MotorNav'
-import SpeedTrail from '../components/SpeedTrail'
+import CarStage from '../components/CarStage'
 
 interface Props {
   onBack: () => void
@@ -40,13 +40,21 @@ const teams = [
 ]
 
 const calendar = [
-  { round: 18, name: 'United States', date: '23 – 25 octobre', circuit: 'Austin', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/USA_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/USA.jpg', length: '5,513 km', laps: 56, record: '1:36.169', recordDriver: 'C. Leclerc', history: 'Inauguré en 2012, conçu par Hermann Tilke. Circuit technique avec de longs virages et une grande ligne droite qui favorise les dépassements.', grip: 'Asphalte lisse, bon grip une fois en température. Usure modérée.', creator: 'Hermann Tilke' },
-  { round: 19, name: 'Mexico City', date: '30 oct – 1 nov', circuit: 'Mexico', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Mexico_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Mexico.jpg', length: '4,304 km', laps: 71, record: '1:17.774', recordDriver: 'V. Bottas', history: 'Autódromo Hermanos Rodríguez, rénové en 2015. L’altitude élevée (2200 m) réduit la puissance des moteurs et augmente l’usure des freins.', grip: 'Grip correct mais usure pneus importante à cause de l’air moins dense.', creator: 'Oscar Fernández' },
-  { round: 20, name: 'São Paulo', date: '6 – 8 novembre', circuit: 'Interlagos', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Brazil_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Brazil.jpg', length: '4,309 km', laps: 71, record: '1:10.540', recordDriver: 'V. Bottas', history: 'Circuit historique depuis 1940, plusieurs fois rénové. Connu pour ses dépassements et l’ambiance unique du public brésilien.', grip: 'Asphalte abrasif, grip moyen, forte usure des pneus.', creator: 'Hermann Tilke (rénovation)' },
-  { round: 21, name: 'Las Vegas', date: '19 – 21 novembre', circuit: 'Las Vegas', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Las_Vegas_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/USA.jpg', length: '6,201 km', laps: 50, record: '1:34.119', recordDriver: 'O. Piastri', history: 'Circuit urbain inauguré en 2023. Très long avec une grande ligne droite sur le Strip. Course de nuit spectaculaire.', grip: 'Asphalte neuf, grip qui évolue fortement pendant le week-end.', creator: 'Hermann Tilke' },
-  { round: 22, name: 'Qatar', date: '27 – 29 novembre', circuit: 'Lusail', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Qatar_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Qatar.jpg', length: '5,419 km', laps: 57, record: '1:22.384', recordDriver: 'M. Verstappen', history: 'Circuit moderne inauguré en 2004, utilisé en F1 depuis 2021. Très exigeant physiquement avec de nombreux virages rapides.', grip: 'Asphalte abrasif, grip élevé mais usure importante.', creator: 'Hermann Tilke' },
-  { round: 23, name: 'Abu Dhabi', date: '4 – 6 décembre', circuit: 'Yas Marina', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Abu_Dhabi_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Abu_Dhabi.jpg', length: '5,281 km', laps: 58, record: '1:26.103', recordDriver: 'M. Verstappen', history: 'Circuit inauguré en 2009, rénové en 2021. Course de nuit sous les lumières, dernier Grand Prix de la saison.', grip: 'Asphalte lisse, grip stable tout le week-end.', creator: 'Hermann Tilke' },
+  { round: 18, iso: '2026-10-25', name: 'United States', date: '23 – 25 octobre', circuit: 'Austin', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/USA_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/USA.jpg', length: '5,513 km', laps: 56, record: '1:36.169', recordDriver: 'C. Leclerc', history: 'Inauguré en 2012, conçu par Hermann Tilke. Circuit technique avec de longs virages et une grande ligne droite qui favorise les dépassements.', grip: 'Asphalte lisse, bon grip une fois en température. Usure modérée.', creator: 'Hermann Tilke' },
+  { round: 19, iso: '2026-11-01', name: 'Mexico City', date: '30 oct – 1 nov', circuit: 'Mexico', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Mexico_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Mexico.jpg', length: '4,304 km', laps: 71, record: '1:17.774', recordDriver: 'V. Bottas', history: 'Autódromo Hermanos Rodríguez, rénové en 2015. L’altitude élevée (2200 m) réduit la puissance des moteurs et augmente l’usure des freins.', grip: 'Grip correct mais usure pneus importante à cause de l’air moins dense.', creator: 'Oscar Fernández' },
+  { round: 20, iso: '2026-11-08', name: 'São Paulo', date: '6 – 8 novembre', circuit: 'Interlagos', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Brazil_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Brazil.jpg', length: '4,309 km', laps: 71, record: '1:10.540', recordDriver: 'V. Bottas', history: 'Circuit historique depuis 1940, plusieurs fois rénové. Connu pour ses dépassements et l’ambiance unique du public brésilien.', grip: 'Asphalte abrasif, grip moyen, forte usure des pneus.', creator: 'Hermann Tilke (rénovation)' },
+  { round: 21, iso: '2026-11-22', name: 'Las Vegas', date: '19 – 21 novembre', circuit: 'Las Vegas', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Las_Vegas_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/USA.jpg', length: '6,201 km', laps: 50, record: '1:34.119', recordDriver: 'O. Piastri', history: 'Circuit urbain inauguré en 2023. Très long avec une grande ligne droite sur le Strip. Course de nuit spectaculaire.', grip: 'Asphalte neuf, grip qui évolue fortement pendant le week-end.', creator: 'Hermann Tilke' },
+  { round: 22, iso: '2026-11-29', name: 'Qatar', date: '27 – 29 novembre', circuit: 'Lusail', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Qatar_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Qatar.jpg', length: '5,419 km', laps: 57, record: '1:22.384', recordDriver: 'M. Verstappen', history: 'Circuit moderne inauguré en 2004, utilisé en F1 depuis 2021. Très exigeant physiquement avec de nombreux virages rapides.', grip: 'Asphalte abrasif, grip élevé mais usure importante.', creator: 'Hermann Tilke' },
+  { round: 23, iso: '2026-12-06', name: 'Abu Dhabi', date: '4 – 6 décembre', circuit: 'Yas Marina', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Abu_Dhabi_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Abu_Dhabi.jpg', length: '5,281 km', laps: 58, record: '1:26.103', recordDriver: 'M. Verstappen', history: 'Circuit inauguré en 2009, rénové en 2021. Course de nuit sous les lumières, dernier Grand Prix de la saison.', grip: 'Asphalte lisse, grip stable tout le week-end.', creator: 'Hermann Tilke' },
 ]
+
+/** Index du prochain GP : première course dont le jour de course (iso) n'est pas encore passé. */
+const findNextRace = () => {
+  const n = new Date()
+  const today = `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`
+  const i = calendar.findIndex((r) => r.iso >= today)
+  return i === -1 ? calendar.length - 1 : i
+}
 
 const carImageFor = (teamName: string) => {
   const n = teamName.toLowerCase()
@@ -73,6 +81,8 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
   const [selectedDrivers, setSelectedDrivers] = useState<string[]>([])
   const [showWelcome, setShowWelcome] = useState(false)
   const [welcomeDone, setWelcomeDone] = useState(false)
+  const [nextIdx] = useState(findNextRace)
+  const nextRace = calendar[nextIdx]
   const [subPage, setSubPage] = useState<'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'circuit' | 'stats-constructors'>('home')
   const [liveStandings, setLiveStandings] = useState<any[]>([])
   const [liveConstructors, setLiveConstructors] = useState<any[]>([])
@@ -131,13 +141,14 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
   }
 
   const getDaysUntilRace = () => {
-    const raceDate = new Date('2026-10-25T00:00:00')
+    const raceDate = new Date(`${nextRace.iso}T00:00:00`)
     const now = new Date()
     now.setHours(0, 0, 0, 0)
-    const diff = Math.ceil((raceDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-    if (diff <= 0) return 'Aujourd’hui'
-    if (diff === 1) return '1 jour'
-    return `${diff} jours`
+    const diff = Math.round((raceDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    if (diff < 0) return 'Terminé'
+    if (diff === 0) return 'Aujourd’hui'
+    if (diff === 1) return 'Demain'
+    return `Dans ${diff} jours`
   }
 
   const getColor = (teamName: string) => {
@@ -213,7 +224,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
     }
 
     if (subPage === 'circuit') {
-      const cota = calendar[0]
+      const cota = nextRace
       return (
         <div className="min-h-dvh w-full flex flex-col bg-black text-white">
           {nav(() => setSubPage('home'), "Circuit")}
@@ -221,10 +232,10 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
             <div className="md:col-span-2 border-l-4 border-red-600 pl-4">
               <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-2">Prochain GP</p>
               <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight leading-none mt-1">{cota.name}</h1>
-              <p className="text-sm text-zinc-400 mt-2">{cota.circuit} • Austin</p>
+              <p className="text-sm text-zinc-400 mt-2">{cota.circuit}</p>
             </div>
             <div className="relative rounded-sm overflow-hidden border border-zinc-900 select-none touch-none" onMouseDown={() => setIsActive(true)} onMouseUp={() => { setIsActive(false); setHover(null) }} onMouseLeave={() => { setIsActive(false); setHover(null) }} onMouseMove={(e) => handleTrackMove(e.clientX, e.clientY, e.currentTarget.getBoundingClientRect())} onTouchStart={() => setIsActive(true)} onTouchEnd={() => { setIsActive(false); setHover(null) }} onTouchMove={(e) => { e.preventDefault(); const touch = e.touches[0]; handleTrackMove(touch.clientX, touch.clientY, e.currentTarget.getBoundingClientRect()) }}>
-              <img src={cota.map} alt="COTA" className="w-full h-auto max-h-[60vh] object-contain bg-zinc-950 pointer-events-none" />
+              <img src={cota.map} alt={`Plan du circuit de ${cota.circuit}`} className="w-full h-auto max-h-[60vh] object-contain bg-zinc-950 pointer-events-none" />
               {hover && isActive && (
                 <div className="absolute bg-black/95 border border-zinc-700 rounded-sm px-4 py-2 text-center text-xs shadow-xl pointer-events-none whitespace-nowrap" style={{ left: `${Math.min(85, Math.max(15, hover.x * 100))}%`, top: hover.y < 0.25 ? `${hover.y * 100 + 12}%` : `${Math.max(8, hover.y * 100)}%`, transform: hover.y < 0.25 ? 'translate(-50%, 0)' : 'translate(-50%, -140%)' }}>
                   <p className="font-semibold text-white">{hover.speed} km/h</p>
@@ -232,7 +243,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
                 </div>
               )}
             </div>
-            <img src={cota.photo} alt="COTA photo" className="w-full h-auto rounded-sm border border-zinc-800" />
+            <img src={cota.photo} alt={`Photo ${cota.circuit}`} className="w-full h-auto rounded-sm border border-zinc-800" />
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:col-span-2">
               <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Longueur</p><p className="font-semibold mt-1">{cota.length}</p></div>
               <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Tours</p><p className="font-semibold mt-1">{cota.laps}</p></div>
@@ -502,9 +513,8 @@ if (subPage === 'stats-constructors') {
         <div className="px-4 sm:px-6 lg:px-10 xl:px-14 pt-6 pb-16 w-full flex-1 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:content-start">
           <div className="lg:col-span-2 mb-6 flex items-center justify-between gap-4"><SectionTitle h1 kicker="Écurie 2026" title={selectedTeamStats.Constructor.name} /><img src={teamLogo} alt="" className="h-10 sm:h-14 max-w-[30%] object-contain" /></div>
 
-          <div className="relative rounded-sm overflow-hidden border border-zinc-800 bg-black h-48 sm:h-64 md:h-80 lg:h-full lg:min-h-[28rem] flex items-center justify-center mb-6 sm:mb-8 lg:mb-0">
-            <SpeedTrail color={trailColor(selectedTeamStats.Constructor.name)} />
-            <img src={carImage} alt="" className="relative max-w-full max-h-full object-contain mix-blend-screen" />
+          <div className="relative rounded-sm overflow-hidden border border-zinc-800 bg-black [container-type:size] h-48 sm:h-64 md:h-80 lg:h-full lg:min-h-[28rem] flex items-center justify-start mb-6 sm:mb-8 lg:mb-0">
+            <CarStage src={carImage} className="w-[min(86cqw,148.6cqh)] ml-[1%] shrink-0" />
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1 items-start">
@@ -570,9 +580,8 @@ if (subPage === 'stats-constructors') {
         {liveConstructors.length === 0 && <p className="col-span-full text-zinc-500 text-sm">Chargement...</p>}
         {liveConstructors.map((t, i) => (
           <button key={t.Constructor.constructorId} onClick={() => setSelectedTeamStats(t)} className="group text-left bg-zinc-950 border border-zinc-800 hover:border-red-600 overflow-hidden transition">
-            <div className="relative aspect-video overflow-hidden bg-black">
-              <SpeedTrail color={trailColor(t.Constructor.name)} />
-              <img src={carImageFor(t.Constructor.name)} alt="" loading="lazy" className="relative w-full h-full object-contain mix-blend-screen" />
+            <div className="relative aspect-video overflow-hidden bg-black [container-type:size] flex items-center justify-start">
+              <CarStage src={carImageFor(t.Constructor.name)} className="w-[min(86cqw,148.6cqh)] ml-[1%] shrink-0" />
               <span className="absolute top-3 left-3 bg-red-600 text-white text-[11px] font-bold uppercase tracking-widest px-2 py-1">P{i + 1}</span>
             </div>
             <div className="p-4 flex items-end justify-between gap-3" style={{ borderTop: `3px solid ${trailColor(t.Constructor.name)}` }}>
@@ -699,12 +708,12 @@ if (subPage === 'stats-constructors') {
             onKeyDown={(e) => { if (e.key === 'Enter') setSubPage('circuit') }}
             className="group relative block w-full overflow-hidden border-b border-zinc-800 cursor-pointer"
           >
-            <img src={calendar[0].photo} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition duration-700" />
+            <img src={nextRace.photo} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition duration-700" />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/10" />
             <div className="relative min-h-[22rem] sm:min-h-[26rem] lg:min-h-[30rem] xl:min-h-[34rem] flex flex-col justify-end px-4 sm:px-6 lg:px-10 xl:px-14 pb-6 sm:pb-10 pt-24">
-              <span className="self-start bg-red-600 text-white text-[11px] font-bold uppercase tracking-widest px-2 py-1">Prochain GP • Round {calendar[0].round}</span>
-              <h1 className="mt-3 font-black uppercase leading-[0.95] tracking-tight text-5xl sm:text-6xl lg:text-8xl">{calendar[0].name}</h1>
-              <p className="mt-3 text-zinc-300 text-sm sm:text-base">{calendar[0].date} • {calendar[0].circuit} • <span className="text-white font-semibold">{getDaysUntilRace()}</span></p>
+              <span className="self-start bg-red-600 text-white text-[11px] font-bold uppercase tracking-widest px-2 py-1">Prochain GP • Round {nextRace.round}</span>
+              <h1 className="mt-3 font-black uppercase leading-[0.95] tracking-tight text-5xl sm:text-6xl lg:text-8xl">{nextRace.name}</h1>
+              <p className="mt-3 text-zinc-300 text-sm sm:text-base">{nextRace.date} • {nextRace.circuit} • <span className="text-white font-semibold">{getDaysUntilRace()}</span></p>
               <span className="mt-5 self-start inline-flex items-center min-h-11 bg-white text-black font-bold uppercase text-xs tracking-widest px-5">Voir le circuit →</span>
             </div>
           </div>
@@ -715,7 +724,7 @@ if (subPage === 'stats-constructors') {
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {[
                   { key: 'standings' as const, tag: 'Classements', title: 'Le championnat pilotes et constructeurs', img: '/cars/mercedes.jpeg', big: true },
-                  { key: 'calendar' as const, tag: 'Calendrier', title: 'Toutes les courses de la saison', img: calendar[1].photo },
+                  { key: 'calendar' as const, tag: 'Calendrier', title: 'Toutes les courses de la saison', img: (calendar[nextIdx + 1] ?? nextRace).photo },
                   { key: 'stats' as const, tag: 'Statistiques', title: 'Chiffres, écarts et écuries', img: '/cars/ferrari.jpeg' },
                   { key: 'favorites' as const, tag: 'Favoris', title: 'Ton pilote et ton écurie', img: drivers.find(d => d.id === favDriver)?.photo || '/cars/mclaren.jpeg' },
                 ].map((t) => (
@@ -751,7 +760,8 @@ if (subPage === 'stats-constructors') {
               <section>
                 <SectionTitle kicker="À suivre" title="Prochaines courses" className="mb-4" />
                 <div className="border border-zinc-800 bg-zinc-950 divide-y divide-zinc-800">
-                  {calendar.slice(1, 5).map((race) => (
+                  {calendar.slice(nextIdx + 1, nextIdx + 5).length === 0 && <p className="p-4 text-sm text-zinc-500">Dernière course de la saison.</p>}
+                  {calendar.slice(nextIdx + 1, nextIdx + 5).map((race) => (
                     <button key={race.round} onClick={() => { setSelectedRace(race); setSubPage('calendar') }} className="w-full flex items-center justify-between gap-3 px-4 min-h-14 text-left hover:bg-zinc-900 transition">
                       <span className="min-w-0">
                         <span className="block text-sm font-bold uppercase truncate">{race.name}</span>

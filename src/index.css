@@ -150,48 +150,37 @@ img, canvas {
   pointer-events: none;
   filter: blur(0.5px);
 }
-/* Traînée de vitesse derrière les monoplaces */
+/* Traînée de vitesse blanche derrière les monoplaces (voiture orientée vers la gauche) */
+.car-stage {
+  aspect-ratio: 1712 / 1152;
+}
+
 .speed-trail-wrap {
   position: absolute;
   inset: 0;
-  overflow: hidden;
   pointer-events: none;
-}
-
-.trail-glow {
-  position: absolute;
-  inset: 20% 5%;
-  background: radial-gradient(ellipse at 60% 55%, var(--trail) 0%, transparent 62%);
-  opacity: 0.22;
-  filter: blur(18px);
-  animation: trail-glow 2.4s ease-in-out infinite;
 }
 
 .speed-trail {
   position: absolute;
-  left: 100%;
+  left: 84%;
   border-radius: 9999px;
-  background: linear-gradient(90deg, #fff 0%, var(--trail) 22%, transparent 100%);
-  box-shadow: 0 0 10px var(--trail);
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.7) 50%, #fff 100%);
+  box-shadow: 0 0 10px rgba(255,255,255,0.9);
   opacity: 0;
   animation-name: trail-flow;
-  animation-timing-function: linear;
+  animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1);
   animation-iteration-count: infinite;
 }
 
 @keyframes trail-flow {
-  0% { left: 100%; opacity: 0; }
-  12% { opacity: 0.9; }
-  80% { opacity: 0.9; }
-  100% { left: -70%; opacity: 0; }
-}
-
-@keyframes trail-glow {
-  0%, 100% { opacity: 0.16; }
-  50% { opacity: 0.32; }
+  0% { left: 84%; opacity: 0; }
+  15% { opacity: 1; }
+  70% { opacity: 0.85; }
+  100% { left: 135%; opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .speed-trail, .trail-glow { animation: none; }
-  .speed-trail { opacity: 0.5; left: 40%; }
+  .speed-trail { animation: none; opacity: 0.55; left: 90%; }
 }
+
