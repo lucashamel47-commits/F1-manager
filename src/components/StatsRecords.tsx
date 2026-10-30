@@ -3,11 +3,13 @@ import { SectionTitle } from './MotorNav'
 import { constructorChampions, driverChampions, type Champion } from '../data/champions'
 import { RECORDS_AS_OF, constructorRecords, driverRecords, seasonFacts, type RecordCat, type RecordEntry } from '../data/records'
 import { getSeasonTop, season, type SeasonSummary } from '../lib/f1api'
+import { CountryBars, DecadeChart, TitlesRace } from './RecordCharts'
+import { colorFor } from '../lib/teamColors'
 
 type Kind = 'drivers' | 'constructors'
 
 const LIMIT = 10
-const FACTS_VISIBLE = 4
+const FACTS_VISIBLE = 6
 const ordinal = (n: number) => (n === 1 ? '1er titre' : `${n}e titre`)
 
 const CATS: { key: RecordCat; label: string; unit: string }[] = [
@@ -55,6 +57,8 @@ function RecordBoard() {
   const active = cats.some((c) => c.key === cat) ? cat : 'titles'
   const rows: RecordEntry[] = table[active] ?? []
   const unit = CATS.find((c) => c.key === active)?.unit ?? ''
+  const max = Math.max(1, ...rows.map((r) => r.value))
+  const [sel, setSel] = useState<string | null>(null)
 
   return (
     <section aria-labelledby="rec-board" className="min-w-0">
@@ -73,18 +77,33 @@ function RecordBoard() {
           </button>
         ))}
       </div>
-      <ol className="divide-y divide-zinc-900">
+      <ol className="divide-y divide-zinc-900" key={`${kind}-${active}`}>
         {rows.map((r, i) => (
-          <li key={r.name} className="flex items-baseline gap-4 py-3.5">
-            <span className="w-5 shrink-0 text-sm text-zinc-600 tabular-nums">{i + 1}</span>
-            <div className="min-w-0 flex-1">
-              <p className={`truncate ${i === 0 ? 'text-lg font-bold' : 'text-base text-zinc-200'}`}>{r.name}</p>
-              {(r.note || r.team) && <p className="text-xs text-zinc-500 truncate">{r.note ?? r.team}</p>}
-            </div>
-            <p className="shrink-0 text-right">
-              <span className={`tabular-nums ${i === 0 ? 'text-2xl font-bold text-white' : 'text-lg font-semibold text-zinc-300'}`}>{r.value}</span>
-              <span className="sr-only"> {unit}</span>
-            </p>
+          <li key={r.name}>
+            <button
+              onClick={() => setSel(sel === r.name ? null : r.name)}
+              onMouseEnter={() => setSel(r.name)}
+              onMouseLeave={() => setSel(null)}
+              onFocus={() => setSel(r.name)}
+              onBlur={() => setSel(null)}
+              aria-label={`${r.name} : ${r.value} ${unit}, ${Math.round((r.value / max) * 100)} % du record`}
+              className={`w-full text-left py-3 transition-opacity ${sel && sel !== r.name ? 'opacity-50' : ''}`}
+            >
+              <span className="flex items-baseline gap-4">
+                <span className="w-5 shrink-0 text-sm text-zinc-600 tabular-nums">{i + 1}</span>
+                <span className="min-w-0 flex-1">
+                  <span className={`block truncate ${i === 0 ? 'text-lg font-bold' : 'text-base text-zinc-200'}`}>{r.name}</span>
+                  {(r.note || r.team) && <span className="block text-xs text-zinc-500 truncate">{r.note ?? r.team}</span>}
+                </span>
+                <span className={`shrink-0 tabular-nums ${i === 0 ? 'text-2xl font-bold text-white' : 'text-lg font-semibold text-zinc-300'}`}>
+                  {r.value}
+                  <span className="sr-only"> {unit}</span>
+                </span>
+              </span>
+              <span className="mt-2 ml-9 block h-1 bg-zinc-900 overflow-hidden" aria-hidden>
+                <span className="grow-x block h-full" style={{ width: `${(r.value / max) * 100}%`, background: colorFor(r.team), opacity: sel === r.name || i === 0 ? 0.9 : 0.55, animationDelay: `${i * 50}ms` }} />
+              </span>
+            </button>
           </li>
         ))}
       </ol>
@@ -100,10 +119,10 @@ function Facts() {
   return (
     <section aria-labelledby="rec-facts" className="min-w-0">
       <Heading id="rec-facts" kicker="Records de référence" title="Faits marquants" />
-      <dl className="divide-y divide-zinc-900 border-y border-zinc-900">
+      <dl className="grid md:grid-cols-2 xl:grid-cols-3 md:gap-x-12 border-t border-zinc-900">
         {list.map((f) => (
-          <div key={f.label} className="flex items-baseline gap-4 py-3.5">
-            <dt className="w-20 sm:w-24 shrink-0 text-xl sm:text-2xl font-bold tabular-nums">{f.value}</dt>
+          <div key={f.label} className="flex items-baseline gap-4 py-3.5 border-b border-zinc-900">
+            <dt className="w-20 sm:w-24 shrink-0 text-xl sm:text-2xl font-bold tabular-nums whitespace-nowrap">{f.value}</dt>
             <dd className="min-w-0 flex-1">
               <p className="text-sm sm:text-base text-zinc-200">{f.label}</p>
               <p className="text-xs text-zinc-500">{f.holder}</p>
@@ -334,10 +353,10 @@ export default function StatsRecords() {
     { big: String(constructorRecords.titles?.[0]?.value ?? ''), label: 'titres constructeurs', who: constructorRecords.titles?.[0]?.name ?? '' },
   ]
   return (
-    <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-8 sm:py-10 w-full max-w-[1400px] flex-1 space-y-14 sm:space-y-16">
+    <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-8 sm:py-10 w-full max-w-[1600px] flex-1 space-y-14 sm:space-y-16">
       <SectionTitle h1 kicker="Statistiques" title="Records & Historique" />
 
-      <dl className="grid grid-cols-2 lg:grid-cols-4 gap-y-8 gap-x-6 border-t border-zinc-900 pt-8">
+      <dl className="grid grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-6 border-t border-zinc-900 pt-8">
         {heroes.map((h) => (
           <div key={h.label}>
             <dt className="text-xs text-zinc-500 uppercase tracking-[0.15em]">{h.label}</dt>
@@ -349,14 +368,36 @@ export default function StatsRecords() {
         ))}
       </dl>
 
-      <div className="grid gap-14 sm:gap-16 xl:grid-cols-2 xl:gap-x-16 items-start">
+      <div className="grid gap-14 sm:gap-16 md:grid-cols-2 md:gap-x-10 lg:gap-x-14 xl:gap-x-20 items-start">
         <RecordBoard />
         <Champions />
       </div>
 
-      <div className="max-w-2xl">
-        <Facts />
-      </div>
+      <section aria-labelledby="rec-charts" className="min-w-0">
+        <div className="mb-6">
+          <p className="text-zinc-500 text-xs uppercase tracking-[0.2em]">En graphiques</p>
+          <h2 id="rec-charts" className="mt-1 text-xl sm:text-2xl font-bold tracking-tight">70 ans de Formule 1 en un coup d’œil</h2>
+        </div>
+        <div className="grid gap-12 md:grid-cols-2 md:gap-x-10 lg:gap-x-14 xl:grid-cols-3 xl:gap-x-16">
+          <div className="min-w-0 md:col-span-2 xl:col-span-1">
+            <h3 className="text-sm font-semibold text-zinc-200">La course aux titres</h3>
+            <p className="text-xs text-zinc-500 mb-3">Titres pilote cumulés, 1950 → 2025</p>
+            <TitlesRace />
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold text-zinc-200">Les dynasties par décennie</h3>
+            <p className="text-xs text-zinc-500 mb-3">Titres constructeurs par écurie</p>
+            <DecadeChart />
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold text-zinc-200">Titres par pays</h3>
+            <p className="text-xs text-zinc-500 mb-3">Les 7 nations les plus titrées</p>
+            <CountryBars />
+          </div>
+        </div>
+      </section>
+
+      <Facts />
 
       <p className="text-xs text-zinc-600 leading-relaxed border-t border-zinc-900 pt-5 max-w-3xl">{RECORDS_AS_OF}</p>
     </div>

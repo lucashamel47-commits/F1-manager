@@ -641,7 +641,7 @@ if (subPage === 'stats-constructors') {
           <div className="px-4 sm:px-6 lg:px-10 xl:px-14 pt-6 w-full">
             {statsTabs('overview')}
           </div>
-          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1 grid content-start gap-7 lg:grid-cols-2 lg:gap-x-8 items-start">
+          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1 grid content-start gap-7 md:grid-cols-2 md:gap-x-8 items-start">
             <SectionTitle h1 kicker="Saison 2026" title="Statistiques" className="col-span-full" />
             <div>
               <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-4">Title Fight</p>
