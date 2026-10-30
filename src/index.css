@@ -68,6 +68,25 @@ html, body, #root {
   background: #000;
   min-height: 100%;
 }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  overflow-x: clip;
+  -webkit-tap-highlight-color: transparent;
+}
+
+img, canvas {
+  max-width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee, .animate-wind { animation: none; }
+}
 @keyframes fadeIn {
   to { opacity: 1; }
 }

@@ -50,7 +50,6 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
   const driverKey = `f1-fav-drivers-${userEmail}`
   const teamKey = `f1-fav-team-${userEmail}`
   const validateRef = useRef<HTMLButtonElement>(null)
-  const [openSection, setOpenSection] = useState<string | null>(null)
 
   const [step, setStep] = useState<'driver' | 'team' | 'done'>('driver')
   const [selectedDrivers, setSelectedDrivers] = useState<string[]>([])
@@ -162,8 +161,8 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
     if (showWelcome && !welcomeDone) {
       const text = 'Bienvenue dans le mode Hors Course'
       return (
-        <div className="min-h-screen bg-black text-white flex items-center justify-center">
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-center px-6">
+        <div className="min-h-dvh bg-black text-white flex items-center justify-center">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight text-center px-6">
             {text.split('').map((char, i) => (
               <span key={i} className="inline-block opacity-0 animate-fadeIn" style={{ animationDelay: `${i * 40}ms` }}>
                 {char === ' ' ? '\u00A0' : char}
@@ -177,36 +176,36 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
     if (subPage === 'circuit') {
       const cota = calendar[0]
       return (
-        <div className="min-h-screen bg-black text-white">
-          <header className="flex items-center justify-between px-6 py-5 border-b border-zinc-900">
-            <button onClick={() => setSubPage('home')} className="text-sm text-zinc-500">← Retour</button>
+        <div className="min-h-dvh bg-black text-white">
+          <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 py-2 sm:py-4 border-b border-zinc-900">
+            <button onClick={() => setSubPage('home')} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
             <p className="text-xs tracking-widest uppercase text-zinc-600">Circuit</p>
-            <div className="w-12" />
+            <div className="min-w-20" aria-hidden="true" />
           </header>
-          <div className="px-6 py-6 max-w-md mx-auto space-y-6">
+          <div className="px-4 sm:px-6 py-6 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto space-y-6">
             <div className="text-center">
-              <p className="text-red-600 text-[10px] tracking-[0.5em] uppercase mb-2">Prochain GP</p>
-              <h1 className="text-2xl font-black">{cota.name}</h1>
+              <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-2">Prochain GP</p>
+              <h1 className="text-2xl md:text-3xl font-black">{cota.name}</h1>
               <p className="text-sm text-zinc-500 mt-1">{cota.circuit} • Austin</p>
             </div>
             <div className="relative rounded-2xl overflow-hidden border border-zinc-900 select-none touch-none" onMouseDown={() => setIsActive(true)} onMouseUp={() => { setIsActive(false); setHover(null) }} onMouseLeave={() => { setIsActive(false); setHover(null) }} onMouseMove={(e) => handleTrackMove(e.clientX, e.clientY, e.currentTarget.getBoundingClientRect())} onTouchStart={() => setIsActive(true)} onTouchEnd={() => { setIsActive(false); setHover(null) }} onTouchMove={(e) => { e.preventDefault(); const touch = e.touches[0]; handleTrackMove(touch.clientX, touch.clientY, e.currentTarget.getBoundingClientRect()) }}>
-              <img src={cota.map} alt="COTA" className="w-full pointer-events-none" />
+              <img src={cota.map} alt="COTA" className="w-full h-auto pointer-events-none" />
               {hover && isActive && (
                 <div className="absolute bg-black/95 border border-zinc-700 rounded-xl px-4 py-2 text-center text-xs shadow-xl pointer-events-none whitespace-nowrap" style={{ left: `${Math.min(85, Math.max(15, hover.x * 100))}%`, top: hover.y < 0.25 ? `${hover.y * 100 + 12}%` : `${Math.max(8, hover.y * 100)}%`, transform: hover.y < 0.25 ? 'translate(-50%, 0)' : 'translate(-50%, -140%)' }}>
                   <p className="font-semibold text-white">{hover.speed} km/h</p>
-                  <p className="text-zinc-500 text-[10px] mt-0.5">Vitesse estimée</p>
+                  <p className="text-zinc-500 text-[11px] mt-0.5">Vitesse estimée</p>
                 </div>
               )}
             </div>
-            <img src={cota.photo} alt="COTA photo" className="w-full rounded-2xl border border-zinc-900" />
+            <img src={cota.photo} alt="COTA photo" className="w-full h-auto rounded-2xl border border-zinc-900" />
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-[11px] text-zinc-500">Longueur</p><p className="font-semibold mt-1">{cota.length}</p></div>
-              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-[11px] text-zinc-500">Tours</p><p className="font-semibold mt-1">{cota.laps}</p></div>
-              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 col-span-2"><p className="text-[11px] text-zinc-500">Record</p><p className="font-semibold mt-1">{cota.record}</p><p className="text-[10px] text-zinc-500 mt-0.5">{cota.recordDriver}</p></div>
+              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-xs text-zinc-500">Longueur</p><p className="font-semibold mt-1">{cota.length}</p></div>
+              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-xs text-zinc-500">Tours</p><p className="font-semibold mt-1">{cota.laps}</p></div>
+              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 col-span-2"><p className="text-xs text-zinc-500">Record</p><p className="font-semibold mt-1">{cota.record}</p><p className="text-[11px] text-zinc-500 mt-0.5">{cota.recordDriver}</p></div>
             </div>
-            <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-[11px] text-zinc-500">Histoire</p><p className="text-sm mt-1 leading-relaxed">{cota.history}</p></div>
-            <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-[11px] text-zinc-500">Grip</p><p className="text-sm mt-1">{cota.grip}</p></div>
-            <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-[11px] text-zinc-500">Concepteur</p><p className="text-sm mt-1">{cota.creator}</p></div>
+            <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-xs text-zinc-500">Histoire</p><p className="text-sm mt-1 leading-relaxed">{cota.history}</p></div>
+            <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-xs text-zinc-500">Grip</p><p className="text-sm mt-1">{cota.grip}</p></div>
+            <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-xs text-zinc-500">Concepteur</p><p className="text-sm mt-1">{cota.creator}</p></div>
           </div>
         </div>
       )
@@ -215,56 +214,56 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
     if (subPage === 'calendar') {
       if (selectedRace) {
         return (
-          <div className="min-h-screen bg-black text-white">
-            <header className="flex items-center justify-between px-6 py-5 border-b border-zinc-900">
-              <button onClick={() => setSelectedRace(null)} className="text-sm text-zinc-500">← Retour</button>
+          <div className="min-h-dvh bg-black text-white">
+            <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 py-2 sm:py-4 border-b border-zinc-900">
+              <button onClick={() => setSelectedRace(null)} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
               <p className="text-xs tracking-widest uppercase text-zinc-600">Course</p>
-              <div className="w-12" />
+              <div className="min-w-20" aria-hidden="true" />
             </header>
-            <div className="px-6 py-6 max-w-md mx-auto space-y-6">
+            <div className="px-4 sm:px-6 py-6 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto space-y-6">
               <div className="text-center">
-                <p className="text-red-600 text-[10px] tracking-[0.5em] uppercase mb-2">Round {selectedRace.round}</p>
-                <h1 className="text-2xl font-black">{selectedRace.name}</h1>
+                <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-2">Round {selectedRace.round}</p>
+                <h1 className="text-2xl md:text-3xl font-black">{selectedRace.name}</h1>
                 <p className="text-sm text-zinc-500 mt-1">{selectedRace.circuit} • {selectedRace.date}</p>
               </div>
               <div className="relative rounded-2xl overflow-hidden border border-zinc-900 select-none touch-none" onMouseDown={() => setIsActive(true)} onMouseUp={() => { setIsActive(false); setHover(null) }} onMouseLeave={() => { setIsActive(false); setHover(null) }} onMouseMove={(e) => handleTrackMove(e.clientX, e.clientY, e.currentTarget.getBoundingClientRect())} onTouchStart={() => setIsActive(true)} onTouchEnd={() => { setIsActive(false); setHover(null) }} onTouchMove={(e) => { e.preventDefault(); const touch = e.touches[0]; handleTrackMove(touch.clientX, touch.clientY, e.currentTarget.getBoundingClientRect()) }}>
-                <img src={selectedRace.map} alt={selectedRace.name} className="w-full pointer-events-none" />
+                <img src={selectedRace.map} alt={selectedRace.name} className="w-full h-auto pointer-events-none" />
                 {hover && isActive && (
                   <div className="absolute bg-black/95 border border-zinc-700 rounded-xl px-4 py-2 text-center text-xs shadow-xl pointer-events-none whitespace-nowrap" style={{ left: `${Math.min(85, Math.max(15, hover.x * 100))}%`, top: hover.y < 0.25 ? `${hover.y * 100 + 12}%` : `${Math.max(8, hover.y * 100)}%`, transform: hover.y < 0.25 ? 'translate(-50%, 0)' : 'translate(-50%, -140%)' }}>
                     <p className="font-semibold text-white">{hover.speed} km/h</p>
-                    <p className="text-zinc-500 text-[10px] mt-0.5">Vitesse estimée</p>
+                    <p className="text-zinc-500 text-[11px] mt-0.5">Vitesse estimée</p>
                   </div>
                 )}
               </div>
-              <img src={selectedRace.photo} alt={selectedRace.name} className="w-full rounded-2xl border border-zinc-900" />
+              <img src={selectedRace.photo} alt={selectedRace.name} className="w-full h-auto rounded-2xl border border-zinc-900" />
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-[11px] text-zinc-500">Longueur</p><p className="font-semibold mt-1">{selectedRace.length}</p></div>
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-[11px] text-zinc-500">Tours</p><p className="font-semibold mt-1">{selectedRace.laps}</p></div>
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 col-span-2"><p className="text-[11px] text-zinc-500">Record</p><p className="font-semibold mt-1">{selectedRace.record}</p><p className="text-[10px] text-zinc-500 mt-0.5">{selectedRace.recordDriver}</p></div>
+                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-xs text-zinc-500">Longueur</p><p className="font-semibold mt-1">{selectedRace.length}</p></div>
+                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-xs text-zinc-500">Tours</p><p className="font-semibold mt-1">{selectedRace.laps}</p></div>
+                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 col-span-2"><p className="text-xs text-zinc-500">Record</p><p className="font-semibold mt-1">{selectedRace.record}</p><p className="text-[11px] text-zinc-500 mt-0.5">{selectedRace.recordDriver}</p></div>
               </div>
-              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-[11px] text-zinc-500">Histoire</p><p className="text-sm mt-1 leading-relaxed">{selectedRace.history}</p></div>
-              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-[11px] text-zinc-500">Grip</p><p className="text-sm mt-1">{selectedRace.grip}</p></div>
-              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-[11px] text-zinc-500">Concepteur</p><p className="text-sm mt-1">{selectedRace.creator}</p></div>
+              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-xs text-zinc-500">Histoire</p><p className="text-sm mt-1 leading-relaxed">{selectedRace.history}</p></div>
+              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-xs text-zinc-500">Grip</p><p className="text-sm mt-1">{selectedRace.grip}</p></div>
+              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-xs text-zinc-500">Concepteur</p><p className="text-sm mt-1">{selectedRace.creator}</p></div>
             </div>
           </div>
         )
       }
 
       return (
-        <div className="min-h-screen bg-black text-white">
-          <header className="flex items-center justify-between px-6 py-5 border-b border-zinc-900">
-            <button onClick={() => setSubPage('home')} className="text-sm text-zinc-500">← Retour</button>
+        <div className="min-h-dvh bg-black text-white">
+          <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 py-2 sm:py-4 border-b border-zinc-900">
+            <button onClick={() => setSubPage('home')} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
             <p className="text-xs tracking-widest uppercase text-zinc-600">Calendrier</p>
-            <div className="w-12" />
+            <div className="min-w-20" aria-hidden="true" />
           </header>
-          <div className="px-6 py-8 max-w-md mx-auto space-y-3">
+          <div className="px-4 sm:px-6 py-6 sm:py-8 w-full max-w-md md:max-w-3xl lg:max-w-5xl mx-auto grid gap-3 md:grid-cols-2">
             {calendar.map((race) => (
-              <button key={race.round} onClick={() => setSelectedRace(race)} className="w-full flex items-center justify-between bg-zinc-950/40 border border-zinc-900/80 rounded-2xl px-5 py-4 text-left hover:border-zinc-700 transition">
+              <button key={race.round} onClick={() => setSelectedRace(race)} className="w-full flex items-center justify-between gap-3 bg-zinc-950/40 border border-zinc-900/80 rounded-2xl px-5 py-4 min-h-14 text-left hover:border-zinc-700 active:bg-zinc-900/60 transition">
                 <div>
                   <p className="text-sm font-medium">{race.name}</p>
-                  <p className="text-[11px] text-zinc-500">{race.circuit}</p>
+                  <p className="text-xs text-zinc-500">{race.circuit}</p>
                 </div>
-                <span className="text-xs text-zinc-400">{race.date}</span>
+                <span className="text-xs text-zinc-400 text-right shrink-0">{race.date}</span>
               </button>
             ))}
           </div>
@@ -277,28 +276,28 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
         const teamName = selectedDriver.Constructors[0]?.name || ''
         const nat = nationalityFR[selectedDriver.Driver.nationality] || selectedDriver.Driver.nationality
         return (
-          <div className="min-h-screen bg-black text-white">
-            <header className="flex items-center justify-between px-6 py-5 border-b border-zinc-900">
-              <button onClick={() => setSelectedDriver(null)} className="text-sm text-zinc-500">← Retour</button>
+          <div className="min-h-dvh bg-black text-white">
+            <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 py-2 sm:py-4 border-b border-zinc-900">
+              <button onClick={() => setSelectedDriver(null)} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
               <p className="text-xs tracking-widest uppercase text-zinc-600">Pilote</p>
-              <div className="w-12" />
+              <div className="min-w-20" aria-hidden="true" />
             </header>
-            <div className="px-6 py-8 max-w-md mx-auto space-y-6">
+            <div className="px-4 sm:px-6 py-8 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto space-y-6">
               <div className="text-center">
-                <div className="w-28 h-28 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl font-black text-white" style={{ backgroundColor: getColor(teamName) }}>
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl font-black text-white" style={{ backgroundColor: getColor(teamName) }}>
                   {selectedDriver.Driver.familyName.charAt(0)}
                 </div>
-                <h1 className="text-2xl font-black">{selectedDriver.Driver.givenName} {selectedDriver.Driver.familyName}</h1>
+                <h1 className="text-2xl md:text-3xl font-black">{selectedDriver.Driver.givenName} {selectedDriver.Driver.familyName}</h1>
                 <p className="text-sm text-zinc-500 mt-1">{teamName}</p>
               </div>
               <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4">
                 <p className="text-sm leading-relaxed text-zinc-300">Pilote de Formule 1 en compétition pour le championnat.</p>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-[11px] text-zinc-500">Points</p><p className="text-xl font-semibold mt-1">{selectedDriver.points}</p></div>
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-[11px] text-zinc-500">Victoires</p><p className="text-xl font-semibold mt-1">{selectedDriver.wins}</p></div>
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-[11px] text-zinc-500">Position</p><p className="text-xl font-semibold mt-1">{selectedDriver.position}</p></div>
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-[11px] text-zinc-500">Nationalité</p><p className="text-xl font-semibold mt-1">{nat}</p></div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-xs text-zinc-500">Points</p><p className="text-xl font-semibold mt-1">{selectedDriver.points}</p></div>
+                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-xs text-zinc-500">Victoires</p><p className="text-xl font-semibold mt-1">{selectedDriver.wins}</p></div>
+                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-xs text-zinc-500">Position</p><p className="text-xl font-semibold mt-1">{selectedDriver.position}</p></div>
+                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-xs text-zinc-500">Nationalité</p><p className="text-xl font-semibold mt-1 break-words">{nat}</p></div>
               </div>
             </div>
           </div>
@@ -308,19 +307,19 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
       if (selectedConstructor) {
         const nat = nationalityFR[selectedConstructor.Constructor.nationality] || selectedConstructor.Constructor.nationality
         return (
-          <div className="min-h-screen bg-black text-white">
-            <header className="flex items-center justify-between px-6 py-5 border-b border-zinc-900">
-              <button onClick={() => setSelectedConstructor(null)} className="text-sm text-zinc-500">← Retour</button>
+          <div className="min-h-dvh bg-black text-white">
+            <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 py-2 sm:py-4 border-b border-zinc-900">
+              <button onClick={() => setSelectedConstructor(null)} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
               <p className="text-xs tracking-widest uppercase text-zinc-600">Écurie</p>
-              <div className="w-12" />
+              <div className="min-w-20" aria-hidden="true" />
             </header>
-            <div className="px-6 py-8 max-w-md mx-auto space-y-6">
-              <h1 className="text-2xl font-black text-center">{selectedConstructor.Constructor.name}</h1>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-[11px] text-zinc-500">Points</p><p className="text-xl font-semibold mt-1">{selectedConstructor.points}</p></div>
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-[11px] text-zinc-500">Victoires</p><p className="text-xl font-semibold mt-1">{selectedConstructor.wins}</p></div>
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-[11px] text-zinc-500">Position</p><p className="text-xl font-semibold mt-1">{selectedConstructor.position}</p></div>
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-[11px] text-zinc-500">Nationalité</p><p className="text-xl font-semibold mt-1">{nat}</p></div>
+            <div className="px-4 sm:px-6 py-8 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto space-y-6">
+              <h1 className="text-2xl md:text-3xl font-black text-center">{selectedConstructor.Constructor.name}</h1>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-xs text-zinc-500">Points</p><p className="text-xl font-semibold mt-1">{selectedConstructor.points}</p></div>
+                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-xs text-zinc-500">Victoires</p><p className="text-xl font-semibold mt-1">{selectedConstructor.wins}</p></div>
+                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-xs text-zinc-500">Position</p><p className="text-xl font-semibold mt-1">{selectedConstructor.position}</p></div>
+                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-xs text-zinc-500">Nationalité</p><p className="text-xl font-semibold mt-1 break-words">{nat}</p></div>
               </div>
             </div>
           </div>
@@ -328,37 +327,37 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
       }
 
       return (
-        <div className="min-h-screen bg-black text-white">
-          <header className="flex items-center justify-between px-6 py-5 border-b border-zinc-900">
-            <button onClick={() => setSubPage('home')} className="text-sm text-zinc-500">← Retour</button>
+        <div className="min-h-dvh bg-black text-white">
+          <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 py-2 sm:py-4 border-b border-zinc-900">
+            <button onClick={() => setSubPage('home')} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
             <p className="text-xs tracking-widest uppercase text-zinc-600">Classements</p>
-            <div className="w-12" />
+            <div className="min-w-20" aria-hidden="true" />
           </header>
-          <div className="px-6 py-6 max-w-md mx-auto">
-            <div className="flex gap-2 mb-6">
+          <div className="px-4 sm:px-6 py-6 w-full max-w-md md:max-w-3xl lg:max-w-5xl mx-auto">
+            <div className="flex gap-2 mb-6 max-w-md mx-auto">
               <button onClick={() => setStandingsTab('drivers')} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition ${standingsTab === 'drivers' ? 'bg-red-600 text-white' : 'bg-zinc-950 border border-zinc-800 text-zinc-400'}`}>Pilotes</button>
               <button onClick={() => setStandingsTab('constructors')} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition ${standingsTab === 'constructors' ? 'bg-red-600 text-white' : 'bg-zinc-950 border border-zinc-800 text-zinc-400'}`}>Constructeurs</button>
             </div>
-            <div className="space-y-3">
+            <div className="grid gap-3 md:grid-cols-2">
               {standingsTab === 'drivers' ? (
                 liveStandings.length === 0 ? <p className="text-center text-zinc-500 text-sm">Chargement...</p> :
                 liveStandings.map((d, i) => {
                   const teamName = d.Constructors[0]?.name || ''
                   return (
-                    <button key={d.Driver.driverId} onClick={() => setSelectedDriver(d)} className="w-full flex items-center justify-between bg-zinc-950/40 border border-zinc-900/80 rounded-2xl px-5 py-4 text-left hover:border-zinc-700 transition">
-                      <div className="flex items-center gap-4">
+                    <button key={d.Driver.driverId} onClick={() => setSelectedDriver(d)} className="w-full flex items-center justify-between gap-3 bg-zinc-950/40 border border-zinc-900/80 rounded-2xl px-4 sm:px-5 py-4 min-h-14 text-left hover:border-zinc-700 active:bg-zinc-900/60 transition">
+                      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                         <span className="text-sm font-medium text-zinc-600 w-6">{i + 1}</span>
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: getColor(teamName) }}>
+                        <div className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: getColor(teamName) }}>
                           {d.Driver.familyName.charAt(0)}
                         </div>
-                        <div>
-                          <p className="text-sm font-medium">{d.Driver.givenName} {d.Driver.familyName}</p>
-                          <p className="text-[11px] text-zinc-500">{teamName}</p>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium truncate">{d.Driver.givenName} {d.Driver.familyName}</p>
+                          <p className="text-xs text-zinc-500">{teamName}</p>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right shrink-0">
                         <span className="text-sm font-semibold text-zinc-300">{d.points}</span>
-                        <p className="text-[10px] text-zinc-500">{d.wins} win{Number(d.wins) !== 1 ? 's' : ''}</p>
+                        <p className="text-[11px] text-zinc-500">{d.wins} win{Number(d.wins) !== 1 ? 's' : ''}</p>
                       </div>
                     </button>
                   )
@@ -366,14 +365,14 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
               ) : (
                 liveConstructors.length === 0 ? <p className="text-center text-zinc-500 text-sm">Chargement...</p> :
                 liveConstructors.map((t, i) => (
-                  <button key={t.Constructor.constructorId} onClick={() => setSelectedConstructor(t)} className="w-full flex items-center justify-between bg-zinc-950/40 border border-zinc-900/80 rounded-2xl px-5 py-4 text-left hover:border-zinc-700 transition">
-                    <div className="flex items-center gap-4">
+                  <button key={t.Constructor.constructorId} onClick={() => setSelectedConstructor(t)} className="w-full flex items-center justify-between gap-3 bg-zinc-950/40 border border-zinc-900/80 rounded-2xl px-4 sm:px-5 py-4 min-h-14 text-left hover:border-zinc-700 active:bg-zinc-900/60 transition">
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                       <span className="text-sm font-medium text-zinc-600 w-6">{i + 1}</span>
                       <p className="text-sm font-medium">{t.Constructor.name}</p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right shrink-0">
                       <span className="text-sm font-semibold text-zinc-300">{t.points}</span>
-                      <p className="text-[10px] text-zinc-500">{t.wins} win{Number(t.wins) !== 1 ? 's' : ''}</p>
+                      <p className="text-[11px] text-zinc-500">{t.wins} win{Number(t.wins) !== 1 ? 's' : ''}</p>
                     </div>
                   </button>
                 ))
@@ -389,7 +388,6 @@ if (subPage === 'stats-constructors') {
     const name = selectedTeamStats.Constructor.name.toLowerCase()
     let carImage = '/cars/redbull.jpeg'
     let teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/red-bull-racing-logo.png'
-    let teamColor = '#3671C6'
     let fournisseur = 'Red Bull Ford'
     let noteMoteur = 'Premier moteur maison de Red Bull (DM01), développé avec Ford. L’écurie conçoit pour la première fois son propre groupe motopropulseur.'
     let noteAero = 'Red Bull va chercher à maximiser l’efficacité en ligne droite avec les ailes actives, tout en gardant un bon appui dans les virages rapides.'
@@ -398,7 +396,6 @@ if (subPage === 'stats-constructors') {
     if (name.includes('ferrari')) {
       carImage = '/cars/ferrari.jpeg'
       teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/ferrari-logo.png'
-      teamColor = '#E8002D'
       fournisseur = 'Ferrari'
       noteMoteur = 'Moteur entièrement développé à Maranello. Ferrari fournit aussi Haas et Cadillac.'
       noteAero = 'Ferrari devra adapter son concept aéro pour bien gérer le passage entre mode virage et mode ligne droite.'
@@ -406,7 +403,6 @@ if (subPage === 'stats-constructors') {
     } else if (name.includes('mercedes')) {
       carImage = '/cars/mercedes.jpeg'
       teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/mercedes-logo.png'
-      teamColor = '#27F4D2'
       fournisseur = 'Mercedes'
       noteMoteur = 'Mercedes fournit McLaren, Williams et Alpine. Référence en gestion de l’énergie et fiabilité.'
       noteAero = 'Mercedes va chercher à tirer le meilleur parti des ailes actives sur les circuits à longues lignes droites.'
@@ -414,7 +410,6 @@ if (subPage === 'stats-constructors') {
     } else if (name.includes('mclaren')) {
       carImage = '/cars/mclaren.jpeg'
       teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/mclaren-logo.png'
-      teamColor = '#FF8000'
       fournisseur = 'Mercedes'
       noteMoteur = 'Client Mercedes depuis 2021. Partenariat prolongé jusqu’en 2030.'
       noteAero = 'McLaren va chercher à maximiser les zones de freinage et les virages rapides.'
@@ -422,7 +417,6 @@ if (subPage === 'stats-constructors') {
     } else if (name.includes('aston')) {
       carImage = '/cars/aston.jpeg'
       teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/aston-martin-logo.png'
-      teamColor = '#229971'
       fournisseur = 'Honda'
       noteMoteur = 'Partenariat exclusif avec Honda à partir de 2026. Honda revient avec un moteur entièrement nouveau.'
       noteAero = 'Aston Martin devra adapter son concept aéro au nouveau moteur Honda.'
@@ -430,7 +424,6 @@ if (subPage === 'stats-constructors') {
     } else if (name.includes('williams')) {
       carImage = '/cars/williams.jpeg'
       teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/williams-logo.png'
-      teamColor = '#64C4FF'
       fournisseur = 'Mercedes'
       noteMoteur = 'Client Mercedes. Williams bénéficie de la puissance et de la fiabilité du constructeur allemand.'
       noteAero = 'Williams espère réduire l’écart grâce aux ailes actives sur les longues lignes droites.'
@@ -438,7 +431,6 @@ if (subPage === 'stats-constructors') {
     } else if (name.includes('alpine')) {
       carImage = '/cars/alpine.jpeg'
       teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/alpine-logo.png'
-      teamColor = '#FF87BC'
       fournisseur = 'Mercedes'
       noteMoteur = 'Alpine passe chez Mercedes en 2026. Un changement majeur qui permet de se concentrer sur le châssis.'
       noteAero = 'Le passage à Mercedes va permettre à Alpine de mieux travailler sur les ailes actives.'
@@ -446,7 +438,6 @@ if (subPage === 'stats-constructors') {
     } else if (name.includes('haas')) {
       carImage = '/cars/haas.jpeg'
       teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/haas-f1-team-logo.png'
-      teamColor = '#B6BABD'
       fournisseur = 'Ferrari'
       noteMoteur = 'Client Ferrari. Haas utilise le même groupe motopropulseur que Ferrari.'
       noteAero = 'Haas va chercher à maximiser les zones de dépassement avec le nouveau règlement.'
@@ -454,7 +445,6 @@ if (subPage === 'stats-constructors') {
     } else if (name.includes('audi')) {
       carImage = '/cars/audi.jpeg'
       teamLogo = 'https://upload.wikimedia.org/wikipedia/commons/a/aa/Audi.png'
-      teamColor = '#BB0A30'
       fournisseur = 'Audi'
       noteMoteur = 'Audi développe son propre moteur pour sa première saison en Formule 1. Un projet ambitieux pour la marque allemande.'
       noteAero = 'Audi devra rapidement maîtriser les ailes actives et le mode dépassement dès sa première année.'
@@ -462,7 +452,6 @@ if (subPage === 'stats-constructors') {
     } else if (name.includes('sauber') || name.includes('kick')) {
       carImage = '/cars/sauber.jpeg'
       teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/kick-sauber-logo.png'
-      teamColor = '#52E252'
       fournisseur = 'Audi'
       noteMoteur = 'Sauber devient Audi. L’équipe prépare la transition vers la marque allemande.'
       noteAero = 'Sauber travaille sur l’adaptation aux nouvelles règles aérodynamiques de 2026.'
@@ -470,7 +459,6 @@ if (subPage === 'stats-constructors') {
     } else if (name.includes('cadillac')) {
       carImage = '/cars/cadillac.jpeg'
       teamLogo = 'https://cdn.brandfetch.io/cadillac.com/logo'
-      teamColor = '#FFD700'
       fournisseur = 'Ferrari'
       noteMoteur = 'Cadillac utilise un moteur Ferrari pour ses débuts en Formule 1. L’équipe américaine arrive avec un projet ambitieux.'
       noteAero = 'Cadillac devra rapidement maîtriser les ailes actives pour être compétitive dès sa première saison.'
@@ -478,7 +466,6 @@ if (subPage === 'stats-constructors') {
     } else if (name.includes('racing bulls') || name.includes('rb')) {
       carImage = '/cars/racingbulls.jpeg'
       teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/rb-logo.png'
-      teamColor = '#6692FF'
       fournisseur = 'Red Bull Ford'
       noteMoteur = 'Utilise le même groupe motopropulseur que Red Bull Racing.'
       noteAero = 'Racing Bulls profite des connaissances de Red Bull en aérodynamique.'
@@ -488,24 +475,24 @@ if (subPage === 'stats-constructors') {
     const youtube = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(selectedTeamStats.Constructor.name + ' F1 2026')
 
     return (
-      <div className="min-h-screen bg-black text-white">
-        <header className="flex items-center justify-between px-6 py-5 border-b border-zinc-900">
-          <button onClick={() => setSelectedTeamStats(null)} className="text-sm text-zinc-500">← Retour</button>
+      <div className="min-h-dvh bg-black text-white">
+        <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 py-2 sm:py-4 border-b border-zinc-900">
+          <button onClick={() => setSelectedTeamStats(null)} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
           <p className="text-xs tracking-[0.3em] uppercase text-zinc-600">{selectedTeamStats.Constructor.name}</p>
-          <div className="w-12" />
+          <div className="min-w-20" aria-hidden="true" />
         </header>
 
-        <div className="px-6 pb-24 max-w-md mx-auto">
+        <div className="px-4 sm:px-6 pt-6 pb-24 w-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto">
           <div className="flex justify-center mb-5">
-            <img src={teamLogo} alt="" className="h-12 object-contain" />
+            <img src={teamLogo} alt="" className="h-10 sm:h-12 max-w-full object-contain" />
           </div>
 
-          <div className="relative rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-950 h-64 flex items-center justify-center mb-8">
+          <div className="relative rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-950 h-48 sm:h-64 md:h-80 lg:h-96 flex items-center justify-center mb-6 sm:mb-8">
             <img src={carImage} alt="" className="max-w-full max-h-full object-contain" />
           </div>
 
-          <div className="space-y-4">
-            <div className="rounded-2xl border border-zinc-900 bg-zinc-950/40 p-5">
+          <div className="grid gap-4 md:grid-cols-2 items-start">
+            <div className="rounded-2xl border border-zinc-900 bg-zinc-950/40 p-5 md:col-span-2">
               <p className="text-xs tracking-widest uppercase text-zinc-600 mb-4">Classement</p>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
@@ -526,11 +513,11 @@ if (subPage === 'stats-constructors') {
             <div className="rounded-2xl border border-zinc-900 bg-zinc-950/40 p-5">
               <p className="text-xs tracking-widest uppercase text-zinc-600 mb-4">Groupe motopropulseur</p>
               <div className="space-y-3 text-sm">
-                <div className="flex justify-between"><span className="text-zinc-500">Fournisseur</span><span>{fournisseur}</span></div>
-                <div className="flex justify-between"><span className="text-zinc-500">Puissance totale</span><span>~1 000 ch</span></div>
-                <div className="flex justify-between"><span className="text-zinc-500">Moteur thermique</span><span>~400 kW</span></div>
-                <div className="flex justify-between"><span className="text-zinc-500">Moteur électrique</span><span>350 kW</span></div>
-                <div className="flex justify-between"><span className="text-zinc-500">Récupération max</span><span>8,5 MJ / tour</span></div>
+                <div className="flex justify-between gap-4"><span className="text-zinc-500">Fournisseur</span><span>{fournisseur}</span></div>
+                <div className="flex justify-between gap-4"><span className="text-zinc-500">Puissance totale</span><span>~1 000 ch</span></div>
+                <div className="flex justify-between gap-4"><span className="text-zinc-500">Moteur thermique</span><span>~400 kW</span></div>
+                <div className="flex justify-between gap-4"><span className="text-zinc-500">Moteur électrique</span><span>350 kW</span></div>
+                <div className="flex justify-between gap-4"><span className="text-zinc-500">Récupération max</span><span>8,5 MJ / tour</span></div>
               </div>
               <p className="text-sm text-zinc-400 mt-5 leading-relaxed">{noteMoteur}</p>
             </div>
@@ -538,19 +525,19 @@ if (subPage === 'stats-constructors') {
             <div className="rounded-2xl border border-zinc-900 bg-zinc-950/40 p-5">
               <p className="text-xs tracking-widest uppercase text-zinc-600 mb-4">Aérodynamique</p>
               <div className="space-y-3 text-sm">
-                <div className="flex justify-between"><span className="text-zinc-500">Mode Virage</span><span>Appui maximum</span></div>
-                <div className="flex justify-between"><span className="text-zinc-500">Mode Ligne droite</span><span>−55 % de traînée</span></div>
-                <div className="flex justify-between"><span className="text-zinc-500">Mode Dépassement</span><span>À moins d’1 seconde</span></div>
+                <div className="flex justify-between gap-4"><span className="text-zinc-500">Mode Virage</span><span className="text-right">Appui maximum</span></div>
+                <div className="flex justify-between gap-4"><span className="text-zinc-500">Mode Ligne droite</span><span>−55 % de traînée</span></div>
+                <div className="flex justify-between gap-4"><span className="text-zinc-500">Mode Dépassement</span><span>À moins d’1 seconde</span></div>
               </div>
               <p className="text-sm text-zinc-400 mt-5 leading-relaxed">{noteAero}</p>
             </div>
           </div>
 
-          <div className="space-y-3 pt-8">
-            <a href={officialSite} target="_blank" rel="noopener noreferrer" className="block w-full text-center py-3.5 bg-zinc-900/50 border border-zinc-800 rounded-xl text-sm text-zinc-300">
+          <div className="grid gap-3 sm:grid-cols-2 pt-8">
+            <a href={officialSite} target="_blank" rel="noopener noreferrer" className="block w-full text-center py-3.5 min-h-12 bg-zinc-900/50 border border-zinc-800 rounded-xl text-sm text-zinc-300">
               Site officiel
             </a>
-            <a href={youtube} target="_blank" rel="noopener noreferrer" className="block w-full text-center py-3.5 bg-zinc-900/50 border border-zinc-800 rounded-xl text-sm text-zinc-300">
+            <a href={youtube} target="_blank" rel="noopener noreferrer" className="block w-full text-center py-3.5 min-h-12 bg-zinc-900/50 border border-zinc-800 rounded-xl text-sm text-zinc-300">
               Actualités YouTube
             </a>
           </div>
@@ -560,16 +547,16 @@ if (subPage === 'stats-constructors') {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <header className="flex items-center justify-between px-6 py-5 border-b border-zinc-900">
-        <button onClick={() => setSubPage('home')} className="text-sm text-zinc-500">← Retour</button>
+    <div className="min-h-dvh bg-black text-white">
+      <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 py-2 sm:py-4 border-b border-zinc-900">
+        <button onClick={() => setSubPage('home')} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
         <p className="text-xs tracking-widest uppercase text-zinc-600">Constructeurs</p>
-        <div className="w-12" />
+        <div className="min-w-20" aria-hidden="true" />
       </header>
-      <div className="px-6 py-6 max-w-md mx-auto space-y-1.5">
+      <div className="px-4 sm:px-6 py-6 w-full max-w-md md:max-w-3xl lg:max-w-5xl mx-auto grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {liveConstructors.map((t) => (
-          <button key={t.Constructor.constructorId} onClick={() => setSelectedTeamStats(t)} className="w-full text-left bg-zinc-950/30 border border-zinc-900/60 rounded-xl px-4 py-3 hover:bg-zinc-900/50 transition">
-            <div className="flex items-center justify-between">
+          <button key={t.Constructor.constructorId} onClick={() => setSelectedTeamStats(t)} className="w-full text-left bg-zinc-950/30 border border-zinc-900/60 rounded-xl px-4 py-3 min-h-12 hover:bg-zinc-900/50 active:bg-zinc-900/60 transition">
+            <div className="flex items-center justify-between gap-3">
               <p className="text-sm font-medium">{t.Constructor.name}</p>
               <p className="text-xs text-zinc-500">{t.points} pts</p>
             </div>
@@ -586,60 +573,62 @@ if (subPage === 'stats-constructors') {
       const gap = leader && second ? Number(leader.points) - Number(second.points) : 0
       const totalRaces = 17
       return (
-        <div className="min-h-screen bg-black text-white pb-10">
-          <header className="flex items-center justify-between px-6 py-5 border-b border-zinc-900">
-            <button onClick={() => setSubPage('home')} className="text-sm text-zinc-500">← Retour</button>
+        <div className="min-h-dvh bg-black text-white pb-10">
+          <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 py-2 sm:py-4 border-b border-zinc-900">
+            <button onClick={() => setSubPage('home')} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
             <p className="text-xs tracking-widest uppercase text-zinc-600">Statistiques</p>
-            <div className="w-12" />
+            <div className="min-w-20" aria-hidden="true" />
           </header>
-          <div className="flex gap-2 mb-6">
-  <button className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white">Aperçu</button>
-  <button onClick={() => setSubPage('stats-constructors')} className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-zinc-950 border border-zinc-800 text-zinc-400">Constructeurs</button>
-</div>
-          <div className="px-5 py-6 max-w-md mx-auto space-y-7">
+          <div className="px-4 sm:px-6 pt-6 w-full max-w-md md:max-w-2xl lg:max-w-5xl mx-auto">
+            <div className="flex gap-2 max-w-md mx-auto">
+              <button className="flex-1 py-2.5 min-h-11 rounded-xl text-sm font-medium bg-red-600 text-white">Aperçu</button>
+              <button onClick={() => setSubPage('stats-constructors')} className="flex-1 py-2.5 min-h-11 rounded-xl text-sm font-medium bg-zinc-950 border border-zinc-800 text-zinc-400">Constructeurs</button>
+            </div>
+          </div>
+          <div className="px-4 sm:px-6 py-6 w-full max-w-md md:max-w-2xl lg:max-w-5xl mx-auto grid gap-7 lg:grid-cols-2 lg:gap-x-8 items-start">
             <div>
-              <p className="text-red-600 text-[10px] tracking-[0.5em] uppercase mb-4">Title Fight</p>
+              <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-4">Title Fight</p>
               {leader && second ? (
                 <div className="bg-zinc-950 border border-zinc-900 rounded-2xl p-5">
                   <div className="flex justify-between items-end mb-4">
-                    <div><p className="text-xs text-zinc-500">{leader.Driver.familyName}</p><p className="text-3xl font-black">{leader.points}</p><p className="text-[11px] text-zinc-500 mt-1">{leader.wins} victoires</p></div>
-                    <div className="text-right"><p className="text-xs text-zinc-500">{second.Driver.familyName}</p><p className="text-3xl font-black text-zinc-400">{second.points}</p><p className="text-[11px] text-zinc-500 mt-1">{second.wins} victoires</p></div>
+                    <div><p className="text-xs text-zinc-500">{leader.Driver.familyName}</p><p className="text-3xl font-black">{leader.points}</p><p className="text-xs text-zinc-500 mt-1">{leader.wins} victoires</p></div>
+                    <div className="text-right"><p className="text-xs text-zinc-500">{second.Driver.familyName}</p><p className="text-3xl font-black text-zinc-400">{second.points}</p><p className="text-xs text-zinc-500 mt-1">{second.wins} victoires</p></div>
                   </div>
                   <div className="flex gap-1 h-1.5 rounded-full overflow-hidden bg-zinc-900 mb-3">
                     <div className="bg-red-600" style={{ width: `${(Number(leader.points) / (Number(leader.points) + Number(second.points))) * 100}%` }} />
                     <div className="bg-zinc-700 flex-1" />
                   </div>
-                  <p className="text-[11px] text-zinc-500 text-center">Écart : {gap} points</p>
+                  <p className="text-xs text-zinc-500 text-center">Écart : {gap} points</p>
                 </div>
               ) : <p className="text-center text-zinc-500 text-sm">Chargement...</p>}
             </div>
             <div>
-              <p className="text-red-600 text-[10px] tracking-[0.5em] uppercase mb-4">Top 3</p>
+              <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-4">Top 3</p>
               <div className="space-y-2">
                 {liveStandings.slice(0, 3).map((d, i) => (
                   <div key={d.Driver.driverId} className="flex items-center justify-between bg-zinc-950/60 border border-zinc-900/80 rounded-xl px-4 py-3">
-                    <div className="flex items-center gap-3"><span className="text-xs text-zinc-600 w-5">{i + 1}</span><div><p className="text-sm font-medium">{d.Driver.familyName}</p><p className="text-[11px] text-zinc-500">{d.Constructors[0]?.name}</p></div></div>
-                    <div className="text-right"><p className="text-sm font-semibold">{d.points}</p><p className="text-[10px] text-zinc-500">{d.wins} win{Number(d.wins) !== 1 ? 's' : ''}</p></div>
+                    <div className="flex items-center gap-3"><span className="text-xs text-zinc-600 w-5">{i + 1}</span><div><p className="text-sm font-medium">{d.Driver.familyName}</p><p className="text-xs text-zinc-500">{d.Constructors[0]?.name}</p></div></div>
+                    <div className="text-right"><p className="text-sm font-semibold">{d.points}</p><p className="text-[11px] text-zinc-500">{d.wins} win{Number(d.wins) !== 1 ? 's' : ''}</p></div>
                   </div>
                 ))}
               </div>
             </div>
             <div>
-              <p className="text-red-600 text-[10px] tracking-[0.5em] uppercase mb-4">Essentiels</p>
+              <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-4">Essentiels</p>
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-zinc-950/60 border border-zinc-900/80 rounded-2xl p-4"><p className="text-[11px] text-zinc-500">Moy. points / course</p><p className="text-lg font-semibold mt-1">{leader ? (Number(leader.points) / totalRaces).toFixed(1) : '-'}</p></div>
-                <div className="bg-zinc-950/60 border border-zinc-900/80 rounded-2xl p-4"><p className="text-[11px] text-zinc-500">Victoires leader</p><p className="text-lg font-semibold mt-1">{leader?.wins || '-'}</p></div>
-                <div className="bg-zinc-950/60 border border-zinc-900/80 rounded-2xl p-4"><p className="text-[11px] text-zinc-500">Écart au 2e</p><p className="text-lg font-semibold mt-1">{gap} pts</p></div>
-                <div className="bg-zinc-950/60 border border-zinc-900/80 rounded-2xl p-4"><p className="text-[11px] text-zinc-500">Écurie leader</p><p className="text-lg font-semibold mt-1">{liveConstructors[0]?.Constructor.name || '-'}</p></div>
+                <div className="bg-zinc-950/60 border border-zinc-900/80 rounded-2xl p-4"><p className="text-xs text-zinc-500">Moy. points / course</p><p className="text-lg font-semibold mt-1">{leader ? (Number(leader.points) / totalRaces).toFixed(1) : '-'}</p></div>
+                <div className="bg-zinc-950/60 border border-zinc-900/80 rounded-2xl p-4"><p className="text-xs text-zinc-500">Victoires leader</p><p className="text-lg font-semibold mt-1">{leader?.wins || '-'}</p></div>
+                <div className="bg-zinc-950/60 border border-zinc-900/80 rounded-2xl p-4"><p className="text-xs text-zinc-500">Écart au 2e</p><p className="text-lg font-semibold mt-1">{gap} pts</p></div>
+                <div className="bg-zinc-950/60 border border-zinc-900/80 rounded-2xl p-4"><p className="text-xs text-zinc-500">Écurie leader</p><p className="text-lg font-semibold mt-1 break-words">{liveConstructors[0]?.Constructor.name || '-'}</p></div>
               </div>
             </div>
             <div>
-              <p className="text-red-600 text-[10px] tracking-[0.5em] uppercase mb-4">Constructeurs</p>
+              <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-4">Constructeurs</p>
               <div className="space-y-2">
                 {liveConstructors.slice(0, 3).map((t, i) => (
                   <div key={t.Constructor.constructorId} className="flex items-center justify-between bg-zinc-950/60 border border-zinc-900/80 rounded-xl px-4 py-3">
                     <div className="flex items-center gap-3"><span className="text-xs text-zinc-600 w-5">{i + 1}</span><p className="text-sm font-medium">{t.Constructor.name}</p></div>
-                    <div className="text-right"><p className="text-sm font-semibold">{t.points}</p><p className="text-[10px] text-zinc-500">{t.wins} win{Number(t.wins) !== 1 ? 's' : ''}</p></div>
+                    <div className="text-right"><p className="text-sm font-semibold">{t.points}</p><p className="text-[11px] text-zinc-500">{t.wins} win{Number(t.wins) !== 1 ? 's' : ''}</p></div>
                   </div>
                 ))}
               </div>
@@ -653,21 +642,21 @@ if (subPage === 'stats-constructors') {
       const driver = drivers.find(d => d.id === favDriver)
       const team = teams.find(t => t.id === favTeam)
       return (
-        <div className="min-h-screen bg-black text-white">
-          <header className="flex items-center justify-between px-6 py-5 border-b border-zinc-900">
-            <button onClick={() => setSubPage('home')} className="text-sm text-zinc-500">← Retour</button>
+        <div className="min-h-dvh bg-black text-white">
+          <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 py-2 sm:py-4 border-b border-zinc-900">
+            <button onClick={() => setSubPage('home')} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
             <p className="text-xs tracking-widest uppercase text-zinc-600">Tes favoris</p>
-            <div className="w-12" />
+            <div className="min-w-20" aria-hidden="true" />
           </header>
-          <div className="px-6 py-8 max-w-md mx-auto space-y-6">
+          <div className="px-4 sm:px-6 py-8 w-full max-w-md md:max-w-3xl mx-auto grid gap-6 md:grid-cols-2 items-start">
             {driver && (
               <div className="bg-zinc-950/40 border border-zinc-900/80 rounded-2xl p-5">
                 <div className="flex items-center gap-4 mb-5">
-                  <img src={driver.photo} alt={driver.name} className="w-16 h-16 rounded-full object-cover object-top" />
+                  <img src={driver.photo} alt={driver.name} className="w-16 h-16 shrink-0 rounded-full object-cover object-top" />
                   <div><p className="font-semibold">{driver.name}</p><p className="text-xs text-zinc-500">{driver.team}</p></div>
                 </div>
-                <a href={`https://www.formula1.com/en/drivers/${driver.name.toLowerCase().replace(/ /g, '-')}.html`} target="_blank" rel="noreferrer" className="block w-full py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-center text-sm font-medium hover:bg-zinc-800 transition">Voir les actualités</a>
-                <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(driver.name + ' F1')}`} target="_blank" rel="noreferrer" className="block w-full py-3 mt-2 bg-zinc-900 border border-zinc-800 rounded-xl text-center text-sm font-medium hover:bg-zinc-800 transition">Vidéos récentes</a>
+                <a href={`https://www.formula1.com/en/drivers/${driver.name.toLowerCase().replace(/ /g, '-')}.html`} target="_blank" rel="noreferrer" className="block w-full py-3 min-h-12 bg-zinc-900 border border-zinc-800 rounded-xl text-center text-sm font-medium hover:bg-zinc-800 transition">Voir les actualités</a>
+                <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(driver.name + ' F1')}`} target="_blank" rel="noreferrer" className="block w-full py-3 min-h-12 mt-2 bg-zinc-900 border border-zinc-800 rounded-xl text-center text-sm font-medium hover:bg-zinc-800 transition">Vidéos récentes</a>
               </div>
             )}
             {team && (
@@ -676,45 +665,45 @@ if (subPage === 'stats-constructors') {
                   <img src={team.logo} alt={team.name} className="w-14 h-14 object-contain" />
                   <p className="font-semibold">{team.name}</p>
                 </div>
-                <a href={`https://en.wikipedia.org/wiki/${encodeURIComponent(team.name.replace(' Racing', ''))}`} target="_blank" rel="noreferrer" className="block w-full py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-center text-sm font-medium hover:bg-zinc-800 transition">Voir les actualités</a>
-                <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(team.name + ' F1')}`} target="_blank" rel="noreferrer" className="block w-full py-3 mt-2 bg-zinc-900 border border-zinc-800 rounded-xl text-center text-sm font-medium hover:bg-zinc-800 transition">Vidéos récentes</a>
+                <a href={`https://en.wikipedia.org/wiki/${encodeURIComponent(team.name.replace(' Racing', ''))}`} target="_blank" rel="noreferrer" className="block w-full py-3 min-h-12 bg-zinc-900 border border-zinc-800 rounded-xl text-center text-sm font-medium hover:bg-zinc-800 transition">Voir les actualités</a>
+                <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(team.name + ' F1')}`} target="_blank" rel="noreferrer" className="block w-full py-3 min-h-12 mt-2 bg-zinc-900 border border-zinc-800 rounded-xl text-center text-sm font-medium hover:bg-zinc-800 transition">Vidéos récentes</a>
               </div>
             )}
-            {!driver && !team && <p className="text-center text-zinc-500">Aucun favori sélectionné</p>}
+            {!driver && !team && <p className="text-center text-zinc-500 md:col-span-2">Aucun favori sélectionné</p>}
           </div>
         </div>
       )
     }
 
     return (
-      <div className="min-h-screen bg-black text-white">
-        <header className="flex items-center justify-between px-6 py-5 border-b border-zinc-900">
-          <button onClick={onBack} className="text-sm text-zinc-500">← Retour</button>
+      <div className="min-h-dvh bg-black text-white">
+        <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 py-2 sm:py-4 border-b border-zinc-900">
+          <button onClick={onBack} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
           <p className="text-xs tracking-widest uppercase text-zinc-600">Hors Course</p>
-          <div className="w-12" />
+          <div className="min-w-20" aria-hidden="true" />
         </header>
-        <div className="px-6 py-8 max-w-md mx-auto space-y-8">
+        <div className="px-4 sm:px-6 py-6 sm:py-8 w-full max-w-md md:max-w-3xl lg:max-w-4xl mx-auto space-y-6 sm:space-y-8">
           <div onClick={() => setSubPage('circuit')} className="relative overflow-hidden rounded-3xl bg-zinc-950 border border-zinc-800 cursor-pointer active:scale-[0.98] transition">
-            <img src="https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/USA_Circuit.png" alt="Circuit of the Americas" className="w-full h-44 object-cover opacity-50" />
+            <img src="https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/USA_Circuit.png" alt="Circuit of the Americas" className="w-full h-44 md:h-64 lg:h-72 object-cover opacity-50" />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
             <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-              <span className="text-red-600 text-[10px] tracking-[0.4em] uppercase">Prochain GP</span>
+              <span className="text-red-600 text-[11px] tracking-[0.4em] uppercase">Prochain GP</span>
               <span className="text-xs text-zinc-400">{getDaysUntilRace()}</span>
             </div>
             <div className="absolute bottom-0 left-0 right-0 p-5">
-              <h2 className="text-2xl font-black leading-none">United States</h2>
+              <h2 className="text-2xl md:text-4xl font-black leading-none">United States</h2>
               <p className="text-sm text-zinc-400 mt-1">23 – 25 octobre • Austin</p>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <button onClick={() => setSubPage('standings')} className="py-4 bg-zinc-950 border border-zinc-800 rounded-2xl text-sm font-medium hover:border-zinc-600 transition">Classements</button>
-            <button onClick={() => setSubPage('calendar')} className="py-4 bg-zinc-950 border border-zinc-800 rounded-2xl text-sm font-medium hover:border-zinc-600 transition">Calendrier</button>
-            <button onClick={() => setSubPage('stats')} className="py-4 bg-zinc-950 border border-zinc-800 rounded-2xl text-sm font-medium hover:border-zinc-600 transition">Statistiques</button>
-            <button onClick={() => setSubPage('favorites')} className="py-4 bg-zinc-950 border border-zinc-800 rounded-2xl text-sm font-medium hover:border-zinc-600 transition">Tes favoris</button>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <button onClick={() => setSubPage('standings')} className="py-4 min-h-14 bg-zinc-950 border border-zinc-800 rounded-2xl text-sm font-medium hover:border-zinc-600 active:bg-zinc-900 transition">Classements</button>
+            <button onClick={() => setSubPage('calendar')} className="py-4 min-h-14 bg-zinc-950 border border-zinc-800 rounded-2xl text-sm font-medium hover:border-zinc-600 active:bg-zinc-900 transition">Calendrier</button>
+            <button onClick={() => setSubPage('stats')} className="py-4 min-h-14 bg-zinc-950 border border-zinc-800 rounded-2xl text-sm font-medium hover:border-zinc-600 active:bg-zinc-900 transition">Statistiques</button>
+            <button onClick={() => setSubPage('favorites')} className="py-4 min-h-14 bg-zinc-950 border border-zinc-800 rounded-2xl text-sm font-medium hover:border-zinc-600 active:bg-zinc-900 transition">Tes favoris</button>
           </div>
           <div>
-            <p className="text-red-600 text-[10px] tracking-[0.5em] uppercase mb-4">Top 3 Pilotes</p>
-            <div className="space-y-2.5">
+            <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-4">Top 3 Pilotes</p>
+            <div className="grid gap-2.5 md:grid-cols-3">
               {liveStandings.slice(0, 3).map((d, i) => (
                 <div key={d.Driver.driverId} className="flex items-center justify-between bg-zinc-950/40 border border-zinc-900/60 rounded-xl px-4 py-3">
                   <div className="flex items-center gap-3"><span className="text-xs text-zinc-600 w-4">{i + 1}</span><p className="text-sm font-medium">{d.Driver.familyName}</p></div>
@@ -730,45 +719,45 @@ if (subPage === 'stats-constructors') {
 
   if (step === 'driver') {
     return (
-      <div className="min-h-screen bg-black text-white pb-10">
-        <header className="flex items-center justify-between px-5 py-4 border-b border-zinc-800 sticky top-0 bg-black z-10">
-          <button onClick={onBack} className="text-sm text-zinc-400">← Retour</button>
-          <h1 className="font-semibold">Choisis tes pilotes</h1>
-          <button onClick={() => setStep('team')} className="text-sm text-zinc-500">Passer</button>
+      <div className="min-h-dvh bg-black text-white pb-10">
+        <header className="flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 py-2 sm:py-4 border-b border-zinc-800 sticky top-0 bg-black z-10">
+          <button onClick={onBack} className="text-sm text-zinc-400 min-h-11 min-w-16 text-left">← Retour</button>
+          <h1 className="font-semibold text-center text-sm sm:text-base">Choisis tes pilotes</h1>
+          <button onClick={() => setStep('team')} className="text-sm text-zinc-400 min-h-11 min-w-16 text-right">Passer</button>
         </header>
-        <div className="px-5 py-6">
-          <div className="grid grid-cols-2 gap-6">
+        <div className="px-4 sm:px-6 py-6 w-full max-w-md sm:max-w-3xl lg:max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
             {drivers.map((d) => (
-              <button key={d.id} onClick={() => toggleDriver(d.id)} className="flex flex-col items-center">
-                <img src={d.photo} alt={d.name} className={`w-28 h-28 rounded-full object-cover object-top transition ${selectedDrivers.includes(d.id) ? 'ring-4 ring-red-600' : ''}`} />
+              <button key={d.id} onClick={() => toggleDriver(d.id)} className="flex flex-col items-center rounded-2xl p-1 active:opacity-80">
+                <img src={d.photo} alt={d.name} className={`w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover object-top transition ${selectedDrivers.includes(d.id) ? 'ring-4 ring-red-600' : ''}`} />
                 <p className="mt-2 font-medium text-sm text-center">{d.name}</p>
                 <p className="text-xs text-zinc-500">{d.team}</p>
               </button>
             ))}
           </div>
-          <button ref={validateRef} disabled={selectedDrivers.length === 0} onClick={() => setStep('team')} className="mt-10 w-full py-4 bg-red-600 disabled:bg-zinc-800 disabled:text-zinc-600 rounded-xl font-medium">Valider ({selectedDrivers.length})</button>
+          <button ref={validateRef} disabled={selectedDrivers.length === 0} onClick={() => setStep('team')} className="mt-10 block w-full max-w-sm mx-auto py-4 bg-red-600 disabled:bg-zinc-800 disabled:text-zinc-600 rounded-xl font-medium">Valider ({selectedDrivers.length})</button>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-black text-white pb-10">
-      <header className="flex items-center justify-between px-5 py-4 border-b border-zinc-800 sticky top-0 bg-black z-10">
-        <button onClick={() => setStep('driver')} className="text-sm text-zinc-400">← Retour</button>
-        <h1 className="font-semibold">Choisis ton écurie</h1>
-        <button onClick={() => setStep('done')} className="text-sm text-zinc-500">Passer</button>
+    <div className="min-h-dvh bg-black text-white pb-10">
+      <header className="flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 py-2 sm:py-4 border-b border-zinc-800 sticky top-0 bg-black z-10">
+        <button onClick={() => setStep('driver')} className="text-sm text-zinc-400 min-h-11 min-w-16 text-left">← Retour</button>
+        <h1 className="font-semibold text-center text-sm sm:text-base">Choisis ton écurie</h1>
+        <button onClick={() => setStep('done')} className="text-sm text-zinc-400 min-h-11 min-w-16 text-right">Passer</button>
       </header>
-      <div className="px-5 py-6">
-        <div className="grid grid-cols-2 gap-6">
+      <div className="px-4 sm:px-6 py-6 w-full max-w-md sm:max-w-3xl lg:max-w-5xl mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6">
           {teams.map((t) => (
             <button key={t.id} onClick={() => { setFavTeam(t.id); localStorage.setItem(teamKey, t.id); scrollToValidate() }} className={`flex flex-col items-center gap-3 p-4 rounded-2xl ${favTeam === t.id ? 'bg-zinc-900' : ''}`}>
-              <img src={t.logo} alt={t.name} className="w-20 h-20 object-contain" />
+              <img src={t.logo} alt={t.name} className="w-16 h-16 sm:w-20 sm:h-20 object-contain" />
               <p className="font-medium text-sm text-center">{t.name}</p>
             </button>
           ))}
         </div>
-        <button ref={validateRef} disabled={!favTeam} onClick={() => setStep('done')} className="mt-10 w-full py-4 bg-red-600 disabled:bg-zinc-800 disabled:text-zinc-600 rounded-xl font-medium">Valider</button>
+        <button ref={validateRef} disabled={!favTeam} onClick={() => setStep('done')} className="mt-10 block w-full max-w-sm mx-auto py-4 bg-red-600 disabled:bg-zinc-800 disabled:text-zinc-600 rounded-xl font-medium">Valider</button>
       </div>
     </div>
   )

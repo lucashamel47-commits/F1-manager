@@ -69,8 +69,8 @@ function App() {
           onInfo={setInfo}
         />
         {info && (
-          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 px-6" onClick={() => setInfo(null)}>
-            <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 px-4 sm:px-6" onClick={() => setInfo(null)}>
+            <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 max-w-sm md:max-w-md w-full max-h-[85dvh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               <h3 className="text-lg font-semibold mb-3">
                 {info === 'hors' ? 'Mode Hors Course' : 'Live Timing'}
               </h3>
