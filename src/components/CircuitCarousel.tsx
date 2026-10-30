@@ -40,7 +40,7 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
   // Au chargement : on place le prochain GP au début de la rangée (sans bouger la page).
   useEffect(() => { goTo(nextIdx, false) }, [goTo, nextIdx])
 
-  const onScroll = () => {
+  const onScroll = useCallback(() => {
     const el = ref.current
     if (!el) return
     const pl = parseFloat(getComputedStyle(el).paddingLeft || '0')
@@ -52,7 +52,18 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
     }
     setActive(best)
     setEdge({ start: el.scrollLeft < 8, end: el.scrollLeft + el.clientWidth >= el.scrollWidth - 8 })
-  }
+  }, [])
+
+  // Les largeurs changent (images, rotation de l'iPad) : on recalcule l'état des flèches.
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const ro = new ResizeObserver(onScroll)
+    ro.observe(el)
+    Array.from(el.children).forEach((c) => ro.observe(c))
+    onScroll()
+    return () => ro.disconnect()
+  }, [onScroll])
 
   const page = (dir: 1 | -1) => {
     const el = ref.current
