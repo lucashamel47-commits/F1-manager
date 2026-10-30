@@ -83,7 +83,7 @@ export default function ChatBot() {
         <button
           onClick={() => setOpen(true)}
           aria-label="Ouvrir l’assistant F1"
-          className="fixed z-40 right-4 bottom-4 sm:right-6 sm:bottom-6 flex items-center gap-2 h-14 pl-4 pr-5 bg-red-600 hover:bg-red-500 active:scale-95 text-white font-black uppercase tracking-wide text-sm shadow-[0_8px_30px_rgba(220,38,38,0.45)] transition"
+          className="fixed z-40 right-3 bottom-3 sm:right-6 sm:bottom-6 flex items-center justify-center gap-2 w-12 h-12 sm:w-auto sm:h-14 sm:pl-4 sm:pr-5 bg-red-600 hover:bg-red-500 active:scale-95 text-white font-black uppercase tracking-wide text-sm shadow-[0_8px_30px_rgba(220,38,38,0.45)] transition"
           style={{ marginBottom: 'env(safe-area-inset-bottom)', marginRight: 'env(safe-area-inset-right)' }}
         >
           <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor" aria-hidden="true">

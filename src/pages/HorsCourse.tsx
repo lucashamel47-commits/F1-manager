@@ -601,7 +601,7 @@ if (subPage === 'stats-constructors') {
       const gap = leader && second ? Number(leader.points) - Number(second.points) : 0
       const totalRaces = 17
       return (
-        <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-10">
+        <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-28 sm:pb-10">
           {nav(() => setSubPage('home'), "Statistiques")}
           <div className="px-4 sm:px-6 lg:px-10 xl:px-14 pt-6 w-full">
             <div className="flex border-b border-zinc-800">
@@ -781,7 +781,7 @@ if (subPage === 'stats-constructors') {
 
   if (step === 'driver') {
     return (
-      <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-10">
+      <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-28 sm:pb-10">
         <header className="flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b-4 border-red-600 sticky top-0 bg-black z-10">
           <button onClick={onBack} className="text-sm text-zinc-400 min-h-11 min-w-16 text-left">← Retour</button>
           <h1 className="font-black uppercase tracking-tight text-center text-sm sm:text-lg">Choisis tes pilotes</h1>
@@ -804,7 +804,7 @@ if (subPage === 'stats-constructors') {
   }
 
   return (
-    <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-10">
+    <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-28 sm:pb-10">
       <header className="flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b-4 border-red-600 sticky top-0 bg-black z-10">
         <button onClick={() => setStep('driver')} className="text-sm text-zinc-400 min-h-11 min-w-16 text-left">← Retour</button>
         <h1 className="font-black uppercase tracking-tight text-center text-sm sm:text-lg">Choisis ton écurie</h1>

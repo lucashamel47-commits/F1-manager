@@ -150,37 +150,104 @@ img, canvas {
   pointer-events: none;
   filter: blur(0.5px);
 }
-/* Traînée de vitesse blanche derrière les monoplaces (voiture orientée vers la gauche) */
+/* Effet de vitesse réaliste derrière les monoplaces (voiture orientée vers la gauche) */
 .car-stage {
   aspect-ratio: 1712 / 1152;
+  container-type: inline-size;
 }
 
-.speed-trail-wrap {
+.speed-fx {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  overflow: visible;
 }
 
-.speed-trail {
+/* Filets d'air : fins, effilés (épais et opaques près de la voiture, transparents à l'extrémité) */
+.airflow {
   position: absolute;
-  left: 84%;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.7) 50%, #fff 100%);
-  box-shadow: 0 0 10px rgba(255,255,255,0.9);
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, rgba(255,255,255,var(--o)) 0%, rgba(255,255,255,calc(var(--o) * 0.55)) 30%, rgba(255,255,255,calc(var(--o) * 0.18)) 65%, rgba(255,255,255,0) 100%);
+  clip-path: polygon(0 0, 100% 42%, 100% 58%, 0 100%);
+  filter: blur(0.4px);
   opacity: 0;
-  animation-name: trail-flow;
-  animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1);
+  animation-name: airflow;
+  animation-timing-function: cubic-bezier(0.25, 0.5, 0.5, 1);
   animation-iteration-count: infinite;
 }
 
-@keyframes trail-flow {
-  0% { left: 84%; opacity: 0; }
-  15% { opacity: 1; }
-  70% { opacity: 0.85; }
-  100% { left: 135%; opacity: 0; }
+/* Les filets restent accrochés à la voiture : ils s'allongent, ondulent légèrement puis s'estompent */
+@keyframes airflow {
+  0% { transform: translateY(0) scaleX(0.3); opacity: 0; }
+  18% { opacity: 1; }
+  55% { transform: translateY(0.6px) scaleX(0.9); opacity: 0.85; }
+  100% { transform: translateY(-0.4px) scaleX(1.2); opacity: 0; }
 }
+
+/* Tourbillons discrets au bout de l'aileron arrière */
+.vortex {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.vortex-line {
+  fill: none;
+  stroke-width: 0.9;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 22 14;
+  opacity: 0.55;
+  animation: vortex-flow 1.1s linear infinite;
+}
+.vortex-line.v2 { animation-duration: 1.45s; opacity: 0.4; }
+@keyframes vortex-flow {
+  to { stroke-dashoffset: -36; }
+}
+
+/* Air chaud : voile très léger derrière l'échappement */
+.heat-haze {
+  position: absolute;
+  left: 86%;
+  top: 38%;
+  width: 34%;
+  height: 34%;
+  background: radial-gradient(ellipse at 15% 50%, rgba(255,255,255,0.13), rgba(255,255,255,0) 70%);
+  filter: blur(7px);
+  animation: haze 2.8s ease-in-out infinite;
+}
+@keyframes haze {
+  0%, 100% { opacity: 0.45; transform: translate(0, 0) scale(1); }
+  50% { opacity: 0.9; transform: translate(6%, -4%) scale(1.12, 0.92); }
+}
+
+/* Photo : fondu sur le bord droit pour que le cadre de l'image ne se voie pas */
+.car-photo {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: screen;
+  -webkit-mask-image: linear-gradient(90deg, #000 90%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 90%, transparent 100%);
+}
+
+/* Flou de mouvement sur la voiture : copies floues décalées vers l'arrière, visibles surtout à l'arrière */
+.car-ghost {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 35%, #000 100%);
+  mask-image: linear-gradient(90deg, transparent 35%, #000 100%);
+}
+.car-ghost.g1 { transform: translateX(1.2%); filter: blur(1.5px); opacity: 0.32; }
+.car-ghost.g2 { transform: translateX(2.6%); filter: blur(3px); opacity: 0.2; }
 
 @media (prefers-reduced-motion: reduce) {
-  .speed-trail { animation: none; opacity: 0.55; left: 90%; }
+  .airflow { animation: none; opacity: 0.4; transform: scaleX(0.8); }
+  .vortex-line { animation: none; }
+  .heat-haze { animation: none; opacity: 0.5; }
 }
-
