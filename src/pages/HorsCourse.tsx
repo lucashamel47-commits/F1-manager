@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import MotorNav, { SectionTitle, type NavKey } from '../components/MotorNav'
 import CarStage from '../components/CarStage'
+import StatsRecords from '../components/StatsRecords'
 
 interface Props {
   onBack: () => void
@@ -83,7 +84,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
   const [welcomeDone, setWelcomeDone] = useState(false)
   const [nextIdx] = useState(findNextRace)
   const nextRace = calendar[nextIdx]
-  const [subPage, setSubPage] = useState<'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'circuit' | 'stats-constructors'>('home')
+  const [subPage, setSubPage] = useState<'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'circuit' | 'stats-constructors' | 'stats-records'>('home')
   const [liveStandings, setLiveStandings] = useState<any[]>([])
   const [liveConstructors, setLiveConstructors] = useState<any[]>([])
   const [hover, setHover] = useState<{ x: number; y: number; speed: number } | null>(null)
@@ -181,8 +182,31 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
     setSubPage(k)
   }
 
+  const statsTabs = (active: 'overview' | 'constructors' | 'records') => {
+    const tabs = [
+      { key: 'overview' as const, label: 'Aperçu', page: 'stats' as const },
+      { key: 'constructors' as const, label: 'Constructeurs', page: 'stats-constructors' as const },
+      { key: 'records' as const, label: 'Records & Historique', short: 'Records', page: 'stats-records' as const },
+    ]
+    return (
+      <div className="flex overflow-x-auto border-b border-zinc-800 [scrollbar-width:none]" role="tablist" aria-label="Sections des statistiques">
+        {tabs.map((t) => (
+          <button
+            key={t.key}
+            role="tab"
+            aria-selected={active === t.key}
+            onClick={() => setSubPage(t.page)}
+            className={`shrink-0 px-3 sm:px-5 min-h-12 text-xs sm:text-sm font-bold uppercase tracking-wider border-b-4 whitespace-nowrap ${active === t.key ? 'border-red-600 text-white' : 'border-transparent text-zinc-400 hover:text-white'}`}
+          >
+            {'short' in t ? (<><span className="sm:hidden">{t.short}</span><span className="hidden sm:inline">{t.label}</span></>) : t.label}
+          </button>
+        ))}
+      </div>
+    )
+  }
+
   const navKey: NavKey =
-    subPage === 'stats-constructors' ? 'stats' : subPage === 'circuit' ? 'home' : subPage
+    subPage === 'stats-constructors' || subPage === 'stats-records' ? 'stats' : subPage === 'circuit' ? 'home' : subPage
   const nav = (back?: () => void, crumb?: string) => (
     <MotorNav active={navKey} onNavigate={go} onExit={onBack} onBack={back} crumb={crumb} />
   )
@@ -415,6 +439,16 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
       )
     }
 
+if (subPage === 'stats-records') {
+  return (
+    <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-28 sm:pb-10">
+      {nav(() => setSubPage('home'), 'Records & Historique')}
+      <div className="px-4 sm:px-6 lg:px-10 xl:px-14 pt-6 w-full">{statsTabs('records')}</div>
+      <StatsRecords />
+    </div>
+  )
+}
+
 if (subPage === 'stats-constructors') {
   if (selectedTeamStats) {
     const name = selectedTeamStats.Constructor.name.toLowerCase()
@@ -575,6 +609,7 @@ if (subPage === 'stats-constructors') {
   return (
     <div className="min-h-dvh w-full flex flex-col bg-black text-white">
       {nav(() => setSubPage('home'), "Constructeurs")}
+      <div className="px-4 sm:px-6 lg:px-10 xl:px-14 pt-6 w-full">{statsTabs('constructors')}</div>
       <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1 grid content-start gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <SectionTitle h1 kicker="Statistiques" title="Constructeurs" className="col-span-full mb-2" />
         {liveConstructors.length === 0 && <p className="col-span-full text-zinc-500 text-sm">Chargement...</p>}
@@ -604,10 +639,7 @@ if (subPage === 'stats-constructors') {
         <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-28 sm:pb-10">
           {nav(() => setSubPage('home'), "Statistiques")}
           <div className="px-4 sm:px-6 lg:px-10 xl:px-14 pt-6 w-full">
-            <div className="flex border-b border-zinc-800">
-              <button className="px-5 min-h-12 text-sm font-bold uppercase tracking-wider border-b-4 border-red-600 text-white">Aperçu</button>
-              <button onClick={() => setSubPage('stats-constructors')} className="px-5 min-h-12 text-sm font-bold uppercase tracking-wider border-b-4 border-transparent text-zinc-400 hover:text-white">Constructeurs</button>
-            </div>
+            {statsTabs('overview')}
           </div>
           <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1 grid content-start gap-7 lg:grid-cols-2 lg:gap-x-8 items-start">
             <SectionTitle h1 kicker="Saison 2026" title="Statistiques" className="col-span-full" />

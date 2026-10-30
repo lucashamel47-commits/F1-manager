@@ -101,3 +101,69 @@ export async function getQualifying(round: string | number): Promise<Race | null
   const d = await get<{ MRData: { RaceTable: { Races: Race[] } } }>(`/${SEASON}/${round}/qualifying.json`)
   return d.MRData.RaceTable.Races[0] ?? null
 }
+
+// ---------- Historique : classement final d'une saison (mis en cache, y compris localStorage) ----------
+export interface SeasonTop {
+  name: string
+  team?: string
+  points: string
+  wins: string
+}
+export interface SeasonSummary {
+  year: number
+  kind: 'drivers' | 'constructors'
+  round: string
+  top: SeasonTop[]
+}
+
+const LS_PREFIX = 'f1-hist-v1-'
+
+function readLs(key: string): SeasonSummary | null {
+  try {
+    const raw = localStorage.getItem(LS_PREFIX + key)
+    return raw ? (JSON.parse(raw) as SeasonSummary) : null
+  } catch {
+    return null
+  }
+}
+
+/** Top 3 final d'une saison passée (immuable → cache permanent). Saison en cours → cache court. */
+export async function getSeasonTop(year: number, kind: 'drivers' | 'constructors'): Promise<SeasonSummary> {
+  const key = `${kind}-${year}`
+  const current = year >= SEASON
+  if (!current) {
+    const hit = readLs(key)
+    if (hit) return hit
+  }
+  const path = kind === 'drivers' ? 'driverStandings' : 'constructorStandings'
+  const attempt = async (): Promise<SeasonSummary> => {
+    const d = await get<{ MRData: { StandingsTable: { StandingsLists: { round: string; DriverStandings?: DriverStanding[]; ConstructorStandings?: ConstructorStanding[] }[] } } }>(`/${year}/${path}.json`)
+    const s = d.MRData.StandingsTable.StandingsLists[0]
+    if (!s) throw new Error('Aucune donnée')
+    const top: SeasonTop[] =
+      kind === 'drivers'
+        ? (s.DriverStandings ?? []).slice(0, 3).map((x) => ({
+            name: `${x.Driver.givenName} ${x.Driver.familyName}`,
+            team: x.Constructors[x.Constructors.length - 1]?.name,
+            points: x.points,
+            wins: x.wins,
+          }))
+        : (s.ConstructorStandings ?? []).slice(0, 3).map((x) => ({ name: x.Constructor.name, points: x.points, wins: x.wins }))
+    return { year, kind, round: s.round, top }
+  }
+  let res: SeasonSummary
+  try {
+    res = await attempt()
+  } catch {
+    await new Promise((r) => setTimeout(r, 1200))
+    res = await attempt()
+  }
+  if (!current) {
+    try {
+      localStorage.setItem(LS_PREFIX + key, JSON.stringify(res))
+    } catch {
+      /* stockage plein ou indisponible : on ignore */
+    }
+  }
+  return res
+}
