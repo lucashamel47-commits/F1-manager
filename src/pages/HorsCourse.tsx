@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
+import MotorNav, { SectionTitle, type NavKey } from '../components/MotorNav'
+import SpeedTrail from '../components/SpeedTrail'
 
 interface Props {
   onBack: () => void
@@ -45,6 +47,22 @@ const calendar = [
   { round: 22, name: 'Qatar', date: '27 – 29 novembre', circuit: 'Lusail', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Qatar_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Qatar.jpg', length: '5,419 km', laps: 57, record: '1:22.384', recordDriver: 'M. Verstappen', history: 'Circuit moderne inauguré en 2004, utilisé en F1 depuis 2021. Très exigeant physiquement avec de nombreux virages rapides.', grip: 'Asphalte abrasif, grip élevé mais usure importante.', creator: 'Hermann Tilke' },
   { round: 23, name: 'Abu Dhabi', date: '4 – 6 décembre', circuit: 'Yas Marina', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Abu_Dhabi_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Abu_Dhabi.jpg', length: '5,281 km', laps: 58, record: '1:26.103', recordDriver: 'M. Verstappen', history: 'Circuit inauguré en 2009, rénové en 2021. Course de nuit sous les lumières, dernier Grand Prix de la saison.', grip: 'Asphalte lisse, grip stable tout le week-end.', creator: 'Hermann Tilke' },
 ]
+
+const carImageFor = (teamName: string) => {
+  const n = teamName.toLowerCase()
+  if (n.includes('ferrari')) return '/cars/ferrari.jpeg'
+  if (n.includes('mercedes')) return '/cars/mercedes.jpeg'
+  if (n.includes('mclaren')) return '/cars/mclaren.jpeg'
+  if (n.includes('aston')) return '/cars/aston.jpeg'
+  if (n.includes('williams')) return '/cars/williams.jpeg'
+  if (n.includes('alpine')) return '/cars/alpine.jpeg'
+  if (n.includes('haas')) return '/cars/haas.jpeg'
+  if (n.includes('audi')) return '/cars/audi.jpeg'
+  if (n.includes('sauber') || n.includes('kick')) return '/cars/sauber.jpeg'
+  if (n.includes('cadillac')) return '/cars/cadillac.jpeg'
+  if (n.includes('racing bulls') || n.includes('rb')) return '/cars/racingbulls.jpeg'
+  return '/cars/redbull.jpeg'
+}
 
 export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver, favTeam, setFavTeam }: Props) {
   const driverKey = `f1-fav-drivers-${userEmail}`
@@ -137,6 +155,27 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
     return '#3f3f46'
   }
 
+  const trailColor = (teamName: string) => {
+    const c = getColor(teamName)
+    if (teamName.toLowerCase().includes('audi')) return '#BB0A30'
+    if (teamName.toLowerCase().includes('cadillac')) return '#FFD700'
+    return c === '#3f3f46' ? '#e10600' : c
+  }
+
+  const go = (k: NavKey) => {
+    setSelectedRace(null)
+    setSelectedDriver(null)
+    setSelectedConstructor(null)
+    setSelectedTeamStats(null)
+    setSubPage(k)
+  }
+
+  const navKey: NavKey =
+    subPage === 'stats-constructors' ? 'stats' : subPage === 'circuit' ? 'home' : subPage
+  const nav = (back?: () => void, crumb?: string) => (
+    <MotorNav active={navKey} onNavigate={go} onExit={onBack} onBack={back} crumb={crumb} />
+  )
+
   const nationalityFR: Record<string, string> = {
     Dutch: 'Néerlandais', British: 'Britannique', Monegasque: 'Monégasque',
     Australian: 'Australien', Spanish: 'Espagnol', French: 'Français',
@@ -177,35 +216,31 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
       const cota = calendar[0]
       return (
         <div className="min-h-dvh w-full flex flex-col bg-black text-white">
-          <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b border-zinc-900">
-            <button onClick={() => setSubPage('home')} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
-            <p className="text-xs tracking-widest uppercase text-zinc-600">Circuit</p>
-            <div className="min-w-20" aria-hidden="true" />
-          </header>
+          {nav(() => setSubPage('home'), "Circuit")}
           <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1 grid content-start gap-6 md:grid-cols-2 items-start">
-            <div className="text-center md:col-span-2">
+            <div className="md:col-span-2 border-l-4 border-red-600 pl-4">
               <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-2">Prochain GP</p>
-              <h1 className="text-2xl md:text-3xl font-black">{cota.name}</h1>
-              <p className="text-sm text-zinc-500 mt-1">{cota.circuit} • Austin</p>
+              <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight leading-none mt-1">{cota.name}</h1>
+              <p className="text-sm text-zinc-400 mt-2">{cota.circuit} • Austin</p>
             </div>
-            <div className="relative rounded-2xl overflow-hidden border border-zinc-900 select-none touch-none" onMouseDown={() => setIsActive(true)} onMouseUp={() => { setIsActive(false); setHover(null) }} onMouseLeave={() => { setIsActive(false); setHover(null) }} onMouseMove={(e) => handleTrackMove(e.clientX, e.clientY, e.currentTarget.getBoundingClientRect())} onTouchStart={() => setIsActive(true)} onTouchEnd={() => { setIsActive(false); setHover(null) }} onTouchMove={(e) => { e.preventDefault(); const touch = e.touches[0]; handleTrackMove(touch.clientX, touch.clientY, e.currentTarget.getBoundingClientRect()) }}>
+            <div className="relative rounded-sm overflow-hidden border border-zinc-900 select-none touch-none" onMouseDown={() => setIsActive(true)} onMouseUp={() => { setIsActive(false); setHover(null) }} onMouseLeave={() => { setIsActive(false); setHover(null) }} onMouseMove={(e) => handleTrackMove(e.clientX, e.clientY, e.currentTarget.getBoundingClientRect())} onTouchStart={() => setIsActive(true)} onTouchEnd={() => { setIsActive(false); setHover(null) }} onTouchMove={(e) => { e.preventDefault(); const touch = e.touches[0]; handleTrackMove(touch.clientX, touch.clientY, e.currentTarget.getBoundingClientRect()) }}>
               <img src={cota.map} alt="COTA" className="w-full h-auto max-h-[60vh] object-contain bg-zinc-950 pointer-events-none" />
               {hover && isActive && (
-                <div className="absolute bg-black/95 border border-zinc-700 rounded-xl px-4 py-2 text-center text-xs shadow-xl pointer-events-none whitespace-nowrap" style={{ left: `${Math.min(85, Math.max(15, hover.x * 100))}%`, top: hover.y < 0.25 ? `${hover.y * 100 + 12}%` : `${Math.max(8, hover.y * 100)}%`, transform: hover.y < 0.25 ? 'translate(-50%, 0)' : 'translate(-50%, -140%)' }}>
+                <div className="absolute bg-black/95 border border-zinc-700 rounded-sm px-4 py-2 text-center text-xs shadow-xl pointer-events-none whitespace-nowrap" style={{ left: `${Math.min(85, Math.max(15, hover.x * 100))}%`, top: hover.y < 0.25 ? `${hover.y * 100 + 12}%` : `${Math.max(8, hover.y * 100)}%`, transform: hover.y < 0.25 ? 'translate(-50%, 0)' : 'translate(-50%, -140%)' }}>
                   <p className="font-semibold text-white">{hover.speed} km/h</p>
                   <p className="text-zinc-500 text-[11px] mt-0.5">Vitesse estimée</p>
                 </div>
               )}
             </div>
-            <img src={cota.photo} alt="COTA photo" className="w-full h-auto rounded-2xl border border-zinc-900" />
+            <img src={cota.photo} alt="COTA photo" className="w-full h-auto rounded-sm border border-zinc-800" />
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:col-span-2">
-              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-xs text-zinc-500">Longueur</p><p className="font-semibold mt-1">{cota.length}</p></div>
-              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-xs text-zinc-500">Tours</p><p className="font-semibold mt-1">{cota.laps}</p></div>
-              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 col-span-2"><p className="text-xs text-zinc-500">Record</p><p className="font-semibold mt-1">{cota.record}</p><p className="text-[11px] text-zinc-500 mt-0.5">{cota.recordDriver}</p></div>
+              <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Longueur</p><p className="font-semibold mt-1">{cota.length}</p></div>
+              <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Tours</p><p className="font-semibold mt-1">{cota.laps}</p></div>
+              <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 col-span-2"><p className="text-xs text-zinc-500">Record</p><p className="font-semibold mt-1">{cota.record}</p><p className="text-[11px] text-zinc-500 mt-0.5">{cota.recordDriver}</p></div>
             </div>
-            <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 md:col-span-2"><p className="text-xs text-zinc-500">Histoire</p><p className="text-sm mt-1 leading-relaxed">{cota.history}</p></div>
-            <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-xs text-zinc-500">Grip</p><p className="text-sm mt-1">{cota.grip}</p></div>
-            <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-xs text-zinc-500">Concepteur</p><p className="text-sm mt-1">{cota.creator}</p></div>
+            <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 md:col-span-2"><p className="text-xs text-zinc-500">Histoire</p><p className="text-sm mt-1 leading-relaxed">{cota.history}</p></div>
+            <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Grip</p><p className="text-sm mt-1">{cota.grip}</p></div>
+            <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Concepteur</p><p className="text-sm mt-1">{cota.creator}</p></div>
           </div>
         </div>
       )
@@ -215,35 +250,31 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
       if (selectedRace) {
         return (
           <div className="min-h-dvh w-full flex flex-col bg-black text-white">
-            <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b border-zinc-900">
-              <button onClick={() => setSelectedRace(null)} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
-              <p className="text-xs tracking-widest uppercase text-zinc-600">Course</p>
-              <div className="min-w-20" aria-hidden="true" />
-            </header>
+            {nav(() => setSelectedRace(null), "Course")}
             <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1 grid content-start gap-6 md:grid-cols-2 items-start">
-              <div className="text-center md:col-span-2">
+              <div className="md:col-span-2 border-l-4 border-red-600 pl-4">
                 <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-2">Round {selectedRace.round}</p>
-                <h1 className="text-2xl md:text-3xl font-black">{selectedRace.name}</h1>
+                <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight leading-none mt-1">{selectedRace.name}</h1>
                 <p className="text-sm text-zinc-500 mt-1">{selectedRace.circuit} • {selectedRace.date}</p>
               </div>
-              <div className="relative rounded-2xl overflow-hidden border border-zinc-900 select-none touch-none" onMouseDown={() => setIsActive(true)} onMouseUp={() => { setIsActive(false); setHover(null) }} onMouseLeave={() => { setIsActive(false); setHover(null) }} onMouseMove={(e) => handleTrackMove(e.clientX, e.clientY, e.currentTarget.getBoundingClientRect())} onTouchStart={() => setIsActive(true)} onTouchEnd={() => { setIsActive(false); setHover(null) }} onTouchMove={(e) => { e.preventDefault(); const touch = e.touches[0]; handleTrackMove(touch.clientX, touch.clientY, e.currentTarget.getBoundingClientRect()) }}>
+              <div className="relative rounded-sm overflow-hidden border border-zinc-900 select-none touch-none" onMouseDown={() => setIsActive(true)} onMouseUp={() => { setIsActive(false); setHover(null) }} onMouseLeave={() => { setIsActive(false); setHover(null) }} onMouseMove={(e) => handleTrackMove(e.clientX, e.clientY, e.currentTarget.getBoundingClientRect())} onTouchStart={() => setIsActive(true)} onTouchEnd={() => { setIsActive(false); setHover(null) }} onTouchMove={(e) => { e.preventDefault(); const touch = e.touches[0]; handleTrackMove(touch.clientX, touch.clientY, e.currentTarget.getBoundingClientRect()) }}>
                 <img src={selectedRace.map} alt={selectedRace.name} className="w-full h-auto max-h-[60vh] object-contain bg-zinc-950 pointer-events-none" />
                 {hover && isActive && (
-                  <div className="absolute bg-black/95 border border-zinc-700 rounded-xl px-4 py-2 text-center text-xs shadow-xl pointer-events-none whitespace-nowrap" style={{ left: `${Math.min(85, Math.max(15, hover.x * 100))}%`, top: hover.y < 0.25 ? `${hover.y * 100 + 12}%` : `${Math.max(8, hover.y * 100)}%`, transform: hover.y < 0.25 ? 'translate(-50%, 0)' : 'translate(-50%, -140%)' }}>
+                  <div className="absolute bg-black/95 border border-zinc-700 rounded-sm px-4 py-2 text-center text-xs shadow-xl pointer-events-none whitespace-nowrap" style={{ left: `${Math.min(85, Math.max(15, hover.x * 100))}%`, top: hover.y < 0.25 ? `${hover.y * 100 + 12}%` : `${Math.max(8, hover.y * 100)}%`, transform: hover.y < 0.25 ? 'translate(-50%, 0)' : 'translate(-50%, -140%)' }}>
                     <p className="font-semibold text-white">{hover.speed} km/h</p>
                     <p className="text-zinc-500 text-[11px] mt-0.5">Vitesse estimée</p>
                   </div>
                 )}
               </div>
-              <img src={selectedRace.photo} alt={selectedRace.name} className="w-full h-auto rounded-2xl border border-zinc-900" />
+              <img src={selectedRace.photo} alt={selectedRace.name} className="w-full h-auto rounded-sm border border-zinc-800" />
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:col-span-2">
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-xs text-zinc-500">Longueur</p><p className="font-semibold mt-1">{selectedRace.length}</p></div>
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-xs text-zinc-500">Tours</p><p className="font-semibold mt-1">{selectedRace.laps}</p></div>
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 col-span-2"><p className="text-xs text-zinc-500">Record</p><p className="font-semibold mt-1">{selectedRace.record}</p><p className="text-[11px] text-zinc-500 mt-0.5">{selectedRace.recordDriver}</p></div>
+                <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Longueur</p><p className="font-semibold mt-1">{selectedRace.length}</p></div>
+                <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Tours</p><p className="font-semibold mt-1">{selectedRace.laps}</p></div>
+                <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 col-span-2"><p className="text-xs text-zinc-500">Record</p><p className="font-semibold mt-1">{selectedRace.record}</p><p className="text-[11px] text-zinc-500 mt-0.5">{selectedRace.recordDriver}</p></div>
               </div>
-              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 md:col-span-2"><p className="text-xs text-zinc-500">Histoire</p><p className="text-sm mt-1 leading-relaxed">{selectedRace.history}</p></div>
-              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-xs text-zinc-500">Grip</p><p className="text-sm mt-1">{selectedRace.grip}</p></div>
-              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4"><p className="text-xs text-zinc-500">Concepteur</p><p className="text-sm mt-1">{selectedRace.creator}</p></div>
+              <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 md:col-span-2"><p className="text-xs text-zinc-500">Histoire</p><p className="text-sm mt-1 leading-relaxed">{selectedRace.history}</p></div>
+              <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Grip</p><p className="text-sm mt-1">{selectedRace.grip}</p></div>
+              <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Concepteur</p><p className="text-sm mt-1">{selectedRace.creator}</p></div>
             </div>
           </div>
         )
@@ -251,19 +282,20 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
 
       return (
         <div className="min-h-dvh w-full flex flex-col bg-black text-white">
-          <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b border-zinc-900">
-            <button onClick={() => setSubPage('home')} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
-            <p className="text-xs tracking-widest uppercase text-zinc-600">Calendrier</p>
-            <div className="min-w-20" aria-hidden="true" />
-          </header>
-          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 sm:py-8 w-full flex-1 grid content-start gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+          {nav(() => setSubPage('home'), "Calendrier")}
+          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 sm:py-8 w-full flex-1 grid content-start gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+            <SectionTitle h1 kicker="Saison 2026" title="Calendrier" className="col-span-full mb-2" />
             {calendar.map((race) => (
-              <button key={race.round} onClick={() => setSelectedRace(race)} className="w-full flex items-center justify-between gap-3 bg-zinc-950/40 border border-zinc-900/80 rounded-2xl px-5 py-4 min-h-14 text-left hover:border-zinc-700 active:bg-zinc-900/60 transition">
-                <div>
-                  <p className="text-sm font-medium">{race.name}</p>
-                  <p className="text-xs text-zinc-500">{race.circuit}</p>
+              <button key={race.round} onClick={() => setSelectedRace(race)} className="group text-left bg-zinc-950 border border-zinc-800 hover:border-red-600 overflow-hidden transition">
+                <div className="relative aspect-video overflow-hidden bg-zinc-900">
+                  <img src={race.photo} alt="" loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                  <span className="absolute top-3 left-3 bg-red-600 text-white text-[11px] font-bold uppercase tracking-widest px-2 py-1">Round {race.round}</span>
                 </div>
-                <span className="text-xs text-zinc-400 text-right shrink-0">{race.date}</span>
+                <div className="p-4">
+                  <h3 className="text-xl font-black uppercase tracking-tight">{race.name}</h3>
+                  <p className="text-xs text-zinc-400 mt-1">{race.circuit} • {race.date}</p>
+                </div>
               </button>
             ))}
           </div>
@@ -277,27 +309,23 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
         const nat = nationalityFR[selectedDriver.Driver.nationality] || selectedDriver.Driver.nationality
         return (
           <div className="min-h-dvh w-full flex flex-col bg-black text-white">
-            <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b border-zinc-900">
-              <button onClick={() => setSelectedDriver(null)} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
-              <p className="text-xs tracking-widest uppercase text-zinc-600">Pilote</p>
-              <div className="min-w-20" aria-hidden="true" />
-            </header>
+            {nav(() => setSelectedDriver(null), "Pilote")}
             <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-8 w-full flex-1 grid content-start gap-6 lg:grid-cols-3 items-start">
               <div className="text-center lg:row-span-2 lg:self-center">
                 <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl font-black text-white" style={{ backgroundColor: getColor(teamName) }}>
                   {selectedDriver.Driver.familyName.charAt(0)}
                 </div>
-                <h1 className="text-2xl md:text-3xl font-black">{selectedDriver.Driver.givenName} {selectedDriver.Driver.familyName}</h1>
+                <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight leading-none mt-1">{selectedDriver.Driver.givenName} {selectedDriver.Driver.familyName}</h1>
                 <p className="text-sm text-zinc-500 mt-1">{teamName}</p>
               </div>
-              <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 lg:col-span-2">
+              <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 lg:col-span-2">
                 <p className="text-sm leading-relaxed text-zinc-300">Pilote de Formule 1 en compétition pour le championnat.</p>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 lg:col-span-2">
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-xs text-zinc-500">Points</p><p className="text-xl font-semibold mt-1">{selectedDriver.points}</p></div>
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-xs text-zinc-500">Victoires</p><p className="text-xl font-semibold mt-1">{selectedDriver.wins}</p></div>
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-xs text-zinc-500">Position</p><p className="text-xl font-semibold mt-1">{selectedDriver.position}</p></div>
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-xs text-zinc-500">Nationalité</p><p className="text-xl font-semibold mt-1 break-words">{nat}</p></div>
+                <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 text-center"><p className="text-xs text-zinc-500">Points</p><p className="text-xl font-semibold mt-1">{selectedDriver.points}</p></div>
+                <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 text-center"><p className="text-xs text-zinc-500">Victoires</p><p className="text-xl font-semibold mt-1">{selectedDriver.wins}</p></div>
+                <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 text-center"><p className="text-xs text-zinc-500">Position</p><p className="text-xl font-semibold mt-1">{selectedDriver.position}</p></div>
+                <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 text-center"><p className="text-xs text-zinc-500">Nationalité</p><p className="text-xl font-semibold mt-1 break-words">{nat}</p></div>
               </div>
             </div>
           </div>
@@ -308,18 +336,14 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
         const nat = nationalityFR[selectedConstructor.Constructor.nationality] || selectedConstructor.Constructor.nationality
         return (
           <div className="min-h-dvh w-full flex flex-col bg-black text-white">
-            <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b border-zinc-900">
-              <button onClick={() => setSelectedConstructor(null)} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
-              <p className="text-xs tracking-widest uppercase text-zinc-600">Écurie</p>
-              <div className="min-w-20" aria-hidden="true" />
-            </header>
+            {nav(() => setSelectedConstructor(null), "Écurie")}
             <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-8 w-full flex-1 space-y-6 content-start">
-              <h1 className="text-2xl md:text-3xl font-black text-center">{selectedConstructor.Constructor.name}</h1>
+              <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-center">{selectedConstructor.Constructor.name}</h1>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 lg:col-span-2">
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-xs text-zinc-500">Points</p><p className="text-xl font-semibold mt-1">{selectedConstructor.points}</p></div>
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-xs text-zinc-500">Victoires</p><p className="text-xl font-semibold mt-1">{selectedConstructor.wins}</p></div>
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-xs text-zinc-500">Position</p><p className="text-xl font-semibold mt-1">{selectedConstructor.position}</p></div>
-                <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl p-4 text-center"><p className="text-xs text-zinc-500">Nationalité</p><p className="text-xl font-semibold mt-1 break-words">{nat}</p></div>
+                <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 text-center"><p className="text-xs text-zinc-500">Points</p><p className="text-xl font-semibold mt-1">{selectedConstructor.points}</p></div>
+                <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 text-center"><p className="text-xs text-zinc-500">Victoires</p><p className="text-xl font-semibold mt-1">{selectedConstructor.wins}</p></div>
+                <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 text-center"><p className="text-xs text-zinc-500">Position</p><p className="text-xl font-semibold mt-1">{selectedConstructor.position}</p></div>
+                <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 text-center"><p className="text-xs text-zinc-500">Nationalité</p><p className="text-xl font-semibold mt-1 break-words">{nat}</p></div>
               </div>
             </div>
           </div>
@@ -328,15 +352,12 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
 
       return (
         <div className="min-h-dvh w-full flex flex-col bg-black text-white">
-          <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b border-zinc-900">
-            <button onClick={() => setSubPage('home')} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
-            <p className="text-xs tracking-widest uppercase text-zinc-600">Classements</p>
-            <div className="min-w-20" aria-hidden="true" />
-          </header>
+          {nav(() => setSubPage('home'), "Classements")}
           <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1">
-            <div className="flex gap-2 mb-6">
-              <button onClick={() => setStandingsTab('drivers')} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition ${standingsTab === 'drivers' ? 'bg-red-600 text-white' : 'bg-zinc-950 border border-zinc-800 text-zinc-400'}`}>Pilotes</button>
-              <button onClick={() => setStandingsTab('constructors')} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition ${standingsTab === 'constructors' ? 'bg-red-600 text-white' : 'bg-zinc-950 border border-zinc-800 text-zinc-400'}`}>Constructeurs</button>
+            <SectionTitle h1 kicker="Championnat 2026" title="Classements" className="mb-6" />
+            <div className="flex border-b border-zinc-800 mb-6">
+              <button onClick={() => setStandingsTab('drivers')} className={`px-5 min-h-12 text-sm font-bold uppercase tracking-wider border-b-4 transition ${standingsTab === 'drivers' ? 'border-red-600 text-white' : 'border-transparent text-zinc-400'}`}>Pilotes</button>
+              <button onClick={() => setStandingsTab('constructors')} className={`px-5 min-h-12 text-sm font-bold uppercase tracking-wider border-b-4 transition ${standingsTab === 'constructors' ? 'border-red-600 text-white' : 'border-transparent text-zinc-400'}`}>Constructeurs</button>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {standingsTab === 'drivers' ? (
@@ -344,7 +365,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
                 liveStandings.map((d, i) => {
                   const teamName = d.Constructors[0]?.name || ''
                   return (
-                    <button key={d.Driver.driverId} onClick={() => setSelectedDriver(d)} className="w-full flex items-center justify-between gap-3 bg-zinc-950/40 border border-zinc-900/80 rounded-2xl px-4 sm:px-5 py-4 min-h-14 text-left hover:border-zinc-700 active:bg-zinc-900/60 transition">
+                    <button key={d.Driver.driverId} onClick={() => setSelectedDriver(d)} className="w-full flex items-center justify-between gap-3 bg-zinc-950 border border-zinc-800 rounded-sm px-4 sm:px-5 py-4 min-h-14 text-left hover:border-zinc-700 active:bg-zinc-900/60 transition">
                       <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                         <span className="text-sm font-medium text-zinc-600 w-6">{i + 1}</span>
                         <div className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: getColor(teamName) }}>
@@ -365,7 +386,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
               ) : (
                 liveConstructors.length === 0 ? <p className="text-center text-zinc-500 text-sm">Chargement...</p> :
                 liveConstructors.map((t, i) => (
-                  <button key={t.Constructor.constructorId} onClick={() => setSelectedConstructor(t)} className="w-full flex items-center justify-between gap-3 bg-zinc-950/40 border border-zinc-900/80 rounded-2xl px-4 sm:px-5 py-4 min-h-14 text-left hover:border-zinc-700 active:bg-zinc-900/60 transition">
+                  <button key={t.Constructor.constructorId} onClick={() => setSelectedConstructor(t)} className="w-full flex items-center justify-between gap-3 bg-zinc-950 border border-zinc-800 rounded-sm px-4 sm:px-5 py-4 min-h-14 text-left hover:border-zinc-700 active:bg-zinc-900/60 transition">
                     <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                       <span className="text-sm font-medium text-zinc-600 w-6">{i + 1}</span>
                       <p className="text-sm font-medium">{t.Constructor.name}</p>
@@ -476,23 +497,18 @@ if (subPage === 'stats-constructors') {
 
     return (
       <div className="min-h-dvh w-full flex flex-col bg-black text-white">
-        <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b border-zinc-900">
-          <button onClick={() => setSelectedTeamStats(null)} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
-          <p className="text-xs tracking-[0.3em] uppercase text-zinc-600">{selectedTeamStats.Constructor.name}</p>
-          <div className="min-w-20" aria-hidden="true" />
-        </header>
+        {nav(() => setSelectedTeamStats(null), selectedTeamStats.Constructor.name)}
 
         <div className="px-4 sm:px-6 lg:px-10 xl:px-14 pt-6 pb-16 w-full flex-1 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:content-start">
-          <div className="flex justify-center mb-5 lg:col-span-2">
-            <img src={teamLogo} alt="" className="h-10 sm:h-12 max-w-full object-contain" />
-          </div>
+          <div className="lg:col-span-2 mb-6 flex items-center justify-between gap-4"><SectionTitle h1 kicker="Écurie 2026" title={selectedTeamStats.Constructor.name} /><img src={teamLogo} alt="" className="h-10 sm:h-14 max-w-[30%] object-contain" /></div>
 
-          <div className="relative rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-950 h-48 sm:h-64 md:h-80 lg:h-full lg:min-h-[28rem] flex items-center justify-center mb-6 sm:mb-8 lg:mb-0">
-            <img src={carImage} alt="" className="max-w-full max-h-full object-contain" />
+          <div className="relative rounded-sm overflow-hidden border border-zinc-800 bg-black h-48 sm:h-64 md:h-80 lg:h-full lg:min-h-[28rem] flex items-center justify-center mb-6 sm:mb-8 lg:mb-0">
+            <SpeedTrail color={trailColor(selectedTeamStats.Constructor.name)} />
+            <img src={carImage} alt="" className="relative max-w-full max-h-full object-contain mix-blend-screen" />
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1 items-start">
-            <div className="rounded-2xl border border-zinc-900 bg-zinc-950/40 p-5 md:col-span-2 lg:col-span-1">
+            <div className="rounded-sm border border-zinc-800 bg-zinc-950 p-5 md:col-span-2 lg:col-span-1">
               <p className="text-xs tracking-widest uppercase text-zinc-600 mb-4">Classement</p>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
@@ -510,7 +526,7 @@ if (subPage === 'stats-constructors') {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-zinc-900 bg-zinc-950/40 p-5">
+            <div className="rounded-sm border border-zinc-800 bg-zinc-950 p-5">
               <p className="text-xs tracking-widest uppercase text-zinc-600 mb-4">Groupe motopropulseur</p>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between gap-4"><span className="text-zinc-500">Fournisseur</span><span>{fournisseur}</span></div>
@@ -522,7 +538,7 @@ if (subPage === 'stats-constructors') {
               <p className="text-sm text-zinc-400 mt-5 leading-relaxed">{noteMoteur}</p>
             </div>
 
-            <div className="rounded-2xl border border-zinc-900 bg-zinc-950/40 p-5">
+            <div className="rounded-sm border border-zinc-800 bg-zinc-950 p-5">
               <p className="text-xs tracking-widest uppercase text-zinc-600 mb-4">Aérodynamique</p>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between gap-4"><span className="text-zinc-500">Mode Virage</span><span className="text-right">Appui maximum</span></div>
@@ -534,10 +550,10 @@ if (subPage === 'stats-constructors') {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2 pt-8 lg:col-span-2">
-            <a href={officialSite} target="_blank" rel="noopener noreferrer" className="block w-full text-center py-3.5 min-h-12 bg-zinc-900/50 border border-zinc-800 rounded-xl text-sm text-zinc-300">
+            <a href={officialSite} target="_blank" rel="noopener noreferrer" className="block w-full text-center py-3.5 min-h-12 bg-zinc-900/50 border border-zinc-800 rounded-sm text-sm text-zinc-300">
               Site officiel
             </a>
-            <a href={youtube} target="_blank" rel="noopener noreferrer" className="block w-full text-center py-3.5 min-h-12 bg-zinc-900/50 border border-zinc-800 rounded-xl text-sm text-zinc-300">
+            <a href={youtube} target="_blank" rel="noopener noreferrer" className="block w-full text-center py-3.5 min-h-12 bg-zinc-900/50 border border-zinc-800 rounded-sm text-sm text-zinc-300">
               Actualités YouTube
             </a>
           </div>
@@ -548,17 +564,20 @@ if (subPage === 'stats-constructors') {
 
   return (
     <div className="min-h-dvh w-full flex flex-col bg-black text-white">
-      <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b border-zinc-900">
-        <button onClick={() => setSubPage('home')} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
-        <p className="text-xs tracking-widest uppercase text-zinc-600">Constructeurs</p>
-        <div className="min-w-20" aria-hidden="true" />
-      </header>
-      <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1 grid content-start gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {liveConstructors.map((t) => (
-          <button key={t.Constructor.constructorId} onClick={() => setSelectedTeamStats(t)} className="w-full text-left bg-zinc-950/30 border border-zinc-900/60 rounded-xl px-4 py-3 min-h-12 hover:bg-zinc-900/50 active:bg-zinc-900/60 transition">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-medium">{t.Constructor.name}</p>
-              <p className="text-xs text-zinc-500">{t.points} pts</p>
+      {nav(() => setSubPage('home'), "Constructeurs")}
+      <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1 grid content-start gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <SectionTitle h1 kicker="Statistiques" title="Constructeurs" className="col-span-full mb-2" />
+        {liveConstructors.length === 0 && <p className="col-span-full text-zinc-500 text-sm">Chargement...</p>}
+        {liveConstructors.map((t, i) => (
+          <button key={t.Constructor.constructorId} onClick={() => setSelectedTeamStats(t)} className="group text-left bg-zinc-950 border border-zinc-800 hover:border-red-600 overflow-hidden transition">
+            <div className="relative aspect-video overflow-hidden bg-black">
+              <SpeedTrail color={trailColor(t.Constructor.name)} />
+              <img src={carImageFor(t.Constructor.name)} alt="" loading="lazy" className="relative w-full h-full object-contain mix-blend-screen" />
+              <span className="absolute top-3 left-3 bg-red-600 text-white text-[11px] font-bold uppercase tracking-widest px-2 py-1">P{i + 1}</span>
+            </div>
+            <div className="p-4 flex items-end justify-between gap-3" style={{ borderTop: `3px solid ${trailColor(t.Constructor.name)}` }}>
+              <h3 className="text-lg font-black uppercase tracking-tight leading-tight">{t.Constructor.name}</h3>
+              <p className="text-sm text-zinc-300 shrink-0"><span className="font-black text-xl">{t.points}</span> pts</p>
             </div>
           </button>
         ))}
@@ -574,22 +593,19 @@ if (subPage === 'stats-constructors') {
       const totalRaces = 17
       return (
         <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-10">
-          <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b border-zinc-900">
-            <button onClick={() => setSubPage('home')} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
-            <p className="text-xs tracking-widest uppercase text-zinc-600">Statistiques</p>
-            <div className="min-w-20" aria-hidden="true" />
-          </header>
+          {nav(() => setSubPage('home'), "Statistiques")}
           <div className="px-4 sm:px-6 lg:px-10 xl:px-14 pt-6 w-full">
-            <div className="flex gap-2">
-              <button className="flex-1 py-2.5 min-h-11 rounded-xl text-sm font-medium bg-red-600 text-white">Aperçu</button>
-              <button onClick={() => setSubPage('stats-constructors')} className="flex-1 py-2.5 min-h-11 rounded-xl text-sm font-medium bg-zinc-950 border border-zinc-800 text-zinc-400">Constructeurs</button>
+            <div className="flex border-b border-zinc-800">
+              <button className="px-5 min-h-12 text-sm font-bold uppercase tracking-wider border-b-4 border-red-600 text-white">Aperçu</button>
+              <button onClick={() => setSubPage('stats-constructors')} className="px-5 min-h-12 text-sm font-bold uppercase tracking-wider border-b-4 border-transparent text-zinc-400 hover:text-white">Constructeurs</button>
             </div>
           </div>
           <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1 grid content-start gap-7 lg:grid-cols-2 lg:gap-x-8 items-start">
+            <SectionTitle h1 kicker="Saison 2026" title="Statistiques" className="col-span-full" />
             <div>
               <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-4">Title Fight</p>
               {leader && second ? (
-                <div className="bg-zinc-950 border border-zinc-900 rounded-2xl p-5">
+                <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-5">
                   <div className="flex justify-between items-end mb-4">
                     <div><p className="text-xs text-zinc-500">{leader.Driver.familyName}</p><p className="text-3xl font-black">{leader.points}</p><p className="text-xs text-zinc-500 mt-1">{leader.wins} victoires</p></div>
                     <div className="text-right"><p className="text-xs text-zinc-500">{second.Driver.familyName}</p><p className="text-3xl font-black text-zinc-400">{second.points}</p><p className="text-xs text-zinc-500 mt-1">{second.wins} victoires</p></div>
@@ -606,7 +622,7 @@ if (subPage === 'stats-constructors') {
               <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-4">Top 3</p>
               <div className="space-y-2">
                 {liveStandings.slice(0, 3).map((d, i) => (
-                  <div key={d.Driver.driverId} className="flex items-center justify-between bg-zinc-950/60 border border-zinc-900/80 rounded-xl px-4 py-3">
+                  <div key={d.Driver.driverId} className="flex items-center justify-between bg-zinc-950 border border-zinc-800 rounded-sm px-4 py-3">
                     <div className="flex items-center gap-3"><span className="text-xs text-zinc-600 w-5">{i + 1}</span><div><p className="text-sm font-medium">{d.Driver.familyName}</p><p className="text-xs text-zinc-500">{d.Constructors[0]?.name}</p></div></div>
                     <div className="text-right"><p className="text-sm font-semibold">{d.points}</p><p className="text-[11px] text-zinc-500">{d.wins} win{Number(d.wins) !== 1 ? 's' : ''}</p></div>
                   </div>
@@ -616,17 +632,17 @@ if (subPage === 'stats-constructors') {
             <div>
               <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-4">Essentiels</p>
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-zinc-950/60 border border-zinc-900/80 rounded-2xl p-4"><p className="text-xs text-zinc-500">Moy. points / course</p><p className="text-lg font-semibold mt-1">{leader ? (Number(leader.points) / totalRaces).toFixed(1) : '-'}</p></div>
-                <div className="bg-zinc-950/60 border border-zinc-900/80 rounded-2xl p-4"><p className="text-xs text-zinc-500">Victoires leader</p><p className="text-lg font-semibold mt-1">{leader?.wins || '-'}</p></div>
-                <div className="bg-zinc-950/60 border border-zinc-900/80 rounded-2xl p-4"><p className="text-xs text-zinc-500">Écart au 2e</p><p className="text-lg font-semibold mt-1">{gap} pts</p></div>
-                <div className="bg-zinc-950/60 border border-zinc-900/80 rounded-2xl p-4"><p className="text-xs text-zinc-500">Écurie leader</p><p className="text-lg font-semibold mt-1 break-words">{liveConstructors[0]?.Constructor.name || '-'}</p></div>
+                <div className="bg-zinc-950 border border-zinc-800 rounded-sm p-4"><p className="text-xs text-zinc-500">Moy. points / course</p><p className="text-lg font-semibold mt-1">{leader ? (Number(leader.points) / totalRaces).toFixed(1) : '-'}</p></div>
+                <div className="bg-zinc-950 border border-zinc-800 rounded-sm p-4"><p className="text-xs text-zinc-500">Victoires leader</p><p className="text-lg font-semibold mt-1">{leader?.wins || '-'}</p></div>
+                <div className="bg-zinc-950 border border-zinc-800 rounded-sm p-4"><p className="text-xs text-zinc-500">Écart au 2e</p><p className="text-lg font-semibold mt-1">{gap} pts</p></div>
+                <div className="bg-zinc-950 border border-zinc-800 rounded-sm p-4"><p className="text-xs text-zinc-500">Écurie leader</p><p className="text-lg font-semibold mt-1 break-words">{liveConstructors[0]?.Constructor.name || '-'}</p></div>
               </div>
             </div>
             <div>
               <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-4">Constructeurs</p>
               <div className="space-y-2">
                 {liveConstructors.slice(0, 3).map((t, i) => (
-                  <div key={t.Constructor.constructorId} className="flex items-center justify-between bg-zinc-950/60 border border-zinc-900/80 rounded-xl px-4 py-3">
+                  <div key={t.Constructor.constructorId} className="flex items-center justify-between bg-zinc-950 border border-zinc-800 rounded-sm px-4 py-3">
                     <div className="flex items-center gap-3"><span className="text-xs text-zinc-600 w-5">{i + 1}</span><p className="text-sm font-medium">{t.Constructor.name}</p></div>
                     <div className="text-right"><p className="text-sm font-semibold">{t.points}</p><p className="text-[11px] text-zinc-500">{t.wins} win{Number(t.wins) !== 1 ? 's' : ''}</p></div>
                   </div>
@@ -643,33 +659,30 @@ if (subPage === 'stats-constructors') {
       const team = teams.find(t => t.id === favTeam)
       return (
         <div className="min-h-dvh w-full flex flex-col bg-black text-white">
-          <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b border-zinc-900">
-            <button onClick={() => setSubPage('home')} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
-            <p className="text-xs tracking-widest uppercase text-zinc-600">Tes favoris</p>
-            <div className="min-w-20" aria-hidden="true" />
-          </header>
+          {nav(() => setSubPage('home'), "Tes favoris")}
           <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-8 w-full flex-1 grid content-start gap-6 md:grid-cols-2 items-start">
+            <SectionTitle h1 kicker="Ton paddock" title="Tes favoris" className="col-span-full" />
             {driver && (
-              <div className="bg-zinc-950/40 border border-zinc-900/80 rounded-2xl p-5">
+              <div className="bg-zinc-950 border border-zinc-800 rounded-sm p-5">
                 <div className="flex items-center gap-4 mb-5">
                   <img src={driver.photo} alt={driver.name} className="w-16 h-16 shrink-0 rounded-full object-cover object-top" />
                   <div><p className="font-semibold">{driver.name}</p><p className="text-xs text-zinc-500">{driver.team}</p></div>
                 </div>
-                <a href={`https://www.formula1.com/en/drivers/${driver.name.toLowerCase().replace(/ /g, '-')}.html`} target="_blank" rel="noreferrer" className="block w-full py-3 min-h-12 bg-zinc-900 border border-zinc-800 rounded-xl text-center text-sm font-medium hover:bg-zinc-800 transition">Voir les actualités</a>
-                <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(driver.name + ' F1')}`} target="_blank" rel="noreferrer" className="block w-full py-3 min-h-12 mt-2 bg-zinc-900 border border-zinc-800 rounded-xl text-center text-sm font-medium hover:bg-zinc-800 transition">Vidéos récentes</a>
+                <a href={`https://www.formula1.com/en/drivers/${driver.name.toLowerCase().replace(/ /g, '-')}.html`} target="_blank" rel="noreferrer" className="block w-full py-3 min-h-12 bg-zinc-900 border border-zinc-800 rounded-sm text-center text-sm font-medium hover:bg-zinc-800 transition">Voir les actualités</a>
+                <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(driver.name + ' F1')}`} target="_blank" rel="noreferrer" className="block w-full py-3 min-h-12 mt-2 bg-zinc-900 border border-zinc-800 rounded-sm text-center text-sm font-medium hover:bg-zinc-800 transition">Vidéos récentes</a>
               </div>
             )}
             {team && (
-              <div className="bg-zinc-950/40 border border-zinc-900/80 rounded-2xl p-5">
+              <div className="bg-zinc-950 border border-zinc-800 rounded-sm p-5">
                 <div className="flex items-center gap-4 mb-5">
                   <img src={team.logo} alt={team.name} className="w-14 h-14 object-contain" />
                   <p className="font-semibold">{team.name}</p>
                 </div>
-                <a href={`https://en.wikipedia.org/wiki/${encodeURIComponent(team.name.replace(' Racing', ''))}`} target="_blank" rel="noreferrer" className="block w-full py-3 min-h-12 bg-zinc-900 border border-zinc-800 rounded-xl text-center text-sm font-medium hover:bg-zinc-800 transition">Voir les actualités</a>
-                <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(team.name + ' F1')}`} target="_blank" rel="noreferrer" className="block w-full py-3 min-h-12 mt-2 bg-zinc-900 border border-zinc-800 rounded-xl text-center text-sm font-medium hover:bg-zinc-800 transition">Vidéos récentes</a>
+                <a href={`https://en.wikipedia.org/wiki/${encodeURIComponent(team.name.replace(' Racing', ''))}`} target="_blank" rel="noreferrer" className="block w-full py-3 min-h-12 bg-zinc-900 border border-zinc-800 rounded-sm text-center text-sm font-medium hover:bg-zinc-800 transition">Voir les actualités</a>
+                <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(team.name + ' F1')}`} target="_blank" rel="noreferrer" className="block w-full py-3 min-h-12 mt-2 bg-zinc-900 border border-zinc-800 rounded-sm text-center text-sm font-medium hover:bg-zinc-800 transition">Vidéos récentes</a>
               </div>
             )}
-            {!driver && !team && <p className="text-center text-zinc-500 md:col-span-2">Aucun favori sélectionné</p>}
+            {!driver && !team && <p className="text-zinc-500 md:col-span-2">Aucun favori sélectionné</p>}
           </div>
         </div>
       )
@@ -677,44 +690,81 @@ if (subPage === 'stats-constructors') {
 
     return (
       <div className="min-h-dvh w-full flex flex-col bg-black text-white">
-        <header className="sticky top-0 z-20 bg-black/90 backdrop-blur flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b border-zinc-900">
-          <button onClick={onBack} className="text-sm text-zinc-400 min-h-11 min-w-20 text-left active:text-white">← Retour</button>
-          <p className="text-xs tracking-widest uppercase text-zinc-600">Hors Course</p>
-          <div className="min-w-20" aria-hidden="true" />
-        </header>
-        <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 sm:py-8 w-full flex-1 grid content-start gap-6 sm:gap-8 lg:grid-cols-2 lg:gap-12 items-start">
-          <div onClick={() => setSubPage('circuit')} className="relative overflow-hidden rounded-3xl bg-zinc-950 border border-zinc-800 cursor-pointer active:scale-[0.98] transition">
-            <img src="https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/USA_Circuit.png" alt="Circuit of the Americas" className="w-full h-44 md:h-64 lg:h-96 xl:h-[28rem] object-cover opacity-50" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-            <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-              <span className="text-red-600 text-[11px] tracking-[0.4em] uppercase">Prochain GP</span>
-              <span className="text-xs text-zinc-400">{getDaysUntilRace()}</span>
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 p-5">
-              <h2 className="text-2xl md:text-4xl font-black leading-none">United States</h2>
-              <p className="text-sm text-zinc-400 mt-1">23 – 25 octobre • Austin</p>
+        {nav()}
+        <main className="flex-1 w-full">
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => setSubPage('circuit')}
+            onKeyDown={(e) => { if (e.key === 'Enter') setSubPage('circuit') }}
+            className="group relative block w-full overflow-hidden border-b border-zinc-800 cursor-pointer"
+          >
+            <img src={calendar[0].photo} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition duration-700" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/10" />
+            <div className="relative min-h-[22rem] sm:min-h-[26rem] lg:min-h-[30rem] xl:min-h-[34rem] flex flex-col justify-end px-4 sm:px-6 lg:px-10 xl:px-14 pb-6 sm:pb-10 pt-24">
+              <span className="self-start bg-red-600 text-white text-[11px] font-bold uppercase tracking-widest px-2 py-1">Prochain GP • Round {calendar[0].round}</span>
+              <h1 className="mt-3 font-black uppercase leading-[0.95] tracking-tight text-5xl sm:text-6xl lg:text-8xl">{calendar[0].name}</h1>
+              <p className="mt-3 text-zinc-300 text-sm sm:text-base">{calendar[0].date} • {calendar[0].circuit} • <span className="text-white font-semibold">{getDaysUntilRace()}</span></p>
+              <span className="mt-5 self-start inline-flex items-center min-h-11 bg-white text-black font-bold uppercase text-xs tracking-widest px-5">Voir le circuit →</span>
             </div>
           </div>
-          <div className="space-y-6 sm:space-y-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-2 gap-3">
-            <button onClick={() => setSubPage('standings')} className="py-4 min-h-14 bg-zinc-950 border border-zinc-800 rounded-2xl text-sm font-medium hover:border-zinc-600 active:bg-zinc-900 transition">Classements</button>
-            <button onClick={() => setSubPage('calendar')} className="py-4 min-h-14 bg-zinc-950 border border-zinc-800 rounded-2xl text-sm font-medium hover:border-zinc-600 active:bg-zinc-900 transition">Calendrier</button>
-            <button onClick={() => setSubPage('stats')} className="py-4 min-h-14 bg-zinc-950 border border-zinc-800 rounded-2xl text-sm font-medium hover:border-zinc-600 active:bg-zinc-900 transition">Statistiques</button>
-            <button onClick={() => setSubPage('favorites')} className="py-4 min-h-14 bg-zinc-950 border border-zinc-800 rounded-2xl text-sm font-medium hover:border-zinc-600 active:bg-zinc-900 transition">Tes favoris</button>
-          </div>
-          <div>
-            <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-4">Top 3 Pilotes</p>
-            <div className="grid gap-2.5 md:grid-cols-3 lg:grid-cols-1">
-              {liveStandings.slice(0, 3).map((d, i) => (
-                <div key={d.Driver.driverId} className="flex items-center justify-between bg-zinc-950/40 border border-zinc-900/60 rounded-xl px-4 py-3">
-                  <div className="flex items-center gap-3"><span className="text-xs text-zinc-600 w-4">{i + 1}</span><p className="text-sm font-medium">{d.Driver.familyName}</p></div>
-                  <span className="text-sm text-zinc-400">{d.points}</span>
+
+          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-8 sm:py-10 grid gap-10 lg:grid-cols-12 items-start">
+            <section className="lg:col-span-8">
+              <SectionTitle kicker="À la une" title="Explorer" className="mb-5" />
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {[
+                  { key: 'standings' as const, tag: 'Classements', title: 'Le championnat pilotes et constructeurs', img: '/cars/mercedes.jpeg', big: true },
+                  { key: 'calendar' as const, tag: 'Calendrier', title: 'Toutes les courses de la saison', img: calendar[1].photo },
+                  { key: 'stats' as const, tag: 'Statistiques', title: 'Chiffres, écarts et écuries', img: '/cars/ferrari.jpeg' },
+                  { key: 'favorites' as const, tag: 'Favoris', title: 'Ton pilote et ton écurie', img: drivers.find(d => d.id === favDriver)?.photo || '/cars/mclaren.jpeg' },
+                ].map((t) => (
+                  <button key={t.key} onClick={() => setSubPage(t.key)} className={`group relative overflow-hidden border border-zinc-800 hover:border-red-600 bg-zinc-950 text-left transition ${t.big ? 'sm:col-span-2 lg:col-span-3 aspect-[16/9] lg:aspect-[21/9]' : 'aspect-[16/10]'}`}>
+                    <img src={t.img} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
+                      <span className="inline-block bg-red-600 text-white text-[11px] font-bold uppercase tracking-widest px-2 py-1">{t.tag}</span>
+                      <h3 className={`mt-2 font-black uppercase tracking-tight leading-tight ${t.big ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl'}`}>{t.title}</h3>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <aside className="lg:col-span-4 space-y-8">
+              <section>
+                <SectionTitle kicker="Championnat" title="Top pilotes" className="mb-4" />
+                <div className="border border-zinc-800 bg-zinc-950 divide-y divide-zinc-800">
+                  {liveStandings.length === 0 && <p className="p-4 text-sm text-zinc-500">Chargement...</p>}
+                  {liveStandings.slice(0, 5).map((d, i) => (
+                    <button key={d.Driver.driverId} onClick={() => setSubPage('standings')} className="w-full flex items-center justify-between gap-3 px-4 min-h-14 text-left hover:bg-zinc-900 transition">
+                      <span className="flex items-center gap-3 min-w-0">
+                        <span className="w-6 text-lg font-black text-red-500">{i + 1}</span>
+                        <span className="w-1 h-6 shrink-0" style={{ backgroundColor: getColor(d.Constructors[0]?.name || '') }} />
+                        <span className="truncate text-sm font-bold uppercase">{d.Driver.givenName} {d.Driver.familyName}</span>
+                      </span>
+                      <span className="text-sm font-black">{d.points}</span>
+                    </button>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </section>
+              <section>
+                <SectionTitle kicker="À suivre" title="Prochaines courses" className="mb-4" />
+                <div className="border border-zinc-800 bg-zinc-950 divide-y divide-zinc-800">
+                  {calendar.slice(1, 5).map((race) => (
+                    <button key={race.round} onClick={() => { setSelectedRace(race); setSubPage('calendar') }} className="w-full flex items-center justify-between gap-3 px-4 min-h-14 text-left hover:bg-zinc-900 transition">
+                      <span className="min-w-0">
+                        <span className="block text-sm font-bold uppercase truncate">{race.name}</span>
+                        <span className="block text-xs text-zinc-500">{race.circuit}</span>
+                      </span>
+                      <span className="text-xs text-zinc-400 text-right shrink-0">{race.date}</span>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            </aside>
           </div>
-          </div>
-        </div>
+        </main>
       </div>
     )
   }
@@ -722,22 +772,22 @@ if (subPage === 'stats-constructors') {
   if (step === 'driver') {
     return (
       <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-10">
-        <header className="flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b border-zinc-800 sticky top-0 bg-black z-10">
+        <header className="flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b-4 border-red-600 sticky top-0 bg-black z-10">
           <button onClick={onBack} className="text-sm text-zinc-400 min-h-11 min-w-16 text-left">← Retour</button>
-          <h1 className="font-semibold text-center text-sm sm:text-base">Choisis tes pilotes</h1>
+          <h1 className="font-black uppercase tracking-tight text-center text-sm sm:text-lg">Choisis tes pilotes</h1>
           <button onClick={() => setStep('team')} className="text-sm text-zinc-400 min-h-11 min-w-16 text-right">Passer</button>
         </header>
         <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6 2xl:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
             {drivers.map((d) => (
-              <button key={d.id} onClick={() => toggleDriver(d.id)} className="flex flex-col items-center rounded-2xl p-1 active:opacity-80">
+              <button key={d.id} onClick={() => toggleDriver(d.id)} className="flex flex-col items-center rounded-sm p-1 active:opacity-80">
                 <img src={d.photo} alt={d.name} className={`w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full object-cover object-top transition ${selectedDrivers.includes(d.id) ? 'ring-4 ring-red-600' : ''}`} />
                 <p className="mt-2 font-medium text-sm text-center">{d.name}</p>
                 <p className="text-xs text-zinc-500">{d.team}</p>
               </button>
             ))}
           </div>
-          <button ref={validateRef} disabled={selectedDrivers.length === 0} onClick={() => setStep('team')} className="mt-10 block w-full sm:max-w-md mx-auto py-4 bg-red-600 disabled:bg-zinc-800 disabled:text-zinc-600 rounded-xl font-medium">Valider ({selectedDrivers.length})</button>
+          <button ref={validateRef} disabled={selectedDrivers.length === 0} onClick={() => setStep('team')} className="mt-10 block w-full sm:max-w-md mx-auto py-4 bg-red-600 disabled:bg-zinc-800 disabled:text-zinc-600 rounded-sm font-medium">Valider ({selectedDrivers.length})</button>
         </div>
       </div>
     )
@@ -745,21 +795,21 @@ if (subPage === 'stats-constructors') {
 
   return (
     <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-10">
-      <header className="flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b border-zinc-800 sticky top-0 bg-black z-10">
+      <header className="flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b-4 border-red-600 sticky top-0 bg-black z-10">
         <button onClick={() => setStep('driver')} className="text-sm text-zinc-400 min-h-11 min-w-16 text-left">← Retour</button>
-        <h1 className="font-semibold text-center text-sm sm:text-base">Choisis ton écurie</h1>
+        <h1 className="font-black uppercase tracking-tight text-center text-sm sm:text-lg">Choisis ton écurie</h1>
         <button onClick={() => setStep('done')} className="text-sm text-zinc-400 min-h-11 min-w-16 text-right">Passer</button>
       </header>
       <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6 lg:gap-8">
           {teams.map((t) => (
-            <button key={t.id} onClick={() => { setFavTeam(t.id); localStorage.setItem(teamKey, t.id); scrollToValidate() }} className={`flex flex-col items-center gap-3 p-4 rounded-2xl ${favTeam === t.id ? 'bg-zinc-900' : ''}`}>
+            <button key={t.id} onClick={() => { setFavTeam(t.id); localStorage.setItem(teamKey, t.id); scrollToValidate() }} className={`flex flex-col items-center gap-3 p-4 rounded-sm ${favTeam === t.id ? 'bg-zinc-900' : ''}`}>
               <img src={t.logo} alt={t.name} className="w-16 h-16 sm:w-20 sm:h-20 lg:w-28 lg:h-28 object-contain" />
               <p className="font-medium text-sm text-center">{t.name}</p>
             </button>
           ))}
         </div>
-        <button ref={validateRef} disabled={!favTeam} onClick={() => setStep('done')} className="mt-10 block w-full sm:max-w-md mx-auto py-4 bg-red-600 disabled:bg-zinc-800 disabled:text-zinc-600 rounded-xl font-medium">Valider</button>
+        <button ref={validateRef} disabled={!favTeam} onClick={() => setStep('done')} className="mt-10 block w-full sm:max-w-md mx-auto py-4 bg-red-600 disabled:bg-zinc-800 disabled:text-zinc-600 rounded-sm font-medium">Valider</button>
       </div>
     </div>
   )
