@@ -1,6 +1,12 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, type ReactNode } from 'react'
 import MotorNav, { SectionTitle, type NavKey } from '../components/MotorNav'
 import CarStage from '../components/CarStage'
+import StatsRecords from '../components/StatsRecords'
+import { colorFor } from '../lib/teamColors'
+import CircuitCarousel from '../components/CircuitCarousel'
+import TrackMap from '../components/TrackMap'
+import { circuits, daysUntil, fmtDay, type Circuit } from '../data/circuits'
+import { getSeasonWinners, type RaceWinner } from '../lib/f1api'
 
 interface Props {
   onBack: () => void
@@ -48,6 +54,12 @@ const calendar = [
   { round: 23, iso: '2026-12-06', name: 'Abu Dhabi', date: '4 – 6 décembre', circuit: 'Yas Marina', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Abu_Dhabi_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Abu_Dhabi.jpg', length: '5,281 km', laps: 58, record: '1:26.103', recordDriver: 'M. Verstappen', history: 'Circuit inauguré en 2009, rénové en 2021. Course de nuit sous les lumières, dernier Grand Prix de la saison.', grip: 'Asphalte lisse, grip stable tout le week-end.', creator: 'Hermann Tilke' },
 ]
 
+/** Les 23 courses (données de base) enrichies par la fiche détaillée des courses de fin de saison. */
+const fullSeason: any[] = circuits.map((c) => {
+  const legacy = calendar.find((r) => r.round === c.round)
+  return { ...legacy, ...c, date: fmtDay(c.iso) }
+})
+
 /** Index du prochain GP : première course dont le jour de course (iso) n'est pas encore passé. */
 const findNextRace = () => {
   const n = new Date()
@@ -83,27 +95,44 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
   const [welcomeDone, setWelcomeDone] = useState(false)
   const [nextIdx] = useState(findNextRace)
   const nextRace = calendar[nextIdx]
-  const [subPage, setSubPage] = useState<'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'circuit' | 'stats-constructors'>('home')
+  const [subPage, setSubPage] = useState<'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'circuit' | 'stats-constructors' | 'stats-records'>('home')
   const [liveStandings, setLiveStandings] = useState<any[]>([])
   const [liveConstructors, setLiveConstructors] = useState<any[]>([])
-  const [hover, setHover] = useState<{ x: number; y: number; speed: number } | null>(null)
-  const [isActive, setIsActive] = useState(false)
   const [standingsTab, setStandingsTab] = useState<'drivers' | 'constructors'>('drivers')
   const [selectedDriver, setSelectedDriver] = useState<any | null>(null)
   const [selectedConstructor, setSelectedConstructor] = useState<any | null>(null)
   const [selectedRace, setSelectedRace] = useState<any | null>(null)
   const [selectedTeamStats, setSelectedTeamStats] = useState<any | null>(null)
+  const [raceFrom, setRaceFrom] = useState<'calendar' | 'stats'>('calendar')
+  const [dataState, setDataState] = useState<'loading' | 'ok' | 'error'>('loading')
+  const [reload, setReload] = useState(0)
+  const [winners, setWinners] = useState<Record<number, RaceWinner>>({})
+  const [winnersState, setWinnersState] = useState<'loading' | 'ok' | 'error'>('loading')
 
   useEffect(() => {
-    fetch('https://api.jolpi.ca/ergast/f1/2026/driverStandings.json')
-      .then(r => r.json())
-      .then(data => setLiveStandings(data.MRData.StandingsTable.StandingsLists[0]?.DriverStandings || []))
-      .catch(() => {})
+    let alive = true
+    const j = (u: string) => fetch(u).then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json() })
+    Promise.all([
+      j('https://api.jolpi.ca/ergast/f1/2026/driverStandings.json'),
+      j('https://api.jolpi.ca/ergast/f1/2026/constructorStandings.json'),
+    ])
+      .then(([d, c]) => {
+        if (!alive) return
+        setLiveStandings(d.MRData.StandingsTable.StandingsLists[0]?.DriverStandings || [])
+        setLiveConstructors(c.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings || [])
+        setDataState('ok')
+      })
+      .catch(() => alive && setDataState('error'))
+    return () => { alive = false }
+  }, [reload])
 
-    fetch('https://api.jolpi.ca/ergast/f1/2026/constructorStandings.json')
-      .then(r => r.json())
-      .then(data => setLiveConstructors(data.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings || []))
-      .catch(() => {})
+  useEffect(() => {
+    let alive = true
+    getSeasonWinners().then(
+      (w) => { if (alive) { setWinners(w); setWinnersState('ok') } },
+      () => { if (alive) setWinnersState('error') },
+    )
+    return () => { alive = false }
   }, [])
 
   useEffect(() => {
@@ -178,13 +207,43 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
     setSelectedDriver(null)
     setSelectedConstructor(null)
     setSelectedTeamStats(null)
+    setRaceFrom('calendar')
     setSubPage(k)
   }
 
+  const statsTabs = (active: 'overview' | 'constructors' | 'records') => {
+    const ico = (d: string) => (
+      <svg viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d={d} /></svg>
+    )
+    const tabs = [
+      { key: 'overview' as const, label: 'Aperçu', page: 'stats' as const, icon: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z' },
+      { key: 'constructors' as const, label: 'Constructeurs', page: 'stats-constructors' as const, icon: 'M3 15l2-5h9l4 3h3v2M6 17a2 2 0 100 .01M17 17a2 2 0 100 .01M8 17h7' },
+      { key: 'records' as const, label: 'Records & Historique', short: 'Records', page: 'stats-records' as const, icon: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0zM17 5h3v2a3 3 0 01-3 3M7 5H4v2a3 3 0 003 3' },
+    ]
+    return (
+      <div className="flex overflow-x-auto [scrollbar-width:none]" role="tablist" aria-label="Sections des statistiques">
+        {tabs.map((t) => (
+          <button
+            key={t.key}
+            role="tab"
+            aria-selected={active === t.key}
+            onClick={() => { setSelectedTeamStats(null); setSelectedRace(null); setSubPage(t.page) }}
+            className={`shrink-0 inline-flex items-center gap-2 px-3 sm:px-5 min-h-12 text-xs sm:text-sm font-bold uppercase tracking-wider border-b-4 whitespace-nowrap transition-colors active:bg-zinc-900 ${active === t.key ? 'border-red-600 text-white' : 'border-transparent text-zinc-400 hover:text-white'}`}
+          >
+            {ico(t.icon)}
+            {'short' in t ? (<><span className="sm:hidden">{t.short}</span><span className="hidden sm:inline">{t.label}</span></>) : t.label}
+          </button>
+        ))}
+      </div>
+    )
+  }
+
   const navKey: NavKey =
-    subPage === 'stats-constructors' ? 'stats' : subPage === 'circuit' ? 'home' : subPage
-  const nav = (back?: () => void, crumb?: string) => (
-    <MotorNav active={navKey} onNavigate={go} onExit={onBack} onBack={back} crumb={crumb} />
+    subPage === 'stats-constructors' || subPage === 'stats-records' || (subPage === 'calendar' && selectedRace && raceFrom === 'stats')
+      ? 'stats'
+      : subPage === 'circuit' ? 'home' : subPage
+  const nav = (back?: () => void, crumb?: string, extra?: ReactNode) => (
+    <MotorNav active={navKey} onNavigate={go} onExit={onBack} onBack={back} crumb={crumb} extra={extra} />
   )
 
   const nationalityFR: Record<string, string> = {
@@ -195,16 +254,51 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
     American: 'Américain', Chinese: 'Chinois', Japanese: 'Japonais', Danish: 'Danois'
   }
 
-  const handleTrackMove = (clientX: number, clientY: number, rect: DOMRect) => {
-    if (!isActive) return
-    const x = (clientX - rect.left) / rect.width
-    const y = (clientY - rect.top) / rect.height
-    let speed = 190
-    if (x > 0.62 && y < 0.45) speed = 248 + Math.random() * 6
-    else if (x < 0.35 && y < 0.42) speed = 162 + Math.sin(y * 12) * 10
-    else if (x > 0.32 && x < 0.62 && y > 0.38) speed = 175 + Math.cos(x * 9) * 8
-    else speed = 198 + Math.sin(x * 6 + y * 4) * 12
-    setHover({ x, y, speed: Math.round(speed) })
+  const raceDetail = (race: any, kicker: string, back: () => void, crumb: string, pager = false) => {
+    const idx = fullSeason.findIndex((r) => r.round === race.round)
+    const prev = pager ? fullSeason[idx - 1] : undefined
+    const nextR = pager ? fullSeason[idx + 1] : undefined
+    const w = winners[race.round]
+    const d = daysUntil(race.iso)
+    const state = d < 0 ? (w ? `Vainqueur : ${w.name}` : 'Course terminée') : d === 0 ? 'Ce week-end' : d === 1 ? 'Demain' : `Dans ${d} jours`
+    return (
+      <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-28 sm:pb-10">
+        {nav(back, crumb)}
+        <div className="px-4 sm:px-5 lg:px-6 py-6 w-full flex-1 grid content-start gap-6 md:grid-cols-2 items-start">
+          <div className="md:col-span-2 border-l-4 border-red-600 pl-4">
+            <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-2">{kicker} · Manche {race.round}</p>
+            <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight leading-none mt-1"><span className="mr-3" aria-hidden>{race.flag}</span>{race.name}</h1>
+            <p className="text-sm text-zinc-400 mt-2">{race.circuit} · {race.country} · {fmtDay(race.iso)} · <span className={d >= 0 ? 'text-white' : ''}>{state}</span></p>
+          </div>
+          <TrackMap src={race.map} alt={`Plan du circuit de ${race.circuit}`} unavailable={race.circuit} />
+          <div className="space-y-4 min-w-0">
+            {race.photo && <img src={race.photo} alt="" className="w-full h-auto rounded-sm border border-zinc-800" />}
+            <dl className="grid grid-cols-3 gap-3">
+              <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><dt className="text-xs text-zinc-500">Longueur</dt><dd className="font-semibold mt-1">{race.length}</dd></div>
+              <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><dt className="text-xs text-zinc-500">Tours</dt><dd className="font-semibold mt-1">{race.laps ?? '—'}</dd></div>
+              <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><dt className="text-xs text-zinc-500">Record</dt><dd className="font-semibold mt-1 tabular-nums">{race.record ?? '—'}</dd>{race.recordDriver && <p className="text-[11px] text-zinc-500 mt-0.5">{race.recordDriver}{race.recordYear ? ` · ${race.recordYear}` : ''}</p>}</div>
+            </dl>
+            {w && (
+              <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Vainqueur 2026</p><p className="font-semibold mt-1">{w.name}</p><p className="text-[11px] text-zinc-500 mt-0.5">{w.team}</p></div>
+            )}
+          </div>
+          {race.history && <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 md:col-span-2"><p className="text-xs text-zinc-500">Histoire</p><p className="text-sm mt-1 leading-relaxed">{race.history}</p></div>}
+          {race.grip && <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Grip</p><p className="text-sm mt-1">{race.grip}</p></div>}
+          {race.creator && <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Concepteur</p><p className="text-sm mt-1">{race.creator}</p></div>}
+          {pager && (
+            <div className="md:col-span-2 flex items-center justify-between gap-3 border-t border-zinc-900 pt-4">
+              <button disabled={!prev} onClick={() => prev && setSelectedRace(prev)} className="min-h-12 px-4 text-sm text-zinc-300 hover:text-white active:bg-zinc-900 disabled:opacity-30 disabled:hover:text-zinc-300 text-left">
+                ‹ {prev ? prev.name : 'Début de saison'}
+              </button>
+              <span className="text-xs text-zinc-500 tabular-nums">{idx + 1} / {fullSeason.length}</span>
+              <button disabled={!nextR} onClick={() => nextR && setSelectedRace(nextR)} className="min-h-12 px-4 text-sm text-zinc-300 hover:text-white active:bg-zinc-900 disabled:opacity-30 disabled:hover:text-zinc-300 text-right">
+                {nextR ? nextR.name : 'Fin de saison'} ›
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    )
   }
 
   if (step === 'done') {
@@ -224,80 +318,28 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
     }
 
     if (subPage === 'circuit') {
-      const cota = nextRace
-      return (
-        <div className="min-h-dvh w-full flex flex-col bg-black text-white">
-          {nav(() => setSubPage('home'), "Circuit")}
-          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1 grid content-start gap-6 md:grid-cols-2 items-start">
-            <div className="md:col-span-2 border-l-4 border-red-600 pl-4">
-              <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-2">Prochain GP</p>
-              <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight leading-none mt-1">{cota.name}</h1>
-              <p className="text-sm text-zinc-400 mt-2">{cota.circuit}</p>
-            </div>
-            <div className="relative rounded-sm overflow-hidden border border-zinc-900 select-none touch-none" onMouseDown={() => setIsActive(true)} onMouseUp={() => { setIsActive(false); setHover(null) }} onMouseLeave={() => { setIsActive(false); setHover(null) }} onMouseMove={(e) => handleTrackMove(e.clientX, e.clientY, e.currentTarget.getBoundingClientRect())} onTouchStart={() => setIsActive(true)} onTouchEnd={() => { setIsActive(false); setHover(null) }} onTouchMove={(e) => { e.preventDefault(); const touch = e.touches[0]; handleTrackMove(touch.clientX, touch.clientY, e.currentTarget.getBoundingClientRect()) }}>
-              <img src={cota.map} alt={`Plan du circuit de ${cota.circuit}`} className="w-full h-auto max-h-[60vh] object-contain bg-zinc-950 pointer-events-none" />
-              {hover && isActive && (
-                <div className="absolute bg-black/95 border border-zinc-700 rounded-sm px-4 py-2 text-center text-xs shadow-xl pointer-events-none whitespace-nowrap" style={{ left: `${Math.min(85, Math.max(15, hover.x * 100))}%`, top: hover.y < 0.25 ? `${hover.y * 100 + 12}%` : `${Math.max(8, hover.y * 100)}%`, transform: hover.y < 0.25 ? 'translate(-50%, 0)' : 'translate(-50%, -140%)' }}>
-                  <p className="font-semibold text-white">{hover.speed} km/h</p>
-                  <p className="text-zinc-500 text-[11px] mt-0.5">Vitesse estimée</p>
-                </div>
-              )}
-            </div>
-            <img src={cota.photo} alt={`Photo ${cota.circuit}`} className="w-full h-auto rounded-sm border border-zinc-800" />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:col-span-2">
-              <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Longueur</p><p className="font-semibold mt-1">{cota.length}</p></div>
-              <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Tours</p><p className="font-semibold mt-1">{cota.laps}</p></div>
-              <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 col-span-2"><p className="text-xs text-zinc-500">Record</p><p className="font-semibold mt-1">{cota.record}</p><p className="text-[11px] text-zinc-500 mt-0.5">{cota.recordDriver}</p></div>
-            </div>
-            <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 md:col-span-2"><p className="text-xs text-zinc-500">Histoire</p><p className="text-sm mt-1 leading-relaxed">{cota.history}</p></div>
-            <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Grip</p><p className="text-sm mt-1">{cota.grip}</p></div>
-            <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Concepteur</p><p className="text-sm mt-1">{cota.creator}</p></div>
-          </div>
-        </div>
-      )
+      return raceDetail(fullSeason.find((r) => r.round === nextRace.round) ?? nextRace, 'Prochain GP', () => setSubPage('home'), 'Circuit')
     }
 
     if (subPage === 'calendar') {
       if (selectedRace) {
-        return (
-          <div className="min-h-dvh w-full flex flex-col bg-black text-white">
-            {nav(() => setSelectedRace(null), "Course")}
-            <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1 grid content-start gap-6 md:grid-cols-2 items-start">
-              <div className="md:col-span-2 border-l-4 border-red-600 pl-4">
-                <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-2">Round {selectedRace.round}</p>
-                <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight leading-none mt-1">{selectedRace.name}</h1>
-                <p className="text-sm text-zinc-500 mt-1">{selectedRace.circuit} • {selectedRace.date}</p>
-              </div>
-              <div className="relative rounded-sm overflow-hidden border border-zinc-900 select-none touch-none" onMouseDown={() => setIsActive(true)} onMouseUp={() => { setIsActive(false); setHover(null) }} onMouseLeave={() => { setIsActive(false); setHover(null) }} onMouseMove={(e) => handleTrackMove(e.clientX, e.clientY, e.currentTarget.getBoundingClientRect())} onTouchStart={() => setIsActive(true)} onTouchEnd={() => { setIsActive(false); setHover(null) }} onTouchMove={(e) => { e.preventDefault(); const touch = e.touches[0]; handleTrackMove(touch.clientX, touch.clientY, e.currentTarget.getBoundingClientRect()) }}>
-                <img src={selectedRace.map} alt={selectedRace.name} className="w-full h-auto max-h-[60vh] object-contain bg-zinc-950 pointer-events-none" />
-                {hover && isActive && (
-                  <div className="absolute bg-black/95 border border-zinc-700 rounded-sm px-4 py-2 text-center text-xs shadow-xl pointer-events-none whitespace-nowrap" style={{ left: `${Math.min(85, Math.max(15, hover.x * 100))}%`, top: hover.y < 0.25 ? `${hover.y * 100 + 12}%` : `${Math.max(8, hover.y * 100)}%`, transform: hover.y < 0.25 ? 'translate(-50%, 0)' : 'translate(-50%, -140%)' }}>
-                    <p className="font-semibold text-white">{hover.speed} km/h</p>
-                    <p className="text-zinc-500 text-[11px] mt-0.5">Vitesse estimée</p>
-                  </div>
-                )}
-              </div>
-              <img src={selectedRace.photo} alt={selectedRace.name} className="w-full h-auto rounded-sm border border-zinc-800" />
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:col-span-2">
-                <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Longueur</p><p className="font-semibold mt-1">{selectedRace.length}</p></div>
-                <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Tours</p><p className="font-semibold mt-1">{selectedRace.laps}</p></div>
-                <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 col-span-2"><p className="text-xs text-zinc-500">Record</p><p className="font-semibold mt-1">{selectedRace.record}</p><p className="text-[11px] text-zinc-500 mt-0.5">{selectedRace.recordDriver}</p></div>
-              </div>
-              <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 md:col-span-2"><p className="text-xs text-zinc-500">Histoire</p><p className="text-sm mt-1 leading-relaxed">{selectedRace.history}</p></div>
-              <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Grip</p><p className="text-sm mt-1">{selectedRace.grip}</p></div>
-              <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4"><p className="text-xs text-zinc-500">Concepteur</p><p className="text-sm mt-1">{selectedRace.creator}</p></div>
-            </div>
-          </div>
+        const fromStats = raceFrom === 'stats'
+        return raceDetail(
+          selectedRace,
+          fromStats ? 'Circuit' : 'Course',
+          fromStats ? () => { setSelectedRace(null); setSubPage('stats') } : () => setSelectedRace(null),
+          fromStats ? 'Statistiques › Circuit' : 'Course',
+          true,
         )
       }
 
       return (
         <div className="min-h-dvh w-full flex flex-col bg-black text-white">
           {nav(() => setSubPage('home'), "Calendrier")}
-          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 sm:py-8 w-full flex-1 grid content-start gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+          <div className="px-4 sm:px-5 lg:px-6 py-6 sm:py-8 w-full flex-1 grid content-start gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
             <SectionTitle h1 kicker="Saison 2026" title="Calendrier" className="col-span-full mb-2" />
             {calendar.map((race) => (
-              <button key={race.round} onClick={() => setSelectedRace(race)} className="group text-left bg-zinc-950 border border-zinc-800 hover:border-red-600 overflow-hidden transition">
+              <button key={race.round} onClick={() => { setRaceFrom('calendar'); setSelectedRace(fullSeason.find((r) => r.round === race.round) ?? race) }} className="group text-left bg-zinc-950 border border-zinc-800 hover:border-red-600 overflow-hidden transition">
                 <div className="relative aspect-video overflow-hidden bg-zinc-900">
                   <img src={race.photo} alt="" loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
@@ -321,7 +363,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
         return (
           <div className="min-h-dvh w-full flex flex-col bg-black text-white">
             {nav(() => setSelectedDriver(null), "Pilote")}
-            <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-8 w-full flex-1 grid content-start gap-6 lg:grid-cols-3 items-start">
+            <div className="px-4 sm:px-5 lg:px-6 py-8 w-full flex-1 grid content-start gap-6 lg:grid-cols-3 items-start">
               <div className="text-center lg:row-span-2 lg:self-center">
                 <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl font-black text-white" style={{ backgroundColor: getColor(teamName) }}>
                   {selectedDriver.Driver.familyName.charAt(0)}
@@ -348,7 +390,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
         return (
           <div className="min-h-dvh w-full flex flex-col bg-black text-white">
             {nav(() => setSelectedConstructor(null), "Écurie")}
-            <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-8 w-full flex-1 space-y-6 content-start">
+            <div className="px-4 sm:px-5 lg:px-6 py-8 w-full flex-1 space-y-6 content-start">
               <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-center">{selectedConstructor.Constructor.name}</h1>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 lg:col-span-2">
                 <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 text-center"><p className="text-xs text-zinc-500">Points</p><p className="text-xl font-semibold mt-1">{selectedConstructor.points}</p></div>
@@ -364,7 +406,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
       return (
         <div className="min-h-dvh w-full flex flex-col bg-black text-white">
           {nav(() => setSubPage('home'), "Classements")}
-          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1">
+          <div className="px-4 sm:px-5 lg:px-6 py-6 w-full flex-1">
             <SectionTitle h1 kicker="Championnat 2026" title="Classements" className="mb-6" />
             <div className="flex border-b border-zinc-800 mb-6">
               <button onClick={() => setStandingsTab('drivers')} className={`px-5 min-h-12 text-sm font-bold uppercase tracking-wider border-b-4 transition ${standingsTab === 'drivers' ? 'border-red-600 text-white' : 'border-transparent text-zinc-400'}`}>Pilotes</button>
@@ -414,6 +456,15 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
         </div>
       )
     }
+
+if (subPage === 'stats-records') {
+  return (
+    <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-28 sm:pb-10">
+      {nav(() => setSubPage('home'), 'Records & Historique', statsTabs('records'))}
+      <StatsRecords />
+    </div>
+  )
+}
 
 if (subPage === 'stats-constructors') {
   if (selectedTeamStats) {
@@ -510,7 +561,7 @@ if (subPage === 'stats-constructors') {
       <div className="min-h-dvh w-full flex flex-col bg-black text-white">
         {nav(() => setSelectedTeamStats(null), selectedTeamStats.Constructor.name)}
 
-        <div className="px-4 sm:px-6 lg:px-10 xl:px-14 pt-6 pb-16 w-full flex-1 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:content-start">
+        <div className="px-4 sm:px-5 lg:px-6 pt-6 pb-16 w-full flex-1 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:content-start">
           <div className="lg:col-span-2 mb-6 flex items-center justify-between gap-4"><SectionTitle h1 kicker="Écurie 2026" title={selectedTeamStats.Constructor.name} /><img src={teamLogo} alt="" className="h-10 sm:h-14 max-w-[30%] object-contain" /></div>
 
           <div className="relative rounded-sm overflow-hidden border border-zinc-800 bg-black [container-type:size] h-48 sm:h-64 md:h-80 lg:h-full lg:min-h-[28rem] flex items-center justify-start mb-6 sm:mb-8 lg:mb-0">
@@ -574,10 +625,16 @@ if (subPage === 'stats-constructors') {
 
   return (
     <div className="min-h-dvh w-full flex flex-col bg-black text-white">
-      {nav(() => setSubPage('home'), "Constructeurs")}
-      <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1 grid content-start gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        <SectionTitle h1 kicker="Statistiques" title="Constructeurs" className="col-span-full mb-2" />
-        {liveConstructors.length === 0 && <p className="col-span-full text-zinc-500 text-sm">Chargement...</p>}
+      {nav(() => setSubPage('home'), "Constructeurs", statsTabs('constructors'))}
+      <div className="px-4 sm:px-5 lg:px-6 py-6 w-full flex-1 grid content-start gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <SectionTitle h1 kicker="Statistiques" title="Constructeurs" desc="Le championnat par écurie. Touchez une voiture pour voir ses chiffres, ses pilotes et son aéro." className="col-span-full mb-2" />
+        {liveConstructors.length === 0 && dataState === 'loading' && Array.from({ length: 8 }, (_, i) => <div key={i} className="aspect-video bg-zinc-950 border border-zinc-900 animate-pulse" aria-busy="true" />)}
+        {liveConstructors.length === 0 && dataState === 'error' && (
+          <div className="col-span-full flex flex-wrap items-center justify-between gap-3 border border-zinc-800 bg-zinc-950 px-4 py-3" role="alert">
+            <p className="text-sm text-zinc-300">Impossible de charger les écuries.</p>
+            <button onClick={() => { setDataState('loading'); setReload((n) => n + 1) }} className="min-h-11 px-4 text-sm font-bold uppercase tracking-wider bg-white text-black active:bg-zinc-300">Réessayer</button>
+          </div>
+        )}
         {liveConstructors.map((t, i) => (
           <button key={t.Constructor.constructorId} onClick={() => setSelectedTeamStats(t)} className="group text-left bg-zinc-950 border border-zinc-800 hover:border-red-600 overflow-hidden transition">
             <div className="relative aspect-video overflow-hidden bg-black [container-type:size] flex items-center justify-start">
@@ -586,7 +643,7 @@ if (subPage === 'stats-constructors') {
             </div>
             <div className="p-4 flex items-end justify-between gap-3" style={{ borderTop: `3px solid ${trailColor(t.Constructor.name)}` }}>
               <h3 className="text-lg font-black uppercase tracking-tight leading-tight">{t.Constructor.name}</h3>
-              <p className="text-sm text-zinc-300 shrink-0"><span className="font-black text-xl">{t.points}</span> pts</p>
+              <p className="text-sm text-zinc-300 shrink-0"><span className="font-black text-xl">{t.points}</span> pts <span className="ml-1 text-zinc-600 group-hover:text-white transition" aria-hidden>›</span></p>
             </div>
           </button>
         ))}
@@ -599,22 +656,47 @@ if (subPage === 'stats-constructors') {
       const leader = liveStandings[0]
       const second = liveStandings[1]
       const gap = leader && second ? Number(leader.points) - Number(second.points) : 0
-      const totalRaces = 17
+      const done = Math.max(0, circuits.filter((c) => c.round < nextRace.round).length)
+      const loading = dataState === 'loading' && liveStandings.length === 0
+      const failed = dataState === 'error' && liveStandings.length === 0
+      const head = (label: string, cta?: string, onClick?: () => void) => (
+        <div className="flex items-center justify-between gap-3 mb-3 min-h-9">
+          <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase">{label}</p>
+          {cta && onClick && (
+            <button onClick={onClick} className="-mr-2 px-2 min-h-9 text-xs text-zinc-400 hover:text-white active:text-white whitespace-nowrap">{cta} ›</button>
+          )}
+        </div>
+      )
+      const skeleton = (n = 3, h = 'h-14') => (
+        <div className="space-y-2" aria-busy="true" aria-label="Chargement">
+          {Array.from({ length: n }, (_, i) => <div key={i} className={`${h} bg-zinc-950 border border-zinc-900 animate-pulse`} />)}
+        </div>
+      )
+      const row = 'w-full flex items-center justify-between gap-3 bg-zinc-950 border border-zinc-800 hover:border-zinc-600 active:bg-zinc-900 rounded-sm px-4 py-3 text-left transition'
       return (
         <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-28 sm:pb-10">
-          {nav(() => setSubPage('home'), "Statistiques")}
-          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 pt-6 w-full">
-            <div className="flex border-b border-zinc-800">
-              <button className="px-5 min-h-12 text-sm font-bold uppercase tracking-wider border-b-4 border-red-600 text-white">Aperçu</button>
-              <button onClick={() => setSubPage('stats-constructors')} className="px-5 min-h-12 text-sm font-bold uppercase tracking-wider border-b-4 border-transparent text-zinc-400 hover:text-white">Constructeurs</button>
-            </div>
-          </div>
-          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1 grid content-start gap-7 lg:grid-cols-2 lg:gap-x-8 items-start">
-            <SectionTitle h1 kicker="Saison 2026" title="Statistiques" className="col-span-full" />
-            <div>
-              <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-4">Title Fight</p>
+          {nav(() => setSubPage('home'), "Statistiques", statsTabs('overview'))}
+          <div className="px-4 sm:px-5 lg:px-6 py-6 w-full flex-1 grid content-start gap-8 md:grid-cols-2 md:gap-x-8 lg:grid-cols-4 items-start">
+            <SectionTitle h1 kicker="Saison 2026" title="Statistiques" desc={`Le championnat en un coup d’œil : ${done} courses disputées sur ${circuits.length}. Touchez une carte pour voir le détail.`} className="col-span-full" />
+
+            <CircuitCarousel
+              nextRound={nextRace.round}
+              winners={winners}
+              winnersState={winnersState}
+              onOpen={(c: Circuit) => { setRaceFrom('stats'); setSelectedRace(fullSeason.find((r) => r.round === c.round) ?? c); setSubPage('calendar') }}
+            />
+
+            {failed && (
+              <div className="col-span-full flex flex-wrap items-center justify-between gap-3 border border-zinc-800 bg-zinc-950 px-4 py-3" role="alert">
+                <p className="text-sm text-zinc-300">Impossible de charger les classements. Vérifiez votre connexion.</p>
+                <button onClick={() => { setDataState('loading'); setReload((n) => n + 1) }} className="min-h-11 px-4 text-sm font-bold uppercase tracking-wider bg-white text-black active:bg-zinc-300">Réessayer</button>
+              </div>
+            )}
+
+            <div className="min-w-0">
+              {head('Title fight', 'Classement', () => setSubPage('standings'))}
               {leader && second ? (
-                <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-5">
+                <button onClick={() => setSubPage('standings')} className="group w-full text-left bg-zinc-950 border border-zinc-800 hover:border-zinc-600 active:bg-zinc-900 rounded-sm p-5 transition">
                   <div className="flex justify-between items-end mb-4">
                     <div><p className="text-xs text-zinc-500">{leader.Driver.familyName}</p><p className="text-3xl font-black">{leader.points}</p><p className="text-xs text-zinc-500 mt-1">{leader.wins} victoires</p></div>
                     <div className="text-right"><p className="text-xs text-zinc-500">{second.Driver.familyName}</p><p className="text-3xl font-black text-zinc-400">{second.points}</p><p className="text-xs text-zinc-500 mt-1">{second.wins} victoires</p></div>
@@ -624,39 +706,71 @@ if (subPage === 'stats-constructors') {
                     <div className="bg-zinc-700 flex-1" />
                   </div>
                   <p className="text-xs text-zinc-500 text-center">Écart : {gap} points</p>
+                </button>
+              ) : loading ? skeleton(1, 'h-40') : <p className="text-sm text-zinc-500">Aucune donnée pour le moment.</p>}
+            </div>
+
+            <div className="min-w-0">
+              {head('Top 3', 'Tout voir', () => setSubPage('standings'))}
+              {loading ? skeleton() : liveStandings.length === 0 ? <p className="text-sm text-zinc-500">Aucune donnée pour le moment.</p> : (
+                <div className="space-y-2">
+                  {liveStandings.slice(0, 3).map((d, i) => (
+                    <button key={d.Driver.driverId} onClick={() => { setSelectedDriver(d); setSubPage('standings') }} className={row}>
+                      <div className="flex items-center gap-3 min-w-0"><span className="text-xs text-zinc-600 w-5">{i + 1}</span><div className="min-w-0"><p className="text-sm font-medium truncate">{d.Driver.familyName}</p><p className="text-xs text-zinc-500 truncate">{d.Constructors[0]?.name}</p></div></div>
+                      <div className="flex items-center gap-2 shrink-0"><div className="text-right"><p className="text-sm font-semibold">{d.points}</p><p className="text-[11px] text-zinc-500">{d.wins} win{Number(d.wins) !== 1 ? 's' : ''}</p></div><span className="text-zinc-600" aria-hidden>›</span></div>
+                    </button>
+                  ))}
                 </div>
-              ) : <p className="text-center text-zinc-500 text-sm">Chargement...</p>}
+              )}
             </div>
-            <div>
-              <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-4">Top 3</p>
-              <div className="space-y-2">
-                {liveStandings.slice(0, 3).map((d, i) => (
-                  <div key={d.Driver.driverId} className="flex items-center justify-between bg-zinc-950 border border-zinc-800 rounded-sm px-4 py-3">
-                    <div className="flex items-center gap-3"><span className="text-xs text-zinc-600 w-5">{i + 1}</span><div><p className="text-sm font-medium">{d.Driver.familyName}</p><p className="text-xs text-zinc-500">{d.Constructors[0]?.name}</p></div></div>
-                    <div className="text-right"><p className="text-sm font-semibold">{d.points}</p><p className="text-[11px] text-zinc-500">{d.wins} win{Number(d.wins) !== 1 ? 's' : ''}</p></div>
-                  </div>
-                ))}
-              </div>
+
+            <div className="min-w-0">
+              {head('Essentiels')}
+              {loading ? skeleton(2, 'h-20') : (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-zinc-950 border border-zinc-800 rounded-sm p-4"><p className="text-xs text-zinc-500">Moy. points / course</p><p className="text-lg font-semibold mt-1">{leader && done ? (Number(leader.points) / done).toFixed(1) : '-'}</p></div>
+                  <div className="bg-zinc-950 border border-zinc-800 rounded-sm p-4"><p className="text-xs text-zinc-500">Victoires leader</p><p className="text-lg font-semibold mt-1">{leader?.wins || '-'}</p></div>
+                  <div className="bg-zinc-950 border border-zinc-800 rounded-sm p-4"><p className="text-xs text-zinc-500">Écart au 2e</p><p className="text-lg font-semibold mt-1">{leader ? `${gap} pts` : '-'}</p></div>
+                  <div className="bg-zinc-950 border border-zinc-800 rounded-sm p-4"><p className="text-xs text-zinc-500">Écurie leader</p><p className="text-lg font-semibold mt-1 break-words">{liveConstructors[0]?.Constructor.name || '-'}</p></div>
+                </div>
+              )}
             </div>
-            <div>
-              <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-4">Essentiels</p>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-zinc-950 border border-zinc-800 rounded-sm p-4"><p className="text-xs text-zinc-500">Moy. points / course</p><p className="text-lg font-semibold mt-1">{leader ? (Number(leader.points) / totalRaces).toFixed(1) : '-'}</p></div>
-                <div className="bg-zinc-950 border border-zinc-800 rounded-sm p-4"><p className="text-xs text-zinc-500">Victoires leader</p><p className="text-lg font-semibold mt-1">{leader?.wins || '-'}</p></div>
-                <div className="bg-zinc-950 border border-zinc-800 rounded-sm p-4"><p className="text-xs text-zinc-500">Écart au 2e</p><p className="text-lg font-semibold mt-1">{gap} pts</p></div>
-                <div className="bg-zinc-950 border border-zinc-800 rounded-sm p-4"><p className="text-xs text-zinc-500">Écurie leader</p><p className="text-lg font-semibold mt-1 break-words">{liveConstructors[0]?.Constructor.name || '-'}</p></div>
-              </div>
+
+            <div className="min-w-0">
+              {head('Constructeurs', 'Tout voir', () => setSubPage('stats-constructors'))}
+              {loading ? skeleton() : liveConstructors.length === 0 ? <p className="text-sm text-zinc-500">Aucune donnée pour le moment.</p> : (
+                <div className="space-y-2">
+                  {liveConstructors.slice(0, 3).map((t, i) => (
+                    <button key={t.Constructor.constructorId} onClick={() => { setSelectedTeamStats(t); setSubPage('stats-constructors') }} className={row}>
+                      <div className="flex items-center gap-3 min-w-0"><span className="text-xs text-zinc-600 w-5">{i + 1}</span><p className="text-sm font-medium truncate">{t.Constructor.name}</p></div>
+                      <div className="flex items-center gap-2 shrink-0"><div className="text-right"><p className="text-sm font-semibold">{t.points}</p><p className="text-[11px] text-zinc-500">{t.wins} win{Number(t.wins) !== 1 ? 's' : ''}</p></div><span className="text-zinc-600" aria-hidden>›</span></div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-            <div>
-              <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-4">Constructeurs</p>
-              <div className="space-y-2">
-                {liveConstructors.slice(0, 3).map((t, i) => (
-                  <div key={t.Constructor.constructorId} className="flex items-center justify-between bg-zinc-950 border border-zinc-800 rounded-sm px-4 py-3">
-                    <div className="flex items-center gap-3"><span className="text-xs text-zinc-600 w-5">{i + 1}</span><p className="text-sm font-medium">{t.Constructor.name}</p></div>
-                    <div className="text-right"><p className="text-sm font-semibold">{t.points}</p><p className="text-[11px] text-zinc-500">{t.wins} win{Number(t.wins) !== 1 ? 's' : ''}</p></div>
-                  </div>
-                ))}
-              </div>
+
+            <div className="col-span-full min-w-0 border-t border-zinc-900 pt-6">
+              {head('Classement pilotes', 'Voir le classement complet', () => setSubPage('standings'))}
+              {loading ? skeleton(4, 'h-10') : (
+                <ol className="grid gap-x-8 md:grid-cols-2 lg:grid-cols-3">
+                  {liveStandings.slice(0, 12).map((d, i) => {
+                    const max = Number(liveStandings[0]?.points) || 1
+                    return (
+                      <li key={d.Driver.driverId} className="min-w-0">
+                        <button onClick={() => { setSelectedDriver(d); setSubPage('standings') }} className="w-full text-left py-2.5 border-b border-zinc-900 hover:bg-zinc-950 active:bg-zinc-900 transition">
+                          <div className="flex items-baseline gap-3">
+                            <span className="w-5 text-xs text-zinc-600 tabular-nums">{i + 1}</span>
+                            <span className="flex-1 min-w-0 truncate text-sm">{d.Driver.givenName} <span className="font-semibold">{d.Driver.familyName}</span></span>
+                            <span className="text-sm font-semibold tabular-nums">{d.points}</span>
+                          </div>
+                          <div className="ml-8 mt-1.5 h-0.5 bg-zinc-900"><div className="h-full" style={{ width: `${(Number(d.points) / max) * 100}%`, background: colorFor(d.Constructors[0]?.name) }} /></div>
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ol>
+              )}
             </div>
           </div>
         </div>
@@ -669,7 +783,7 @@ if (subPage === 'stats-constructors') {
       return (
         <div className="min-h-dvh w-full flex flex-col bg-black text-white">
           {nav(() => setSubPage('home'), "Tes favoris")}
-          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-8 w-full flex-1 grid content-start gap-6 md:grid-cols-2 items-start">
+          <div className="px-4 sm:px-5 lg:px-6 py-8 w-full flex-1 grid content-start gap-6 md:grid-cols-2 items-start">
             <SectionTitle h1 kicker="Ton paddock" title="Tes favoris" className="col-span-full" />
             {driver && (
               <div className="bg-zinc-950 border border-zinc-800 rounded-sm p-5">
@@ -710,7 +824,7 @@ if (subPage === 'stats-constructors') {
           >
             <img src={nextRace.photo} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition duration-700" />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/10" />
-            <div className="relative min-h-[22rem] sm:min-h-[26rem] lg:min-h-[30rem] xl:min-h-[34rem] flex flex-col justify-end px-4 sm:px-6 lg:px-10 xl:px-14 pb-6 sm:pb-10 pt-24">
+            <div className="relative min-h-[22rem] sm:min-h-[26rem] lg:min-h-[30rem] xl:min-h-[34rem] flex flex-col justify-end px-4 sm:px-5 lg:px-6 pb-6 sm:pb-10 pt-24">
               <span className="self-start bg-red-600 text-white text-[11px] font-bold uppercase tracking-widest px-2 py-1">Prochain GP • Round {nextRace.round}</span>
               <h1 className="mt-3 font-black uppercase leading-[0.95] tracking-tight text-5xl sm:text-6xl lg:text-8xl">{nextRace.name}</h1>
               <p className="mt-3 text-zinc-300 text-sm sm:text-base">{nextRace.date} • {nextRace.circuit} • <span className="text-white font-semibold">{getDaysUntilRace()}</span></p>
@@ -718,7 +832,7 @@ if (subPage === 'stats-constructors') {
             </div>
           </div>
 
-          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-8 sm:py-10 grid gap-10 lg:grid-cols-12 items-start">
+          <div className="px-4 sm:px-5 lg:px-6 py-8 sm:py-10 grid gap-10 lg:grid-cols-12 items-start">
             <section className="lg:col-span-8">
               <SectionTitle kicker="À la une" title="Explorer" className="mb-5" />
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -762,7 +876,7 @@ if (subPage === 'stats-constructors') {
                 <div className="border border-zinc-800 bg-zinc-950 divide-y divide-zinc-800">
                   {calendar.slice(nextIdx + 1, nextIdx + 5).length === 0 && <p className="p-4 text-sm text-zinc-500">Dernière course de la saison.</p>}
                   {calendar.slice(nextIdx + 1, nextIdx + 5).map((race) => (
-                    <button key={race.round} onClick={() => { setSelectedRace(race); setSubPage('calendar') }} className="w-full flex items-center justify-between gap-3 px-4 min-h-14 text-left hover:bg-zinc-900 transition">
+                    <button key={race.round} onClick={() => { setRaceFrom('calendar'); setSelectedRace(fullSeason.find((r) => r.round === race.round) ?? race); setSubPage('calendar') }} className="w-full flex items-center justify-between gap-3 px-4 min-h-14 text-left hover:bg-zinc-900 transition">
                       <span className="min-w-0">
                         <span className="block text-sm font-bold uppercase truncate">{race.name}</span>
                         <span className="block text-xs text-zinc-500">{race.circuit}</span>
@@ -782,12 +896,12 @@ if (subPage === 'stats-constructors') {
   if (step === 'driver') {
     return (
       <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-28 sm:pb-10">
-        <header className="flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b-4 border-red-600 sticky top-0 bg-black z-10">
+        <header className="flex items-center justify-between gap-2 px-4 sm:px-5 lg:px-6 py-2 sm:py-4 border-b-4 border-red-600 sticky top-0 bg-black z-10">
           <button onClick={onBack} className="text-sm text-zinc-400 min-h-11 min-w-16 text-left">← Retour</button>
           <h1 className="font-black uppercase tracking-tight text-center text-sm sm:text-lg">Choisis tes pilotes</h1>
           <button onClick={() => setStep('team')} className="text-sm text-zinc-400 min-h-11 min-w-16 text-right">Passer</button>
         </header>
-        <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1">
+        <div className="px-4 sm:px-5 lg:px-6 py-6 w-full flex-1">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6 2xl:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
             {drivers.map((d) => (
               <button key={d.id} onClick={() => toggleDriver(d.id)} className="flex flex-col items-center rounded-sm p-1 active:opacity-80">
@@ -805,12 +919,12 @@ if (subPage === 'stats-constructors') {
 
   return (
     <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-28 sm:pb-10">
-      <header className="flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b-4 border-red-600 sticky top-0 bg-black z-10">
+      <header className="flex items-center justify-between gap-2 px-4 sm:px-5 lg:px-6 py-2 sm:py-4 border-b-4 border-red-600 sticky top-0 bg-black z-10">
         <button onClick={() => setStep('driver')} className="text-sm text-zinc-400 min-h-11 min-w-16 text-left">← Retour</button>
         <h1 className="font-black uppercase tracking-tight text-center text-sm sm:text-lg">Choisis ton écurie</h1>
         <button onClick={() => setStep('done')} className="text-sm text-zinc-400 min-h-11 min-w-16 text-right">Passer</button>
       </header>
-      <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1">
+      <div className="px-4 sm:px-5 lg:px-6 py-6 w-full flex-1">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6 lg:gap-8">
           {teams.map((t) => (
             <button key={t.id} onClick={() => { setFavTeam(t.id); localStorage.setItem(teamKey, t.id); scrollToValidate() }} className={`flex flex-col items-center gap-3 p-4 rounded-sm ${favTeam === t.id ? 'bg-zinc-900' : ''}`}>

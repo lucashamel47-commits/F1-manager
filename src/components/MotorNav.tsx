@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 export type NavKey = 'home' | 'standings' | 'calendar' | 'stats' | 'favorites'
 
 const items: { key: NavKey; label: string }[] = [
@@ -14,13 +16,15 @@ interface Props {
   onExit: () => void
   onBack?: () => void
   crumb?: string
+  /** Contenu collé sous la barre (ex. onglets de section) : reste visible au défilement. */
+  extra?: ReactNode
 }
 
-export default function MotorNav({ active, onNavigate, onExit, onBack, crumb }: Props) {
+export default function MotorNav({ active, onNavigate, onExit, onBack, crumb, extra }: Props) {
   return (
     <header className="sticky top-0 z-30 w-full bg-black/95 backdrop-blur border-b border-zinc-800">
       <div className="h-1 bg-red-600" />
-      <div className="flex items-center gap-3 px-4 sm:px-6 lg:px-10 xl:px-14 h-14 lg:h-16">
+      <div className="flex items-center gap-3 px-4 sm:px-5 lg:px-6 h-14 lg:h-16">
         <button
           onClick={onExit}
           aria-label="Changer de mode"
@@ -65,23 +69,25 @@ export default function MotorNav({ active, onNavigate, onExit, onBack, crumb }: 
         ))}
       </nav>
       {onBack && (
-        <div className="flex items-center gap-3 px-4 sm:px-6 lg:px-10 xl:px-14 border-t border-zinc-900 bg-zinc-950/80">
+        <div className={`${extra ? 'hidden md:flex' : 'flex'} items-center gap-3 px-4 sm:px-5 lg:px-6 border-t border-zinc-900 bg-zinc-950/80`}>
           <button onClick={onBack} className="min-h-11 text-sm text-zinc-300 hover:text-white active:text-white">
             ← Retour
           </button>
           {crumb && <span className="text-xs uppercase tracking-widest text-zinc-500 truncate">{crumb}</span>}
         </div>
       )}
+      {extra && <div className="px-4 sm:px-5 lg:px-6 border-t border-zinc-900 bg-black/95">{extra}</div>}
     </header>
   )
 }
 
-export function SectionTitle({ kicker, title, className = '', h1 = false }: { kicker: string; title: string; className?: string; h1?: boolean }) {
+export function SectionTitle({ kicker, title, className = '', h1 = false, desc }: { kicker: string; title: string; className?: string; h1?: boolean; desc?: string }) {
   const Tag = h1 ? 'h1' : 'h2'
   return (
     <div className={`border-l-4 border-red-600 pl-3 ${className}`}>
       <p className="text-red-500 text-xs font-bold uppercase tracking-[0.25em]">{kicker}</p>
       <Tag className="mt-1 text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-tight leading-none">{title}</Tag>
+      {desc && <p className="mt-2 text-sm text-zinc-400 max-w-2xl">{desc}</p>}
     </div>
   )
 }
