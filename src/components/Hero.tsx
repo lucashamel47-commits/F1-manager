@@ -82,11 +82,11 @@ ctx.fill()
   return (
     <>
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
-      <div className={`relative z-10 flex flex-col items-center pt-32 pb-16 px-6 transition-all duration-1000 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        <p className="text-red-600 text-[10px] tracking-[0.8em] uppercase mb-6">Formula 1</p>
-        <h1 className="text-7xl md:text-8xl font-black tracking-tighter leading-none">MANAGER</h1>
+      <div className={`relative z-10 flex flex-col items-center pt-24 sm:pt-32 pb-12 sm:pb-16 px-4 sm:px-6 transition-all duration-1000 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <p className="text-red-600 text-[11px] tracking-[0.5em] sm:tracking-[0.8em] uppercase mb-6">Formula 1</p>
+        <h1 className="text-5xl min-[400px]:text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-none">MANAGER</h1>
         <div className="mt-6 h-px w-28 bg-red-600" />
-        <p className="mt-6 text-zinc-500 text-xs tracking-[0.4em] uppercase">Saison 2026</p>
+        <p className="mt-6 text-zinc-500 text-xs tracking-[0.3em] sm:tracking-[0.4em] uppercase">Saison 2026</p>
       </div>
     </>
   )
