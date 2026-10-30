@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import MotorNav, { SectionTitle, type NavKey } from '../components/MotorNav'
 import CarStage from '../components/CarStage'
 import StatsRecords from '../components/StatsRecords'
+import { colorFor } from '../lib/teamColors'
 
 interface Props {
   onBack: () => void
@@ -252,7 +253,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
       return (
         <div className="min-h-dvh w-full flex flex-col bg-black text-white">
           {nav(() => setSubPage('home'), "Circuit")}
-          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1 grid content-start gap-6 md:grid-cols-2 items-start">
+          <div className="px-4 sm:px-5 lg:px-6 py-6 w-full flex-1 grid content-start gap-6 md:grid-cols-2 items-start">
             <div className="md:col-span-2 border-l-4 border-red-600 pl-4">
               <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-2">Prochain GP</p>
               <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight leading-none mt-1">{cota.name}</h1>
@@ -286,7 +287,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
         return (
           <div className="min-h-dvh w-full flex flex-col bg-black text-white">
             {nav(() => setSelectedRace(null), "Course")}
-            <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1 grid content-start gap-6 md:grid-cols-2 items-start">
+            <div className="px-4 sm:px-5 lg:px-6 py-6 w-full flex-1 grid content-start gap-6 md:grid-cols-2 items-start">
               <div className="md:col-span-2 border-l-4 border-red-600 pl-4">
                 <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-2">Round {selectedRace.round}</p>
                 <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight leading-none mt-1">{selectedRace.name}</h1>
@@ -318,7 +319,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
       return (
         <div className="min-h-dvh w-full flex flex-col bg-black text-white">
           {nav(() => setSubPage('home'), "Calendrier")}
-          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 sm:py-8 w-full flex-1 grid content-start gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+          <div className="px-4 sm:px-5 lg:px-6 py-6 sm:py-8 w-full flex-1 grid content-start gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
             <SectionTitle h1 kicker="Saison 2026" title="Calendrier" className="col-span-full mb-2" />
             {calendar.map((race) => (
               <button key={race.round} onClick={() => setSelectedRace(race)} className="group text-left bg-zinc-950 border border-zinc-800 hover:border-red-600 overflow-hidden transition">
@@ -345,7 +346,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
         return (
           <div className="min-h-dvh w-full flex flex-col bg-black text-white">
             {nav(() => setSelectedDriver(null), "Pilote")}
-            <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-8 w-full flex-1 grid content-start gap-6 lg:grid-cols-3 items-start">
+            <div className="px-4 sm:px-5 lg:px-6 py-8 w-full flex-1 grid content-start gap-6 lg:grid-cols-3 items-start">
               <div className="text-center lg:row-span-2 lg:self-center">
                 <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl font-black text-white" style={{ backgroundColor: getColor(teamName) }}>
                   {selectedDriver.Driver.familyName.charAt(0)}
@@ -372,7 +373,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
         return (
           <div className="min-h-dvh w-full flex flex-col bg-black text-white">
             {nav(() => setSelectedConstructor(null), "Écurie")}
-            <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-8 w-full flex-1 space-y-6 content-start">
+            <div className="px-4 sm:px-5 lg:px-6 py-8 w-full flex-1 space-y-6 content-start">
               <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-center">{selectedConstructor.Constructor.name}</h1>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 lg:col-span-2">
                 <div className="bg-zinc-950 border border-zinc-900 rounded-sm p-4 text-center"><p className="text-xs text-zinc-500">Points</p><p className="text-xl font-semibold mt-1">{selectedConstructor.points}</p></div>
@@ -388,7 +389,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
       return (
         <div className="min-h-dvh w-full flex flex-col bg-black text-white">
           {nav(() => setSubPage('home'), "Classements")}
-          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1">
+          <div className="px-4 sm:px-5 lg:px-6 py-6 w-full flex-1">
             <SectionTitle h1 kicker="Championnat 2026" title="Classements" className="mb-6" />
             <div className="flex border-b border-zinc-800 mb-6">
               <button onClick={() => setStandingsTab('drivers')} className={`px-5 min-h-12 text-sm font-bold uppercase tracking-wider border-b-4 transition ${standingsTab === 'drivers' ? 'border-red-600 text-white' : 'border-transparent text-zinc-400'}`}>Pilotes</button>
@@ -443,7 +444,7 @@ if (subPage === 'stats-records') {
   return (
     <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-28 sm:pb-10">
       {nav(() => setSubPage('home'), 'Records & Historique')}
-      <div className="px-4 sm:px-6 lg:px-10 xl:px-14 pt-6 w-full">{statsTabs('records')}</div>
+      <div className="px-4 sm:px-5 lg:px-6 pt-6 w-full">{statsTabs('records')}</div>
       <StatsRecords />
     </div>
   )
@@ -544,7 +545,7 @@ if (subPage === 'stats-constructors') {
       <div className="min-h-dvh w-full flex flex-col bg-black text-white">
         {nav(() => setSelectedTeamStats(null), selectedTeamStats.Constructor.name)}
 
-        <div className="px-4 sm:px-6 lg:px-10 xl:px-14 pt-6 pb-16 w-full flex-1 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:content-start">
+        <div className="px-4 sm:px-5 lg:px-6 pt-6 pb-16 w-full flex-1 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:content-start">
           <div className="lg:col-span-2 mb-6 flex items-center justify-between gap-4"><SectionTitle h1 kicker="Écurie 2026" title={selectedTeamStats.Constructor.name} /><img src={teamLogo} alt="" className="h-10 sm:h-14 max-w-[30%] object-contain" /></div>
 
           <div className="relative rounded-sm overflow-hidden border border-zinc-800 bg-black [container-type:size] h-48 sm:h-64 md:h-80 lg:h-full lg:min-h-[28rem] flex items-center justify-start mb-6 sm:mb-8 lg:mb-0">
@@ -609,8 +610,8 @@ if (subPage === 'stats-constructors') {
   return (
     <div className="min-h-dvh w-full flex flex-col bg-black text-white">
       {nav(() => setSubPage('home'), "Constructeurs")}
-      <div className="px-4 sm:px-6 lg:px-10 xl:px-14 pt-6 w-full">{statsTabs('constructors')}</div>
-      <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1 grid content-start gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="px-4 sm:px-5 lg:px-6 pt-6 w-full">{statsTabs('constructors')}</div>
+      <div className="px-4 sm:px-5 lg:px-6 py-6 w-full flex-1 grid content-start gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <SectionTitle h1 kicker="Statistiques" title="Constructeurs" className="col-span-full mb-2" />
         {liveConstructors.length === 0 && <p className="col-span-full text-zinc-500 text-sm">Chargement...</p>}
         {liveConstructors.map((t, i) => (
@@ -638,10 +639,10 @@ if (subPage === 'stats-constructors') {
       return (
         <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-28 sm:pb-10">
           {nav(() => setSubPage('home'), "Statistiques")}
-          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 pt-6 w-full">
+          <div className="px-4 sm:px-5 lg:px-6 pt-6 w-full">
             {statsTabs('overview')}
           </div>
-          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1 grid content-start gap-7 md:grid-cols-2 md:gap-x-8 items-start">
+          <div className="px-4 sm:px-5 lg:px-6 py-6 w-full flex-1 grid content-start gap-7 md:grid-cols-2 md:gap-x-8 lg:grid-cols-4 items-start">
             <SectionTitle h1 kicker="Saison 2026" title="Statistiques" className="col-span-full" />
             <div>
               <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-4">Title Fight</p>
@@ -690,6 +691,24 @@ if (subPage === 'stats-constructors') {
                 ))}
               </div>
             </div>
+            <div className="col-span-full min-w-0 border-t border-zinc-900 pt-6">
+              <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase mb-4">Classement pilotes</p>
+              <ol className="grid gap-x-8 md:grid-cols-2 lg:grid-cols-3">
+                {liveStandings.slice(0, 12).map((d, i) => {
+                  const max = Number(liveStandings[0]?.points) || 1
+                  return (
+                    <li key={d.Driver.driverId} className="py-2.5 border-b border-zinc-900 min-w-0">
+                      <div className="flex items-baseline gap-3">
+                        <span className="w-5 text-xs text-zinc-600 tabular-nums">{i + 1}</span>
+                        <span className="flex-1 min-w-0 truncate text-sm">{d.Driver.givenName} <span className="font-semibold">{d.Driver.familyName}</span></span>
+                        <span className="text-sm font-semibold tabular-nums">{d.points}</span>
+                      </div>
+                      <div className="ml-8 mt-1.5 h-0.5 bg-zinc-900"><div className="h-full" style={{ width: `${(Number(d.points) / max) * 100}%`, background: colorFor(d.Constructors[0]?.name) }} /></div>
+                    </li>
+                  )
+                })}
+              </ol>
+            </div>
           </div>
         </div>
       )
@@ -701,7 +720,7 @@ if (subPage === 'stats-constructors') {
       return (
         <div className="min-h-dvh w-full flex flex-col bg-black text-white">
           {nav(() => setSubPage('home'), "Tes favoris")}
-          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-8 w-full flex-1 grid content-start gap-6 md:grid-cols-2 items-start">
+          <div className="px-4 sm:px-5 lg:px-6 py-8 w-full flex-1 grid content-start gap-6 md:grid-cols-2 items-start">
             <SectionTitle h1 kicker="Ton paddock" title="Tes favoris" className="col-span-full" />
             {driver && (
               <div className="bg-zinc-950 border border-zinc-800 rounded-sm p-5">
@@ -742,7 +761,7 @@ if (subPage === 'stats-constructors') {
           >
             <img src={nextRace.photo} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition duration-700" />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/10" />
-            <div className="relative min-h-[22rem] sm:min-h-[26rem] lg:min-h-[30rem] xl:min-h-[34rem] flex flex-col justify-end px-4 sm:px-6 lg:px-10 xl:px-14 pb-6 sm:pb-10 pt-24">
+            <div className="relative min-h-[22rem] sm:min-h-[26rem] lg:min-h-[30rem] xl:min-h-[34rem] flex flex-col justify-end px-4 sm:px-5 lg:px-6 pb-6 sm:pb-10 pt-24">
               <span className="self-start bg-red-600 text-white text-[11px] font-bold uppercase tracking-widest px-2 py-1">Prochain GP • Round {nextRace.round}</span>
               <h1 className="mt-3 font-black uppercase leading-[0.95] tracking-tight text-5xl sm:text-6xl lg:text-8xl">{nextRace.name}</h1>
               <p className="mt-3 text-zinc-300 text-sm sm:text-base">{nextRace.date} • {nextRace.circuit} • <span className="text-white font-semibold">{getDaysUntilRace()}</span></p>
@@ -750,7 +769,7 @@ if (subPage === 'stats-constructors') {
             </div>
           </div>
 
-          <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-8 sm:py-10 grid gap-10 lg:grid-cols-12 items-start">
+          <div className="px-4 sm:px-5 lg:px-6 py-8 sm:py-10 grid gap-10 lg:grid-cols-12 items-start">
             <section className="lg:col-span-8">
               <SectionTitle kicker="À la une" title="Explorer" className="mb-5" />
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -814,12 +833,12 @@ if (subPage === 'stats-constructors') {
   if (step === 'driver') {
     return (
       <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-28 sm:pb-10">
-        <header className="flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b-4 border-red-600 sticky top-0 bg-black z-10">
+        <header className="flex items-center justify-between gap-2 px-4 sm:px-5 lg:px-6 py-2 sm:py-4 border-b-4 border-red-600 sticky top-0 bg-black z-10">
           <button onClick={onBack} className="text-sm text-zinc-400 min-h-11 min-w-16 text-left">← Retour</button>
           <h1 className="font-black uppercase tracking-tight text-center text-sm sm:text-lg">Choisis tes pilotes</h1>
           <button onClick={() => setStep('team')} className="text-sm text-zinc-400 min-h-11 min-w-16 text-right">Passer</button>
         </header>
-        <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1">
+        <div className="px-4 sm:px-5 lg:px-6 py-6 w-full flex-1">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6 2xl:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
             {drivers.map((d) => (
               <button key={d.id} onClick={() => toggleDriver(d.id)} className="flex flex-col items-center rounded-sm p-1 active:opacity-80">
@@ -837,12 +856,12 @@ if (subPage === 'stats-constructors') {
 
   return (
     <div className="min-h-dvh w-full flex flex-col bg-black text-white pb-28 sm:pb-10">
-      <header className="flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-10 xl:px-14 py-2 sm:py-4 border-b-4 border-red-600 sticky top-0 bg-black z-10">
+      <header className="flex items-center justify-between gap-2 px-4 sm:px-5 lg:px-6 py-2 sm:py-4 border-b-4 border-red-600 sticky top-0 bg-black z-10">
         <button onClick={() => setStep('driver')} className="text-sm text-zinc-400 min-h-11 min-w-16 text-left">← Retour</button>
         <h1 className="font-black uppercase tracking-tight text-center text-sm sm:text-lg">Choisis ton écurie</h1>
         <button onClick={() => setStep('done')} className="text-sm text-zinc-400 min-h-11 min-w-16 text-right">Passer</button>
       </header>
-      <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-6 w-full flex-1">
+      <div className="px-4 sm:px-5 lg:px-6 py-6 w-full flex-1">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6 lg:gap-8">
           {teams.map((t) => (
             <button key={t.id} onClick={() => { setFavTeam(t.id); localStorage.setItem(teamKey, t.id); scrollToValidate() }} className={`flex flex-col items-center gap-3 p-4 rounded-sm ${favTeam === t.id ? 'bg-zinc-900' : ''}`}>

@@ -119,7 +119,7 @@ function Facts() {
   return (
     <section aria-labelledby="rec-facts" className="min-w-0">
       <Heading id="rec-facts" kicker="Records de référence" title="Faits marquants" />
-      <dl className="grid md:grid-cols-2 xl:grid-cols-3 md:gap-x-12 border-t border-zinc-900">
+      <dl className="grid md:grid-cols-2 xl:grid-cols-1 md:gap-x-10 border-t border-zinc-900">
         {list.map((f) => (
           <div key={f.label} className="flex items-baseline gap-4 py-3.5 border-b border-zinc-900">
             <dt className="w-20 sm:w-24 shrink-0 text-xl sm:text-2xl font-bold tabular-nums whitespace-nowrap">{f.value}</dt>
@@ -353,7 +353,7 @@ export default function StatsRecords() {
     { big: String(constructorRecords.titles?.[0]?.value ?? ''), label: 'titres constructeurs', who: constructorRecords.titles?.[0]?.name ?? '' },
   ]
   return (
-    <div className="px-4 sm:px-6 lg:px-10 xl:px-14 py-8 sm:py-10 w-full max-w-[1600px] flex-1 space-y-14 sm:space-y-16">
+    <div className="px-4 sm:px-5 lg:px-6 py-6 sm:py-8 w-full flex-1 space-y-12 sm:space-y-14">
       <SectionTitle h1 kicker="Statistiques" title="Records & Historique" />
 
       <dl className="grid grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-6 border-t border-zinc-900 pt-8">
@@ -368,9 +368,12 @@ export default function StatsRecords() {
         ))}
       </dl>
 
-      <div className="grid gap-14 sm:gap-16 md:grid-cols-2 md:gap-x-10 lg:gap-x-14 xl:gap-x-20 items-start">
+      <div className="grid gap-12 md:grid-cols-2 md:gap-x-8 lg:gap-x-10 xl:grid-cols-3 items-start">
         <RecordBoard />
         <Champions />
+        <div className="min-w-0 md:col-span-2 xl:col-span-1">
+          <Facts />
+        </div>
       </div>
 
       <section aria-labelledby="rec-charts" className="min-w-0">
@@ -378,8 +381,8 @@ export default function StatsRecords() {
           <p className="text-zinc-500 text-xs uppercase tracking-[0.2em]">En graphiques</p>
           <h2 id="rec-charts" className="mt-1 text-xl sm:text-2xl font-bold tracking-tight">70 ans de Formule 1 en un coup d’œil</h2>
         </div>
-        <div className="grid gap-12 md:grid-cols-2 md:gap-x-10 lg:gap-x-14 xl:grid-cols-3 xl:gap-x-16">
-          <div className="min-w-0 md:col-span-2 xl:col-span-1">
+        <div className="grid gap-12 lg:grid-cols-3 md:gap-x-8 lg:gap-x-10">
+          <div className="min-w-0 md:col-span-2 lg:col-span-1">
             <h3 className="text-sm font-semibold text-zinc-200">La course aux titres</h3>
             <p className="text-xs text-zinc-500 mb-3">Titres pilote cumulés, 1950 → 2025</p>
             <TitlesRace />
@@ -396,8 +399,6 @@ export default function StatsRecords() {
           </div>
         </div>
       </section>
-
-      <Facts />
 
       <p className="text-xs text-zinc-600 leading-relaxed border-t border-zinc-900 pt-5 max-w-3xl">{RECORDS_AS_OF}</p>
     </div>
