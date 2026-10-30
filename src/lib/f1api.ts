@@ -167,3 +167,20 @@ export async function getSeasonTop(year: number, kind: 'drivers' | 'constructors
   }
   return res
 }
+
+// ---------- Vainqueurs des courses de la saison (une seule requête) ----------
+export interface RaceWinner {
+  name: string
+  team?: string
+}
+export async function getSeasonWinners(): Promise<Record<number, RaceWinner>> {
+  const d = await get<{
+    MRData: { RaceTable: { Races: { round: string; Results: { Driver: { givenName: string; familyName: string }; Constructor: { name: string } }[] }[] } }
+  }>(`/${SEASON}/results/1.json?limit=30`)
+  const out: Record<number, RaceWinner> = {}
+  for (const r of d.MRData.RaceTable.Races) {
+    const w = r.Results[0]
+    if (w) out[Number(r.round)] = { name: `${w.Driver.givenName} ${w.Driver.familyName}`, team: w.Constructor.name }
+  }
+  return out
+}
