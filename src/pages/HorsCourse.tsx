@@ -148,7 +148,8 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
       if (parsed.length > 0) setFavDriver(parsed[0])
     }
     if (savedTeam) setFavTeam(savedTeam)
-    if (savedDrivers && savedTeam) {
+    const onboarded = localStorage.getItem(driverKey + '-onboarded') === '1'
+    if ((savedDrivers && savedTeam) || onboarded) {
       setStep('done')
       setShowWelcome(true)
       setTimeout(() => {
@@ -158,6 +159,10 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
     } else if (savedDrivers) setStep('team')
     else setStep('driver')
   }, [userEmail])
+
+  useEffect(() => {
+    if (step === 'done') localStorage.setItem(driverKey + '-onboarded', '1')
+  }, [step, driverKey])
 
   const toggleDriver = (id: string) => {
     setSelectedDrivers(prev => {
