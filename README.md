@@ -13,7 +13,7 @@ L'interface est responsive : elle s'adapte au téléphone, à l'iPad et à l'ord
 
 ## Comptes et rappels par email
 
-Comptes (Supabase) + rappels automatiques avant les sessions (Resend, envoyés par un cron GitHub Actions) : voir [SETUP.md](SETUP.md). Sans configuration, l'app fonctionne comme avant et masque ces fonctions.
+Comptes (Supabase) + rappels automatiques avant les sessions (Gmail, envoyés par un cron GitHub Actions) : voir [SETUP.md](SETUP.md). Sans configuration, l'app fonctionne comme avant et masque ces fonctions.
 
 ## Lancer le projet
 

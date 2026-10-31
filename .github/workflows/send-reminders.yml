@@ -1,6 +1,6 @@
 name: Rappels par email avant les sessions
 
-# Toutes les 15 min : lit le calendrier F1 (Jolpica) et envoie les rappels via Resend aux inscrits (table Supabase).
+# Toutes les 15 min : lit le calendrier F1 (Jolpica) et envoie les rappels par Gmail (SMTP) aux inscrits (table Supabase).
 # Les crons de GitHub peuvent avoir du retard : le script rattrape jusqu'à 90 min et ne crée jamais de doublon.
 on:
   schedule:
@@ -30,17 +30,24 @@ jobs:
     env:
       SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      RESEND_FROM: ${{ vars.RESEND_FROM }}
+      GMAIL_USER: ${{ secrets.GMAIL_USER }}
+      GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
     steps:
-      # Tant que Supabase / Resend ne sont pas configurés, le run reste vert et ne fait rien.
+      # Tant que Supabase / Gmail ne sont pas configurés, le run reste vert et ne fait rien.
       - name: Configuration absente
-        if: env.SUPABASE_URL == '' || env.SUPABASE_SERVICE_ROLE_KEY == '' || env.RESEND_API_KEY == ''
-        run: echo "Rappels non configurés (variable VITE_SUPABASE_URL ou secrets SUPABASE_SERVICE_ROLE_KEY / RESEND_API_KEY manquants) — voir SETUP.md."
+        if: env.SUPABASE_URL == '' || env.SUPABASE_SERVICE_ROLE_KEY == '' || env.GMAIL_USER == '' || env.GMAIL_APP_PASSWORD == ''
+        run: echo "Rappels non configurés (variable VITE_SUPABASE_URL ou secrets SUPABASE_SERVICE_ROLE_KEY / GMAIL_USER / GMAIL_APP_PASSWORD manquants) — voir SETUP.md."
       - uses: actions/checkout@v4
-        if: env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' && env.RESEND_API_KEY != ''
+        if: env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' && env.GMAIL_USER != '' && env.GMAIL_APP_PASSWORD != ''
+      - uses: actions/setup-node@v4
+        if: env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' && env.GMAIL_USER != '' && env.GMAIL_APP_PASSWORD != ''
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+        if: env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' && env.GMAIL_USER != '' && env.GMAIL_APP_PASSWORD != ''
       - run: node scripts/send-reminders.mjs
-        if: env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' && env.RESEND_API_KEY != ''
+        if: env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' && env.GMAIL_USER != '' && env.GMAIL_APP_PASSWORD != ''
         env:
           SEND_TEST: ${{ inputs.test && '1' || '' }}
           DRY_RUN: ${{ inputs.dry_run && '1' || '' }}
