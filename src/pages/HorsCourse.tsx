@@ -45,6 +45,8 @@ const teams = [
   { id: 'sau', name: 'Sauber', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/sauber-logo.png' },
 ]
 
+const BASE = import.meta.env.BASE_URL
+
 const calendar = [
   { round: 18, iso: '2026-10-25', name: 'United States', date: '23 – 25 octobre', circuit: 'Austin', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/USA_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/USA.jpg', length: '5,513 km', laps: 56, record: '1:36.169', recordDriver: 'C. Leclerc', history: 'Inauguré en 2012, conçu par Hermann Tilke. Circuit technique avec de longs virages et une grande ligne droite qui favorise les dépassements.', grip: 'Asphalte lisse, bon grip une fois en température. Usure modérée.', creator: 'Hermann Tilke' },
   { round: 19, iso: '2026-11-01', name: 'Mexico City', date: '30 oct – 1 nov', circuit: 'Mexico', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Mexico_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Mexico.jpg', length: '4,304 km', laps: 71, record: '1:17.774', recordDriver: 'V. Bottas', history: 'Autódromo Hermanos Rodríguez, rénové en 2015. L’altitude élevée (2200 m) réduit la puissance des moteurs et augmente l’usure des freins.', grip: 'Grip correct mais usure pneus importante à cause de l’air moins dense.', creator: 'Oscar Fernández' },
@@ -70,18 +72,18 @@ const findNextRace = () => {
 
 const carImageFor = (teamName: string) => {
   const n = teamName.toLowerCase()
-  if (n.includes('ferrari')) return '/cars/ferrari.jpeg'
-  if (n.includes('mercedes')) return '/cars/mercedes.jpeg'
-  if (n.includes('mclaren')) return '/cars/mclaren.jpeg'
-  if (n.includes('aston')) return '/cars/aston.jpeg'
-  if (n.includes('williams')) return '/cars/williams.jpeg'
-  if (n.includes('alpine')) return '/cars/alpine.jpeg'
-  if (n.includes('haas')) return '/cars/haas.jpeg'
-  if (n.includes('audi')) return '/cars/audi.jpeg'
-  if (n.includes('sauber') || n.includes('kick')) return '/cars/sauber.jpeg'
-  if (n.includes('cadillac')) return '/cars/cadillac.jpeg'
-  if (n.includes('racing bulls') || n.includes('rb')) return '/cars/racingbulls.jpeg'
-  return '/cars/redbull.jpeg'
+  if (n.includes('ferrari')) return BASE + 'cars/ferrari.jpeg'
+  if (n.includes('mercedes')) return BASE + 'cars/mercedes.jpeg'
+  if (n.includes('mclaren')) return BASE + 'cars/mclaren.jpeg'
+  if (n.includes('aston')) return BASE + 'cars/aston.jpeg'
+  if (n.includes('williams')) return BASE + 'cars/williams.jpeg'
+  if (n.includes('alpine')) return BASE + 'cars/alpine.jpeg'
+  if (n.includes('haas')) return BASE + 'cars/haas.jpeg'
+  if (n.includes('audi')) return BASE + 'cars/audi.jpeg'
+  if (n.includes('sauber') || n.includes('kick')) return BASE + 'cars/sauber.jpeg'
+  if (n.includes('cadillac')) return BASE + 'cars/cadillac.jpeg'
+  if (n.includes('racing bulls') || n.includes('rb')) return BASE + 'cars/racingbulls.jpeg'
+  return BASE + 'cars/redbull.jpeg'
 }
 
 export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver, favTeam, setFavTeam }: Props) {
@@ -469,7 +471,7 @@ if (subPage === 'stats-records') {
 if (subPage === 'stats-constructors') {
   if (selectedTeamStats) {
     const name = selectedTeamStats.Constructor.name.toLowerCase()
-    let carImage = '/cars/redbull.jpeg'
+    let carImage = BASE + 'cars/redbull.jpeg'
     let teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/red-bull-racing-logo.png'
     let fournisseur = 'Red Bull Ford'
     let noteMoteur = 'Premier moteur maison de Red Bull (DM01), développé avec Ford. L’écurie conçoit pour la première fois son propre groupe motopropulseur.'
@@ -477,77 +479,77 @@ if (subPage === 'stats-constructors') {
     let officialSite = 'https://www.redbullracing.com'
 
     if (name.includes('ferrari')) {
-      carImage = '/cars/ferrari.jpeg'
+      carImage = BASE + 'cars/ferrari.jpeg'
       teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/ferrari-logo.png'
       fournisseur = 'Ferrari'
       noteMoteur = 'Moteur entièrement développé à Maranello. Ferrari fournit aussi Haas et Cadillac.'
       noteAero = 'Ferrari devra adapter son concept aéro pour bien gérer le passage entre mode virage et mode ligne droite.'
       officialSite = 'https://www.ferrari.com/en-EN/formula1'
     } else if (name.includes('mercedes')) {
-      carImage = '/cars/mercedes.jpeg'
+      carImage = BASE + 'cars/mercedes.jpeg'
       teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/mercedes-logo.png'
       fournisseur = 'Mercedes'
       noteMoteur = 'Mercedes fournit McLaren, Williams et Alpine. Référence en gestion de l’énergie et fiabilité.'
       noteAero = 'Mercedes va chercher à tirer le meilleur parti des ailes actives sur les circuits à longues lignes droites.'
       officialSite = 'https://www.mercedesamgf1.com'
     } else if (name.includes('mclaren')) {
-      carImage = '/cars/mclaren.jpeg'
+      carImage = BASE + 'cars/mclaren.jpeg'
       teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/mclaren-logo.png'
       fournisseur = 'Mercedes'
       noteMoteur = 'Client Mercedes depuis 2021. Partenariat prolongé jusqu’en 2030.'
       noteAero = 'McLaren va chercher à maximiser les zones de freinage et les virages rapides.'
       officialSite = 'https://www.mclaren.com/racing'
     } else if (name.includes('aston')) {
-      carImage = '/cars/aston.jpeg'
+      carImage = BASE + 'cars/aston.jpeg'
       teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/aston-martin-logo.png'
       fournisseur = 'Honda'
       noteMoteur = 'Partenariat exclusif avec Honda à partir de 2026. Honda revient avec un moteur entièrement nouveau.'
       noteAero = 'Aston Martin devra adapter son concept aéro au nouveau moteur Honda.'
       officialSite = 'https://www.astonmartinf1.com'
     } else if (name.includes('williams')) {
-      carImage = '/cars/williams.jpeg'
+      carImage = BASE + 'cars/williams.jpeg'
       teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/williams-logo.png'
       fournisseur = 'Mercedes'
       noteMoteur = 'Client Mercedes. Williams bénéficie de la puissance et de la fiabilité du constructeur allemand.'
       noteAero = 'Williams espère réduire l’écart grâce aux ailes actives sur les longues lignes droites.'
       officialSite = 'https://www.williamsf1.com'
     } else if (name.includes('alpine')) {
-      carImage = '/cars/alpine.jpeg'
+      carImage = BASE + 'cars/alpine.jpeg'
       teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/alpine-logo.png'
       fournisseur = 'Mercedes'
       noteMoteur = 'Alpine passe chez Mercedes en 2026. Un changement majeur qui permet de se concentrer sur le châssis.'
       noteAero = 'Le passage à Mercedes va permettre à Alpine de mieux travailler sur les ailes actives.'
       officialSite = 'https://www.alpinecars.com/en/formula-1'
     } else if (name.includes('haas')) {
-      carImage = '/cars/haas.jpeg'
+      carImage = BASE + 'cars/haas.jpeg'
       teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/haas-f1-team-logo.png'
       fournisseur = 'Ferrari'
       noteMoteur = 'Client Ferrari. Haas utilise le même groupe motopropulseur que Ferrari.'
       noteAero = 'Haas va chercher à maximiser les zones de dépassement avec le nouveau règlement.'
       officialSite = 'https://www.haasf1team.com'
     } else if (name.includes('audi')) {
-      carImage = '/cars/audi.jpeg'
+      carImage = BASE + 'cars/audi.jpeg'
       teamLogo = 'https://upload.wikimedia.org/wikipedia/commons/a/aa/Audi.png'
       fournisseur = 'Audi'
       noteMoteur = 'Audi développe son propre moteur pour sa première saison en Formule 1. Un projet ambitieux pour la marque allemande.'
       noteAero = 'Audi devra rapidement maîtriser les ailes actives et le mode dépassement dès sa première année.'
       officialSite = 'https://www.audi.com'
     } else if (name.includes('sauber') || name.includes('kick')) {
-      carImage = '/cars/sauber.jpeg'
+      carImage = BASE + 'cars/sauber.jpeg'
       teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/kick-sauber-logo.png'
       fournisseur = 'Audi'
       noteMoteur = 'Sauber devient Audi. L’équipe prépare la transition vers la marque allemande.'
       noteAero = 'Sauber travaille sur l’adaptation aux nouvelles règles aérodynamiques de 2026.'
       officialSite = 'https://www.sauber-group.com'
     } else if (name.includes('cadillac')) {
-      carImage = '/cars/cadillac.jpeg'
+      carImage = BASE + 'cars/cadillac.jpeg'
       teamLogo = 'https://cdn.brandfetch.io/cadillac.com/logo'
       fournisseur = 'Ferrari'
       noteMoteur = 'Cadillac utilise un moteur Ferrari pour ses débuts en Formule 1. L’équipe américaine arrive avec un projet ambitieux.'
       noteAero = 'Cadillac devra rapidement maîtriser les ailes actives pour être compétitive dès sa première saison.'
       officialSite = 'https://www.cadillac.com'
     } else if (name.includes('racing bulls') || name.includes('rb')) {
-      carImage = '/cars/racingbulls.jpeg'
+      carImage = BASE + 'cars/racingbulls.jpeg'
       teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/rb-logo.png'
       fournisseur = 'Red Bull Ford'
       noteMoteur = 'Utilise le même groupe motopropulseur que Red Bull Racing.'
@@ -837,10 +839,10 @@ if (subPage === 'stats-constructors') {
               <SectionTitle kicker="À la une" title="Explorer" className="mb-5" />
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {[
-                  { key: 'standings' as const, tag: 'Classements', title: 'Le championnat pilotes et constructeurs', img: '/cars/mercedes.jpeg', big: true },
+                  { key: 'standings' as const, tag: 'Classements', title: 'Le championnat pilotes et constructeurs', img: BASE + 'cars/mercedes.jpeg', big: true },
                   { key: 'calendar' as const, tag: 'Calendrier', title: 'Toutes les courses de la saison', img: (calendar[nextIdx + 1] ?? nextRace).photo },
-                  { key: 'stats' as const, tag: 'Statistiques', title: 'Chiffres, écarts et écuries', img: '/cars/ferrari.jpeg' },
-                  { key: 'favorites' as const, tag: 'Favoris', title: 'Ton pilote et ton écurie', img: drivers.find(d => d.id === favDriver)?.photo || '/cars/mclaren.jpeg' },
+                  { key: 'stats' as const, tag: 'Statistiques', title: 'Chiffres, écarts et écuries', img: BASE + 'cars/ferrari.jpeg' },
+                  { key: 'favorites' as const, tag: 'Favoris', title: 'Ton pilote et ton écurie', img: drivers.find(d => d.id === favDriver)?.photo || BASE + 'cars/mclaren.jpeg' },
                 ].map((t) => (
                   <button key={t.key} onClick={() => setSubPage(t.key)} className={`group relative overflow-hidden border border-zinc-800 hover:border-red-600 bg-zinc-950 text-left transition ${t.big ? 'sm:col-span-2 lg:col-span-3 aspect-[16/9] lg:aspect-[21/9]' : 'aspect-[16/10]'}`}>
                     <img src={t.img} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition duration-500" />
