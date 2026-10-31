@@ -39,6 +39,9 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,jpeg,ico,webmanifest}'],
         maximumFileSizeToCacheInBytes: 1024 * 1024,
         navigateFallback: `${base}index.html`,
+        // Réception des notifications Web Push (public/push-sw.js), chargé par le service worker.
+        importScripts: ['push-sw.js'],
+        globIgnores: ['push-sw.js'],
         cleanupOutdatedCaches: true,
         clientsClaim: true, // le SW prend la main dès la 1re visite (la mise à jour, elle, attend le clic de l'utilisateur)
         runtimeCaching: [

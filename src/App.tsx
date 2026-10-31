@@ -3,6 +3,7 @@ import Home from './pages/Home'
 import ModeSelect from './pages/ModeSelect'
 import HorsCourse from './pages/HorsCourse'
 import LiveMode from './pages/LiveMode'
+import Notifications from './pages/Notifications'
 import ChatBot from './components/ChatBot'
 
 function App() {
@@ -14,7 +15,7 @@ function App() {
   const [showConfetti, setShowConfetti] = useState(false)
   const [loggedIn, setLoggedIn] = useState(false)
   const [info, setInfo] = useState<string | null>(null)
-  const [mode, setMode] = useState<'select' | 'hors' | 'live'>('select')
+  const [mode, setMode] = useState<'select' | 'hors' | 'live' | 'notif'>('select')
   const [favDriver, setFavDriver] = useState<string | null>(null)
   const [favTeam, setFavTeam] = useState<string | null>(null)
 
@@ -41,6 +42,10 @@ function App() {
         setTimeout(() => setLoggedIn(true), 1400)
       }
     }
+  }
+
+  if (loggedIn && mode === 'notif') {
+    return <Notifications onBack={() => setMode('select')} />
   }
 
   if (loggedIn && mode === 'live') {
@@ -74,6 +79,7 @@ function App() {
         <ModeSelect
           onSelectHors={() => setMode('hors')}
           onSelectLive={() => setMode('live')}
+          onSelectNotif={() => setMode('notif')}
           onLogout={() => {
             localStorage.removeItem('f1-current-user')
             setLoggedIn(false)

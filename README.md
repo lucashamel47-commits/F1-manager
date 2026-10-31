@@ -44,3 +44,11 @@ F1 Manager est une PWA : installable sur l'écran d'accueil, plein écran, avec 
 - Le chemin de base `/F1-manager/` est fourni par la variable `VITE_BASE` au build ; en local, tout reste à `/`.
 - Installation sur iPad / iPhone : ouvrir l'URL dans **Safari → Partager → Sur l'écran d'accueil**.
 - Les icônes viennent de `assets-src/logo.svg` (PNG générés dans `public/`).
+
+## Notifications avant les sessions (gratuit)
+
+- **Dans l'app** : Modes › *Notifications* — compte à rebours de la prochaine session, choix des sessions (course, qualifs, sprint, essais) et de l'avance (15 min, 1 h, 3 h, 1 jour), export `.ics` de tout le calendrier avec rappels (marche sans serveur).
+- **Web Push** (iPadOS 16.4+, app ajoutée à l'écran d'accueil) : l'app génère un *code d'activation* (abonnement + réglages). Le workflow `.github/workflows/notify.yml` (cron toutes les 15 min) lit le calendrier Jolpica et envoie les notifications avec `scripts/notify.mjs`.
+- **Secrets GitHub** (jamais dans le code) : `VAPID_PRIVATE_KEY` (clé privée Web Push) et `PUSH_SUBSCRIPTIONS` (un code d'activation par ligne). La clé publique VAPID est dans `src/lib/notify.ts`.
+- **Enregistrer un appareil** : `node scripts/add-subscription.mjs <code>` (met à jour le secret via `gh`). Test : Actions › *Notifications avant les sessions* › Run workflow › `test`.
+- Limites : le cron GitHub peut avoir quelques minutes de retard (le script rattrape la fenêtre exacte) ; GitHub coupe les crons après 60 jours sans activité dans le dépôt.

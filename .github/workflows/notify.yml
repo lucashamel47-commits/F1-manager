@@ -1,0 +1,48 @@
+name: Notifications avant les sessions
+
+# Toutes les 15 min : regarde le calendrier F1 (Jolpica) et envoie un Web Push aux appareils enregistrés.
+# Les crons de GitHub peuvent avoir quelques minutes de retard ; le script rattrape la fenêtre exacte.
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      test:
+        description: 'Envoyer aussi une notification de test à tous les abonnés'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: notify
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      PUSH_SUBSCRIPTIONS: ${{ secrets.PUSH_SUBSCRIPTIONS }}
+      VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+    steps:
+      # Sans abonné enregistré, on ne fait rien (le run reste vert et dure quelques secondes).
+      - name: Aucun abonné
+        if: env.PUSH_SUBSCRIPTIONS == ''
+        run: echo "Aucun abonné enregistré (secret PUSH_SUBSCRIPTIONS vide)."
+      - uses: actions/checkout@v4
+        if: env.PUSH_SUBSCRIPTIONS != ''
+      - uses: actions/setup-node@v4
+        if: env.PUSH_SUBSCRIPTIONS != ''
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+        if: env.PUSH_SUBSCRIPTIONS != ''
+      - run: node scripts/notify.mjs
+        if: env.PUSH_SUBSCRIPTIONS != ''
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SEND_TEST: ${{ inputs.test && '1' || '' }}
