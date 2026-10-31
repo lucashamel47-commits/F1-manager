@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#09090b"/>
+  <!-- traînées de vitesse -->
+  <g fill="#fff" opacity=".9">
+    <rect x="52" y="226" width="86" height="9" rx="4.5" opacity=".55"/>
+    <rect x="30" y="251" width="110" height="9" rx="4.5"/>
+    <rect x="62" y="276" width="76" height="9" rx="4.5" opacity=".35"/>
+  </g>
+  <g transform="translate(266 256) skewX(-12) scale(1.18)">
+    <rect x="-128" y="-86" width="256" height="172" rx="20" fill="#e10600"/>
+    <g fill="#fff" transform="translate(-70 -56)">
+      <!-- F -->
+      <path d="M0 0H64V27H30V47H56V72H30V112H0Z"/>
+      <!-- 1 -->
+      <path d="M92 0H126V112H96V30L74 37V13Z"/>
+    </g>
+  </g>
+</svg>

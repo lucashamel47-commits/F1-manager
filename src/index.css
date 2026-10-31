@@ -271,3 +271,21 @@ img, canvas {
 @media (prefers-reduced-motion: reduce) {
   .grow-x, .grow-y, .draw-line { animation: none; }
 }
+
+/* ---- App installée (PWA, écran d'accueil) : on respecte l'encoche et la barre d'accueil ---- */
+html { overscroll-behavior-y: none; }
+@media (display-mode: standalone) {
+  body {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+  input, textarea { user-select: text; }
+  /* La page garde sa hauteur d'écran malgré le padding du body. */
+  .min-h-dvh { min-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); }
+  /* La barre du haut colle au bord de l'écran et passe sous la barre d'état avec son propre padding. */
+  header.sticky {
+    margin-top: calc(-1 * env(safe-area-inset-top, 0px));
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+}
