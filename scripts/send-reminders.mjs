@@ -1,14 +1,14 @@
 // Envoi des rappels par email avant les sessions de F1. Lancé toutes les 15 min par .github/workflows/send-reminders.yml.
-// Aucune dépendance : fetch vers Supabase (PostgREST), Jolpica (calendrier) et Resend (email).
+// fetch vers Supabase (PostgREST) et Jolpica (calendrier) ; email via Gmail SMTP (nodemailer).
 //
 // Variables d'environnement :
 //   SUPABASE_URL                 ex. https://abcd1234.supabase.co
 //   SUPABASE_SERVICE_ROLE_KEY    clé « service_role » (secret GitHub, ne jamais la mettre dans l'app)
-//   RESEND_API_KEY               clé API Resend (secret GitHub)
-//   RESEND_FROM                  expéditeur, ex. « F1 Manager <rappels@ton-domaine.fr> » (défaut : onboarding@resend.dev)
+//   GMAIL_USER                   adresse Gmail d'envoi (secret GitHub)
+//   GMAIL_APP_PASSWORD           « mot de passe d'application » Google à 16 caractères (secret GitHub)
 //   DRY_RUN=1                    n'envoie rien, affiche seulement ce qui partirait
 //   SEND_TEST=1                  envoie un email de test à tous les inscrits actifs
-//   NOW / RESEND_API_URL / JOLPICA_URL   (tests en local)
+//   NOW / SMTP_HOST / SMTP_PORT / SMTP_SECURE / JOLPICA_URL   (tests en local)
 //
 // Principe : pour chaque inscrit, chaque session choisie et chaque délai choisi, l'heure d'envoi = début − délai.
 // On envoie si cette heure est passée depuis moins de 90 min, si la session n'a pas commencé et si l'inscrit
@@ -16,9 +16,8 @@
 // (clé primaire user_id + session + délai) : deux runs en parallèle ou un retard du cron ne peuvent jamais créer de doublon.
 const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/+$/, '')
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-const RESEND_KEY = process.env.RESEND_API_KEY || ''
-const FROM = process.env.RESEND_FROM || 'F1 Manager <onboarding@resend.dev>'
-const RESEND_URL = process.env.RESEND_API_URL || 'https://api.resend.com/emails'
+const GMAIL_USER = process.env.GMAIL_USER || ''
+const GMAIL_PASS = (process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, '') // Google l'affiche par blocs de 4 : on enlève les espaces
 const JOLPICA = process.env.JOLPICA_URL || 'https://api.jolpi.ca/ergast/f1'
 const APP_URL = 'https://lucashamel47-commits.github.io/F1-manager/'
 const DRY = process.env.DRY_RUN === '1'
@@ -26,8 +25,8 @@ const NOW = process.env.NOW ? new Date(process.env.NOW) : new Date()
 const MIN = 60_000
 const MAX_LATE = 90 * MIN
 
-if (!SUPABASE_URL || !SERVICE_KEY || (!RESEND_KEY && !DRY)) {
-  console.error('Configuration incomplète : SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY et RESEND_API_KEY sont requis.')
+if (!SUPABASE_URL || !SERVICE_KEY || (!(GMAIL_USER && GMAIL_PASS) && !DRY)) {
+  console.error('Configuration incomplète : SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, GMAIL_USER et GMAIL_APP_PASSWORD sont requis.')
   process.exit(1)
 }
 
@@ -126,17 +125,21 @@ function reminderMail(p, s, lead) {
   }
 }
 
-let lastSend = 0
-async function send(to, mail, key) {
-  const wait = 600 - (Date.now() - lastSend) // Resend : 2 requêtes / seconde max
-  if (wait > 0) await new Promise((r) => setTimeout(r, wait))
-  lastSend = Date.now()
-  const res = await fetch(RESEND_URL, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json', 'Idempotency-Key': key },
-    body: JSON.stringify({ from: FROM, to: [to], subject: mail.subject, html: mail.html, text: mail.text }),
-  })
-  if (!res.ok) throw new Error(`Resend ${res.status} ${await res.text()}`)
+let transport = null
+async function send(to, mail) {
+  if (!transport) {
+    const { default: nodemailer } = await import('nodemailer')
+    const port = Number(process.env.SMTP_PORT || 465)
+    transport = nodemailer.createTransport({
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port,
+      secure: process.env.SMTP_SECURE ? process.env.SMTP_SECURE === '1' : port === 465,
+      auth: { user: GMAIL_USER, pass: GMAIL_PASS },
+      pool: true,
+      maxConnections: 1,
+    })
+  }
+  await transport.sendMail({ from: `F1 Manager <${GMAIL_USER}>`, to, subject: mail.subject, html: mail.html, text: mail.text })
 }
 
 // ---------- Run ----------
@@ -157,7 +160,7 @@ for (const p of subs) {
         if (DRY) { console.log(`[dry-run] ${p.email} ← ${s.label} · ${s.gp} (−${lead} min)`); sent++; continue }
         if (!(await claim(p.user_id, s.id, lead))) { skipped++; continue }
         try {
-          await send(p.email, reminderMail(p, s, lead), `${p.user_id}-${s.id}-${lead}`)
+          await send(p.email, reminderMail(p, s, lead))
           sent++
           console.log(`envoyé : ${s.label} · ${s.gp} (−${lead} min)`)
         } catch (e) {
@@ -175,10 +178,11 @@ for (const p of subs) {
 if (process.env.SEND_TEST === '1' && !DRY) {
   for (const p of subs) {
     try {
-      await send(p.email, { subject: 'F1 Manager 🏁 Test des rappels', ...template('Test réussi 🏁', ['Les rappels par email de F1 Manager fonctionnent.']) }, `test-${p.user_id}-${Date.now()}`)
+      await send(p.email, { subject: 'F1 Manager 🏁 Test des rappels', ...template('Test réussi 🏁', ['Les rappels par email de F1 Manager fonctionnent.']) })
       sent++
     } catch (e) { failed++; console.error('échec test :', e.message) }
   }
 }
+transport?.close()
 console.log(`Terminé : ${sent} envoyé(s), ${skipped} déjà envoyé(s), ${failed} échec(s).`)
 if (failed) process.exit(1)
