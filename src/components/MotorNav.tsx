@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react'
 
-export type NavKey = 'home' | 'standings' | 'calendar' | 'stats' | 'favorites'
+export type NavKey = 'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'live'
 
 const items: { key: NavKey; label: string }[] = [
   { key: 'home', label: 'Accueil' },
+  { key: 'live', label: 'Live' },
   { key: 'standings', label: 'Classements' },
   { key: 'calendar', label: 'Calendrier' },
   { key: 'stats', label: 'Statistiques' },
@@ -49,6 +50,7 @@ export default function MotorNav({ active, onNavigate, onExit, onBack, crumb, ex
                 active === it.key ? 'border-red-600 text-white' : 'border-transparent text-zinc-400 hover:text-white'
               }`}
             >
+              {it.key === 'live' && <span className="inline-block size-1.5 mr-1.5 mb-0.5 rounded-full bg-red-600 animate-pulse" aria-hidden />}
               {it.label}
             </button>
           ))}
@@ -64,6 +66,7 @@ export default function MotorNav({ active, onNavigate, onExit, onBack, crumb, ex
               active === it.key ? 'border-red-600 text-white' : 'border-transparent text-zinc-400'
             }`}
           >
+            {it.key === 'live' && <span className="inline-block size-1.5 mr-1 mb-0.5 rounded-full bg-red-600 animate-pulse" aria-hidden />}
             {it.label}
           </button>
         ))}

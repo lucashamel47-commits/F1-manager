@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type ReactNode } from 'react'
+import { useState, useEffect, useRef, lazy, Suspense, type ReactNode } from 'react'
 import MotorNav, { SectionTitle, type NavKey } from '../components/MotorNav'
 import CarStage from '../components/CarStage'
 import StatsRecords from '../components/StatsRecords'
@@ -7,6 +7,8 @@ import CircuitCarousel from '../components/CircuitCarousel'
 import TrackMap from '../components/TrackMap'
 import { circuits, daysUntil, fmtDay, type Circuit } from '../data/circuits'
 import { getSeasonWinners, type RaceWinner } from '../lib/f1api'
+
+const LivePage = lazy(() => import('../live/LivePage'))
 
 interface Props {
   onBack: () => void
@@ -97,7 +99,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
   const [welcomeDone, setWelcomeDone] = useState(false)
   const [nextIdx] = useState(findNextRace)
   const nextRace = calendar[nextIdx]
-  const [subPage, setSubPage] = useState<'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'circuit' | 'stats-constructors' | 'stats-records'>('home')
+  const [subPage, setSubPage] = useState<'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'live' | 'circuit' | 'stats-constructors' | 'stats-records'>('home')
   const [liveStandings, setLiveStandings] = useState<any[]>([])
   const [liveConstructors, setLiveConstructors] = useState<any[]>([])
   const [standingsTab, setStandingsTab] = useState<'drivers' | 'constructors'>('drivers')
@@ -775,6 +777,15 @@ if (subPage === 'stats-constructors') {
               )}
             </div>
           </div>
+        </div>
+      )
+    }
+
+    if (subPage === 'live') {
+      return (
+        <div className="min-h-dvh w-full flex flex-col bg-black text-white">
+          {nav(() => setSubPage('home'), 'Live')}
+          <Suspense fallback={<p className="p-8 text-sm text-zinc-500">Chargement du live…</p>}><LivePage /></Suspense>
         </div>
       )
     }
