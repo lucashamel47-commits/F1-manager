@@ -1,10 +1,11 @@
 interface Props {
   onSelectHors: () => void
+  onSelectLive: () => void
   onLogout: () => void
   onInfo: (type: 'hors' | 'live') => void
 }
 
-export default function ModeSelect({ onSelectHors, onLogout, onInfo }: Props) {
+export default function ModeSelect({ onSelectHors, onSelectLive, onLogout, onInfo }: Props) {
   return (
     <div className="min-h-dvh bg-black text-white relative overflow-hidden">
       <div className="flex flex-col items-center justify-center min-h-dvh px-4 sm:px-6 pb-28">
@@ -34,10 +35,12 @@ export default function ModeSelect({ onSelectHors, onLogout, onInfo }: Props) {
 
           <div className="relative">
             <button
-              disabled
-              className="w-full py-5 bg-zinc-900/80 text-zinc-500 rounded-2xl font-semibold text-base cursor-not-allowed border border-zinc-800"
+              onClick={onSelectLive}
+              className="w-full py-5 bg-zinc-900 hover:bg-zinc-800 active:bg-zinc-800 text-white rounded-2xl font-semibold text-base transition border border-red-600/70 flex items-center justify-center gap-3"
             >
+              <span className="size-2 rounded-full bg-red-600 animate-pulse" aria-hidden />
               Live Timing
+              <span className="text-[10px] font-black tracking-[0.2em] bg-red-600 px-1.5 py-0.5 rounded-sm leading-none">LIVE</span>
             </button>
             <button
               aria-label="Informations"

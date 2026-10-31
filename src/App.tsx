@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Home from './pages/Home'
 import ModeSelect from './pages/ModeSelect'
 import HorsCourse from './pages/HorsCourse'
+import LiveMode from './pages/LiveMode'
 import ChatBot from './components/ChatBot'
 
 function App() {
@@ -13,7 +14,7 @@ function App() {
   const [showConfetti, setShowConfetti] = useState(false)
   const [loggedIn, setLoggedIn] = useState(false)
   const [info, setInfo] = useState<string | null>(null)
-  const [mode, setMode] = useState<'select' | 'hors'>('select')
+  const [mode, setMode] = useState<'select' | 'hors' | 'live'>('select')
   const [favDriver, setFavDriver] = useState<string | null>(null)
   const [favTeam, setFavTeam] = useState<string | null>(null)
 
@@ -42,6 +43,15 @@ function App() {
     }
   }
 
+  if (loggedIn && mode === 'live') {
+    return (
+      <>
+        <LiveMode onBack={() => setMode('select')} />
+        <ChatBot />
+      </>
+    )
+  }
+
   if (loggedIn && mode === 'hors') {
     return (
       <>
@@ -63,6 +73,7 @@ function App() {
       <>
         <ModeSelect
           onSelectHors={() => setMode('hors')}
+          onSelectLive={() => setMode('live')}
           onLogout={() => {
             localStorage.removeItem('f1-current-user')
             setLoggedIn(false)
@@ -77,12 +88,12 @@ function App() {
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 px-4 sm:px-6" onClick={() => setInfo(null)}>
             <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 max-w-sm md:max-w-md w-full max-h-[85dvh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               <h3 className="text-lg font-semibold mb-3">
-                {info === 'hors' ? 'Mode Hors Course' : 'Live Timing'}
+                {info === 'hors' ? 'Mode Hors Course' : 'Mode Live Timing'}
               </h3>
               <p className="text-sm text-zinc-400 leading-relaxed">
                 {info === 'hors'
                   ? 'Classements, statistiques, suivi de ton pilote préféré, de ton écurie, calendrier des courses et données hors week-end.'
-                  : 'Positions en temps réel, pneus, arrêts au stand et prédictions pendant les sessions et les courses.'}
+                  : 'Classement en direct, carte du circuit avec les voitures, pneus et stratégie, chronos par secteur, télémétrie de chaque pilote, direction de course, radios et météo pendant les sessions. Hors week-end : compte à rebours de la prochaine session et rejeu des courses passées (×1, ×10, ×50).'}
               </p>
               <button onClick={() => setInfo(null)} className="mt-5 w-full py-3 bg-zinc-800 rounded-xl text-sm">
                 Fermer
