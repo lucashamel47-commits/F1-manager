@@ -9,12 +9,14 @@ interface Props {
   setPassword: (v: string) => void
   message: string
   onSubmit: (e: React.FormEvent) => void
+  busy?: boolean
+  onForgot?: () => void // défini seulement quand les comptes en ligne sont actifs
 }
 
 export default function AuthForm({
   showAuth, setShowAuth, isLogin, setIsLogin,
   email, setEmail, password, setPassword,
-  message, onSubmit
+  message, onSubmit, busy, onForgot
 }: Props) {
   return (
     <div className="relative z-10 px-4 sm:px-6 pb-20 sm:pb-24">
@@ -40,6 +42,7 @@ export default function AuthForm({
         <form onSubmit={onSubmit} className="max-w-xs sm:max-w-sm mx-auto space-y-4">
           <input
             type="email"
+            autoComplete="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -47,15 +50,24 @@ export default function AuthForm({
           />
           <input
             type="password"
+            autoComplete={isLogin ? 'current-password' : 'new-password'}
             placeholder="Mot de passe"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-4 text-base bg-zinc-950/70 backdrop-blur rounded-xl border border-zinc-800 focus:border-zinc-600 outline-none transition"
           />
-          <button type="submit" className="w-full py-4 bg-red-600 rounded-xl font-medium">
-            {isLogin ? 'Connexion' : 'Créer le compte'}
+          <button type="submit" disabled={busy} className="w-full py-4 bg-red-600 rounded-xl font-medium disabled:opacity-60">
+            {busy ? 'Un instant…' : isLogin ? 'Connexion' : 'Créer le compte'}
           </button>
-          {message && <p className="text-xs text-center text-zinc-500">{message}</p>}
+          {message && <p role="status" className="text-sm text-center text-zinc-300">{message}</p>}
+          {onForgot && isLogin && (
+            <button type="button" onClick={onForgot} className="w-full text-xs text-zinc-400 py-2">
+              Mot de passe oublié ?
+            </button>
+          )}
+          <button type="button" onClick={() => setIsLogin(!isLogin)} className="w-full text-xs text-zinc-400 py-2">
+            {isLogin ? 'Pas encore de compte ? Créer un compte' : 'Déjà un compte ? Se connecter'}
+          </button>
           <button type="button" onClick={() => setShowAuth(false)} className="w-full text-xs text-zinc-500 py-3">
             Retour
           </button>
