@@ -14,6 +14,8 @@ interface Props {
   message: string
   showConfetti: boolean
   onSubmit: (e: React.FormEvent) => void
+  busy?: boolean
+  onForgot?: () => void
 }
 
 export default function Home(props: Props) {

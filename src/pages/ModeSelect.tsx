@@ -1,11 +1,14 @@
+import NextSessionLine from '../components/NextSessionLine'
+
 interface Props {
   onSelectHors: () => void
   onSelectLive: () => void
+  onSelectNotif: () => void
   onLogout: () => void
   onInfo: (type: 'hors' | 'live') => void
 }
 
-export default function ModeSelect({ onSelectHors, onSelectLive, onLogout, onInfo }: Props) {
+export default function ModeSelect({ onSelectHors, onSelectLive, onSelectNotif, onLogout, onInfo }: Props) {
   return (
     <div className="min-h-dvh bg-black text-white relative overflow-hidden">
       <div className="flex flex-col items-center justify-center min-h-dvh px-4 sm:px-6 pb-28">
@@ -50,6 +53,18 @@ export default function ModeSelect({ onSelectHors, onSelectLive, onLogout, onInf
               <span className="w-6 h-6 rounded-full border border-zinc-600 flex items-center justify-center">?</span>
             </button>
           </div>
+
+          <button
+            onClick={onSelectNotif}
+            className="w-full min-h-14 border border-zinc-700 hover:border-zinc-500 active:bg-zinc-900 rounded-2xl font-semibold text-sm text-zinc-200 transition flex items-center justify-center gap-2.5"
+          >
+            <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8" />
+              <path d="M10.3 20a2 2 0 0 0 3.4 0" />
+            </svg>
+            Rappels &amp; calendrier
+          </button>
+          <NextSessionLine />
         </div>
 
         <button

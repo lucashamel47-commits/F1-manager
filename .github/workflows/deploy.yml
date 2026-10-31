@@ -29,6 +29,10 @@ jobs:
       - run: npm run build
         env:
           VITE_BASE: /F1-manager/
+          # Comptes (Supabase) : valeurs publiques, définies dans Settings › Secrets and variables › Actions › Variables.
+          # Vides = l'app fonctionne sans comptes en ligne.
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
