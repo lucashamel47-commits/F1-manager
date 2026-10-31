@@ -36,11 +36,11 @@ export default function ModeSelect({ onSelectHors, onSelectLive, onLogout, onInf
           <div className="relative">
             <button
               onClick={onSelectLive}
-              className="w-full py-5 bg-zinc-900 hover:bg-zinc-800 active:bg-zinc-800 text-white rounded-2xl font-semibold text-base transition border border-red-600/70 flex items-center justify-center gap-3"
+              className="w-full py-5 bg-red-600 hover:bg-red-700 active:bg-red-700 text-white rounded-2xl font-semibold text-base transition flex items-center justify-center gap-3"
             >
-              <span className="size-2 rounded-full bg-red-600 animate-pulse" aria-hidden />
+              <span className="size-2 rounded-full bg-white animate-pulse" aria-hidden />
               Live Timing
-              <span className="text-[10px] font-black tracking-[0.2em] bg-red-600 px-1.5 py-0.5 rounded-sm leading-none">LIVE</span>
+              <span className="text-[10px] font-black tracking-[0.2em] bg-white text-red-600 px-1.5 py-0.5 rounded-sm leading-none">LIVE</span>
             </button>
             <button
               aria-label="Informations"
