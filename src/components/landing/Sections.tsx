@@ -254,7 +254,7 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-4 pt-14 sm:px-6">
         <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <a href="#top" className="inline-flex items-center gap-2.5"><span className="rounded-md bg-white px-2 py-1 text-sm font-bold leading-none tracking-tight text-black">F1</span><span className="text-[15px] font-semibold tracking-tight">Manager</span></a>
+            <a href="#top" className="inline-flex items-center gap-2.5"><span className="rounded-md bg-gradient-to-br from-[#5b7cff] to-[#7a5cf5] px-2 py-1 text-sm font-bold leading-none tracking-tight text-white">F1</span><span className="text-[15px] font-semibold tracking-tight">Manager</span></a>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-zinc-500">Classements, calendrier, statistiques et live timing de la Formule 1.</p>
           </div>
           <nav aria-label="Produit"><p className="kicker mb-3">Produit</p><ul className={col}>

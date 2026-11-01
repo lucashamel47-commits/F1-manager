@@ -6,16 +6,6 @@ const links = [
   { href: '#faq', label: 'FAQ' },
 ]
 
-export function AnnouncementBar() {
-  return (
-    <a href="#apercu" className="relative z-30 flex min-h-9 items-center justify-center gap-2 bg-white px-4 py-1.5 text-center text-xs font-medium text-black">
-      <span className="rounded-full bg-black px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">Saison 2026</span>
-      <span>Live timing, rejeu des courses et rappels par email</span>
-      <span aria-hidden>→</span>
-    </a>
-  )
-}
-
 export default function LandingNav({ onSignup, onLogin }: { onSignup: () => void; onLogin: () => void }) {
   const [scrolled, setScrolled] = useState(false)
   useEffect(() => {
@@ -28,7 +18,7 @@ export default function LandingNav({ onSignup, onLogin }: { onSignup: () => void
     <header className={`sticky top-0 z-40 transition-[background-color,border-color,backdrop-filter] duration-300 border-b ${scrolled ? 'border-white/[0.08] bg-[#08090a]/70 backdrop-blur-xl' : 'border-transparent bg-transparent'}`}>
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4 sm:px-6">
         <a href="#top" className="flex items-center gap-2.5" aria-label="F1 Manager, haut de page">
-          <span className="rounded-md bg-white px-2 py-1 text-sm font-bold leading-none tracking-tight text-black">F1</span>
+          <span className="rounded-md bg-gradient-to-br from-[#5b7cff] to-[#7a5cf5] px-2 py-1 text-sm font-bold leading-none tracking-tight text-white">F1</span>
           <span className="text-[15px] font-semibold tracking-tight">Manager</span>
         </a>
         <nav aria-label="Sections de la page" className="ml-4 hidden items-center gap-1 md:flex">
@@ -38,7 +28,7 @@ export default function LandingNav({ onSignup, onLogin }: { onSignup: () => void
         </nav>
         <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
           <button onClick={onLogin} className="min-h-11 rounded-full px-4 text-sm font-medium text-zinc-300 transition hover:bg-white/[0.06] hover:text-white">Se connecter</button>
-          <button onClick={onSignup} className="min-h-11 rounded-full bg-white px-5 text-sm font-semibold text-black transition hover:bg-zinc-200 active:scale-[0.97]">Créer un compte</button>
+          <button onClick={onSignup} className="btn-primary min-h-11 rounded-full px-5 text-sm font-semibold active:scale-[0.97]">Créer un compte</button>
         </div>
       </div>
     </header>

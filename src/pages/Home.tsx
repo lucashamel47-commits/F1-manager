@@ -1,7 +1,7 @@
 import Hero from '../components/Hero'
 import AuthCard, { AuthCtas } from '../components/AuthForm'
 import AppPreview from '../components/AppPreview'
-import LandingNav, { AnnouncementBar } from '../components/landing/LandingNav'
+import LandingNav from '../components/landing/LandingNav'
 import { NumbersStrip, Features, Faq, FinalCta, Footer } from '../components/landing/Sections'
 import Reveal from '../components/landing/Reveal'
 
@@ -45,7 +45,6 @@ export default function Home(props: Props) {
         </div>
       )}
 
-      <AnnouncementBar />
       <LandingNav onSignup={() => open(false)} onLogin={() => open(true)} />
       <main>
         <Hero
