@@ -193,7 +193,7 @@ function App() {
       showAuth={showAuth}
       setShowAuth={setShowAuth}
       isLogin={isLogin}
-      setIsLogin={setIsLogin}
+      setIsLogin={(v) => { setIsLogin(v); setMessage('') }}
       email={email}
       setEmail={setEmail}
       password={password}
