@@ -13,7 +13,7 @@ function RowView({ r, sel, onSelect, mode }: { r: Row; sel: boolean; onSelect: (
       >
         <span className="w-8 sm:w-10 text-center text-sm font-bold text-zinc-300">{r.pos}</span>
         <span className="w-1 self-stretch my-1" style={{ background: r.color }} aria-hidden />
-        <span className="w-16 sm:w-20 pl-2 sm:pl-3 font-black uppercase tracking-tight text-sm sm:text-base">
+        <span className="w-16 sm:w-20 pl-2 sm:pl-3 font-bold uppercase tracking-tight text-sm sm:text-base">
           {r.acr}
           {r.inPit && <span className="ml-1 align-middle text-[9px] font-bold bg-sky-600 text-white px-1 rounded-sm">PIT</span>}
         </span>

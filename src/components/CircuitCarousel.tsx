@@ -74,13 +74,13 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
     <section aria-labelledby="circuits-title" className="col-span-full min-w-0">
       <div className="flex items-end justify-between gap-4 mb-4">
         <div className="min-w-0">
-          <p className="text-red-600 text-[11px] tracking-[0.35em] sm:tracking-[0.5em] uppercase">Calendrier</p>
-          <h2 id="circuits-title" className="mt-1 text-xl sm:text-2xl font-black uppercase tracking-tight">Les circuits</h2>
+          <p className="text-red-500 text-[11px] font-medium tracking-[0.22em] uppercase">Calendrier</p>
+          <h2 id="circuits-title" className="mt-1 text-xl sm:text-2xl font-semibold tracking-tight">Les circuits</h2>
           <p className="mt-1 text-sm text-zinc-400">Faites défiler les {circuits.length} Grands Prix. Touchez un circuit pour ouvrir sa fiche.</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {active !== nextIdx && (
-            <button onClick={() => goTo(nextIdx)} className="min-h-11 px-3 text-xs font-bold uppercase tracking-wider text-red-500 hover:text-red-400 active:text-white">
+            <button onClick={() => goTo(nextIdx)} className="min-h-11 px-3 text-xs font-medium text-red-500 hover:text-red-400 active:text-white">
               Prochain GP
             </button>
           )}
@@ -91,7 +91,7 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
                 onClick={() => page(d === 'l' ? -1 : 1)}
                 disabled={d === 'l' ? edge.start : edge.end}
                 aria-label={d === 'l' ? 'Circuits précédents' : 'Circuits suivants'}
-                className="size-11 grid place-items-center border border-zinc-700 text-white hover:border-red-600 hover:bg-zinc-900 active:bg-zinc-800 disabled:opacity-30 disabled:hover:border-zinc-700 disabled:hover:bg-transparent transition"
+                className="size-11 rounded-full grid place-items-center border border-white/15 text-white hover:border-white/40 hover:bg-zinc-900 active:bg-zinc-800 disabled:opacity-30 disabled:hover:border-zinc-700 disabled:hover:bg-transparent transition"
               >
                 <Chevron dir={d} />
               </button>
@@ -115,8 +115,8 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
               key={c.round}
               onClick={() => onOpen(c)}
               aria-label={`${c.name}, manche ${c.round}, ouvrir la fiche`}
-              className={`group snap-start shrink-0 w-[82%] sm:w-[46%] lg:w-[31.5%] xl:w-[23.5%] text-left bg-zinc-950 border transition active:scale-[0.99] ${
-                st.kind === 'next' ? 'border-red-600' : 'border-zinc-800 hover:border-zinc-500'
+              className={`group snap-start shrink-0 w-[82%] sm:w-[46%] lg:w-[31.5%] xl:w-[23.5%] text-left bg-zinc-950 border rounded-3xl overflow-hidden transition duration-300 active:scale-[0.99] hover:-translate-y-0.5 ${
+                st.kind === 'next' ? 'border-red-500/70 shadow-[0_0_40px_-12px_rgb(234_42_31_/_0.55)]' : 'border-white/10 hover:border-white/30'
               }`}
             >
               <div className="relative aspect-video bg-zinc-100 overflow-hidden">
@@ -125,16 +125,16 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
                 ) : (
                   <div className="absolute inset-0 grid place-items-center text-xs text-zinc-500 px-4 text-center">Plan bientôt disponible</div>
                 )}
-                <span className="absolute top-2.5 left-2.5 bg-black text-white text-[11px] font-bold uppercase tracking-widest px-2 py-1">R{c.round}</span>
-                {st.kind === 'next' && <span className="absolute top-2.5 right-2.5 bg-red-600 text-white text-[11px] font-bold uppercase tracking-widest px-2 py-1">Prochain GP</span>}
+                <span className="absolute top-2.5 left-2.5 bg-black/80 backdrop-blur text-white text-[11px] font-semibold px-2.5 py-1 rounded-full">R{c.round}</span>
+                {st.kind === 'next' && <span className="absolute top-2.5 right-2.5 bg-red-600 text-white text-[11px] font-semibold tracking-wide px-3 py-1 rounded-full">Prochain GP</span>}
               </div>
               <div className="p-4">
                 <div className="flex items-center justify-between gap-3">
-                  <h3 className="min-w-0 truncate text-lg font-black uppercase tracking-tight"><span className="mr-2" aria-hidden>{c.flag}</span>{c.name}</h3>
+                  <h3 className="min-w-0 truncate text-lg font-semibold tracking-tight"><span className="mr-2" aria-hidden>{c.flag}</span>{c.name}</h3>
                   <span className="text-zinc-500 group-hover:text-white transition shrink-0"><Chevron dir="r" /></span>
                 </div>
                 <p className="mt-0.5 text-xs text-zinc-400 truncate">{c.circuit} · {c.country} · {fmtDay(c.iso)}</p>
-                <dl className="mt-3 grid grid-cols-3 gap-2 border-t border-zinc-900 pt-3 text-xs">
+                <dl className="mt-3 grid grid-cols-3 gap-2 border-t border-white/[0.07] pt-3 text-xs">
                   <div><dt className="text-zinc-500">Tours</dt><dd className="mt-0.5 font-semibold tabular-nums">{c.laps ?? '—'}</dd></div>
                   <div><dt className="text-zinc-500">Longueur</dt><dd className="mt-0.5 font-semibold tabular-nums whitespace-nowrap">{c.length.replace(' km', '')} km</dd></div>
                   <div><dt className="text-zinc-500">Record</dt><dd className="mt-0.5 font-semibold tabular-nums">{c.record ?? '—'}</dd></div>

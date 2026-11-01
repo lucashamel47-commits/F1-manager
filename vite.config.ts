@@ -23,8 +23,8 @@ export default defineConfig({
         dir: 'ltr',
         display: 'standalone',
         orientation: 'any',
-        background_color: '#000000',
-        theme_color: '#000000',
+        background_color: '#08090a',
+        theme_color: '#08090a',
         categories: ['sports', 'entertainment'],
         start_url: base,
         scope: base,
@@ -36,7 +36,7 @@ export default defineConfig({
       },
       workbox: {
         // Coquille de l'app (JS, CSS, HTML, icônes, photos des voitures) en précache → démarrage hors ligne.
-        globPatterns: ['**/*.{js,css,html,svg,png,jpeg,ico,webmanifest}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,jpeg,ico,webmanifest,woff2}'],
         maximumFileSizeToCacheInBytes: 1024 * 1024,
         navigateFallback: `${base}index.html`,
         cleanupOutdatedCaches: true,

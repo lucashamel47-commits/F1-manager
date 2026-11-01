@@ -83,7 +83,7 @@ export function GapChart({ store, series, snap, lap, selected }: { store: Store;
         {snap.rows.map((r) => {
           const on = sel.includes(r.n)
           return (
-            <button key={r.n} onClick={() => toggle(r.n)} aria-pressed={on} className={`min-h-9 px-2.5 text-xs font-bold uppercase border ${on ? 'text-white' : 'text-zinc-500 border-zinc-800'}`} style={on ? { borderColor: r.color, background: `${r.color}22` } : undefined}>
+            <button key={r.n} onClick={() => toggle(r.n)} aria-pressed={on} className={`min-h-9 px-3 rounded-full text-xs font-semibold uppercase border ${on ? 'text-white' : 'text-zinc-500 border-white/10'}`} style={on ? { borderColor: r.color, background: `${r.color}22` } : undefined}>
               {r.acr}
             </button>
           )

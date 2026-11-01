@@ -20,7 +20,7 @@ interface Props {
 
 export default function Home(props: Props) {
   return (
-    <div className="min-h-dvh bg-black text-white relative">
+    <div className="min-h-dvh text-white relative">
       {props.showConfetti && (
         <div className="fixed inset-0 pointer-events-none z-50">
           {Array.from({ length: 20 }).map((_, i) => (
@@ -41,9 +41,9 @@ export default function Home(props: Props) {
       <AuthForm {...props} />
       <FeatureSection />
 
-      <div className="relative z-10 text-center pb-20 pt-10 text-zinc-600 text-xs tracking-wide border-t border-zinc-900/50">
-  F1 Manager • Saison 2026
-</div>
+      <div className="relative z-10 text-center pb-20 pt-10 text-zinc-500 text-xs tracking-wide border-t border-white/5">
+        F1 Manager • Saison 2026
+      </div>
     </div>
   )
 }

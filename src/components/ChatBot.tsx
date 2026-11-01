@@ -83,7 +83,7 @@ export default function ChatBot() {
         <button
           onClick={() => setOpen(true)}
           aria-label="Ouvrir l’assistant F1"
-          className="fixed z-40 right-3 bottom-3 sm:right-6 sm:bottom-6 flex items-center justify-center gap-2 w-12 h-12 sm:w-auto sm:h-14 sm:pl-4 sm:pr-5 bg-red-600 hover:bg-red-500 active:scale-95 text-white font-black uppercase tracking-wide text-sm shadow-[0_8px_30px_rgba(220,38,38,0.45)] transition"
+          className="fixed z-40 right-3 bottom-3 sm:right-6 sm:bottom-6 flex items-center justify-center gap-2 w-12 h-12 sm:w-auto sm:h-14 sm:pl-5 sm:pr-6 rounded-full btn-primary active:scale-95 text-white font-semibold text-sm transition"
           style={{ marginBottom: 'env(safe-area-inset-bottom)', marginRight: 'env(safe-area-inset-right)' }}
         >
           <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor" aria-hidden="true">
@@ -97,13 +97,12 @@ export default function ChatBot() {
         <section
           role="dialog"
           aria-label="Assistant F1"
-          className="fixed z-50 inset-0 sm:inset-auto sm:right-6 sm:bottom-6 sm:w-[420px] sm:h-[620px] sm:max-h-[calc(100dvh-3rem)] flex flex-col bg-black text-white sm:border sm:border-zinc-800 sm:shadow-[0_20px_60px_rgba(0,0,0,0.7)]"
+          className="fixed z-50 inset-0 sm:inset-auto sm:right-6 sm:bottom-6 sm:w-[420px] sm:h-[620px] sm:max-h-[calc(100dvh-3rem)] flex flex-col bg-[#0b0c0d]/95 backdrop-blur-2xl text-white sm:rounded-3xl overflow-hidden sm:border sm:border-white/10 sm:shadow-[0_30px_80px_rgba(0,0,0,0.75)]"
         >
-          <div className="h-1 bg-red-600 shrink-0" />
-          <header className="shrink-0 flex items-center gap-3 px-4 h-14 border-b border-zinc-800 bg-zinc-950" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-            <span className="bg-red-600 text-white font-black italic px-2 py-0.5 text-base leading-none">F1</span>
+          <header className="shrink-0 flex items-center gap-3 px-4 h-14 border-b border-white/[0.08] bg-white/[0.03]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+            <span className="bg-red-600 text-white font-bold px-2 py-1 rounded-md text-sm leading-none tracking-tight shadow-[0_0_20px_-4px_rgb(234_42_31_/_0.8)]">F1</span>
             <div className="leading-tight">
-              <p className="font-black uppercase tracking-tight">Assistant</p>
+              <p className="font-semibold tracking-tight">Assistant</p>
               <p className="text-[11px] text-zinc-500 flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500" /> Données en direct • Jolpica
               </p>
@@ -118,7 +117,7 @@ export default function ChatBot() {
               <div key={i} className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div
                   className={`max-w-[88%] px-3.5 py-2.5 text-[15px] leading-relaxed break-words ${
-                    m.from === 'user' ? 'bg-red-600 text-white rounded-2xl rounded-br-sm' : 'bg-zinc-900 text-zinc-200 border-l-4 border-red-600 rounded-r-lg'
+                    m.from === 'user' ? 'bg-red-600 text-white rounded-2xl rounded-br-md' : 'bg-white/[0.06] text-zinc-200 border border-white/[0.08] rounded-2xl rounded-bl-md'
                   }`}
                 >
                   {renderText(m.text)}
@@ -127,7 +126,7 @@ export default function ChatBot() {
             ))}
             {busy && (
               <div className="flex justify-start">
-                <div className="bg-zinc-900 border-l-4 border-red-600 rounded-r-lg px-4 py-3 flex gap-1.5" aria-label="L’assistant écrit">
+                <div className="bg-white/[0.06] border border-white/[0.08] rounded-2xl rounded-bl-md px-4 py-3 flex gap-1.5" aria-label="L’assistant écrit">
                   {[0, 1, 2].map((d) => (
                     <span key={d} className="w-2 h-2 rounded-full bg-zinc-400 animate-bounce" style={{ animationDelay: `${d * 150}ms` }} />
                   ))}
@@ -138,12 +137,12 @@ export default function ChatBot() {
           </div>
 
           {chips.length > 0 && (
-            <div className="shrink-0 flex gap-2 overflow-x-auto px-4 py-2 border-t border-zinc-900 bg-black [scrollbar-width:none]">
+            <div className="shrink-0 flex gap-2 overflow-x-auto px-4 py-2 border-t border-white/[0.06] [scrollbar-width:none]">
               {chips.map((c) => (
                 <button
                   key={c}
                   onClick={() => send(c)}
-                  className="shrink-0 min-h-9 px-3 border border-zinc-700 hover:border-red-600 hover:text-white text-zinc-300 text-xs font-bold uppercase tracking-wide transition rounded-full"
+                  className="shrink-0 min-h-9 px-3 border border-white/15 bg-white/[0.04] hover:bg-white/10 hover:text-white text-zinc-300 text-xs font-medium transition rounded-full"
                 >
                   {c}
                 </button>
@@ -156,7 +155,7 @@ export default function ChatBot() {
               e.preventDefault()
               send(input)
             }}
-            className="shrink-0 flex items-center gap-2 p-3 border-t border-zinc-800 bg-zinc-950"
+            className="shrink-0 flex items-center gap-2 p-3 border-t border-white/[0.08] bg-white/[0.03]"
             style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
           >
             <input
@@ -167,9 +166,9 @@ export default function ChatBot() {
               aria-label="Ta question"
               enterKeyHint="send"
               autoComplete="off"
-              className="flex-1 min-w-0 h-11 px-3 bg-black border border-zinc-700 focus:border-red-600 outline-none text-base text-white placeholder:text-zinc-600"
+              className="flex-1 min-w-0 h-11 px-4 rounded-full bg-white/[0.05] border border-white/10 focus:border-white/30 outline-none text-base text-white placeholder:text-zinc-500"
             />
-            <button type="submit" disabled={busy || !input.trim()} aria-label="Envoyer" className="h-11 w-11 shrink-0 flex items-center justify-center bg-red-600 disabled:bg-zinc-800 disabled:text-zinc-600 text-white transition">
+            <button type="submit" disabled={busy || !input.trim()} aria-label="Envoyer" className="btn-primary h-11 w-11 shrink-0 rounded-full flex items-center justify-center disabled:opacity-35 disabled:saturate-0 text-white transition">
               <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor" aria-hidden="true">
                 <path d="M2 21l21-9L2 3v7l15 2-15 2z" />
               </svg>

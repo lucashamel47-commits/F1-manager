@@ -13,6 +13,9 @@ interface Props {
   onForgot?: () => void // défini seulement quand les comptes en ligne sont actifs
 }
 
+const field =
+  'w-full min-h-14 px-5 text-base bg-white/[0.04] rounded-2xl border border-white/10 placeholder:text-zinc-500 focus:border-white/30 focus:bg-white/[0.06] focus:ring-4 focus:ring-white/5 outline-none'
+
 export default function AuthForm({
   showAuth, setShowAuth, isLogin, setIsLogin,
   email, setEmail, password, setPassword,
@@ -21,10 +24,10 @@ export default function AuthForm({
   return (
     <div className="relative z-10 px-4 sm:px-6 pb-20 sm:pb-24">
       {!showAuth ? (
-        <div className="max-w-xs sm:max-w-sm mx-auto space-y-4">
+        <div className="max-w-xs sm:max-w-sm mx-auto space-y-3">
           <button
             onClick={() => setShowAuth(true)}
-            className="w-full py-4.5 bg-red-600 hover:bg-red-700 rounded-2xl font-medium text-base transition-all duration-200 active:scale-[0.98]"
+            className="btn-primary w-full min-h-14 rounded-full font-semibold text-base active:scale-[0.98]"
           >
             Créer un compte
           </button>
@@ -33,20 +36,21 @@ export default function AuthForm({
               setIsLogin(true)
               setShowAuth(true)
             }}
-            className="w-full py-4.5 border border-zinc-800 hover:border-zinc-600 rounded-2xl font-medium text-base transition-all duration-200"
+            className="btn-ghost w-full min-h-14 rounded-full font-medium text-base text-zinc-100 active:scale-[0.98]"
           >
             Se connecter
           </button>
         </div>
       ) : (
-        <form onSubmit={onSubmit} className="max-w-xs sm:max-w-sm mx-auto space-y-4">
+        <form onSubmit={onSubmit} className="glass max-w-xs sm:max-w-sm mx-auto space-y-3 rounded-3xl p-5 sm:p-6">
+          <h2 className="text-lg font-semibold tracking-tight text-center pb-1">{isLogin ? 'Content de te revoir' : 'Crée ton compte'}</h2>
           <input
             type="email"
             autoComplete="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-4 text-base bg-zinc-950/70 backdrop-blur rounded-xl border border-zinc-800 focus:border-zinc-600 outline-none transition"
+            className={field}
           />
           <input
             type="password"
@@ -54,21 +58,21 @@ export default function AuthForm({
             placeholder="Mot de passe"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-4 text-base bg-zinc-950/70 backdrop-blur rounded-xl border border-zinc-800 focus:border-zinc-600 outline-none transition"
+            className={field}
           />
-          <button type="submit" disabled={busy} className="w-full py-4 bg-red-600 rounded-xl font-medium disabled:opacity-60">
+          <button type="submit" disabled={busy} className="btn-primary w-full min-h-14 rounded-full font-semibold disabled:opacity-60 active:scale-[0.98]">
             {busy ? 'Un instant…' : isLogin ? 'Connexion' : 'Créer le compte'}
           </button>
           {message && <p role="status" className="text-sm text-center text-zinc-300">{message}</p>}
           {onForgot && isLogin && (
-            <button type="button" onClick={onForgot} className="w-full text-xs text-zinc-400 py-2">
+            <button type="button" onClick={onForgot} className="w-full min-h-11 text-xs text-zinc-400 hover:text-white">
               Mot de passe oublié ?
             </button>
           )}
-          <button type="button" onClick={() => setIsLogin(!isLogin)} className="w-full text-xs text-zinc-400 py-2">
+          <button type="button" onClick={() => setIsLogin(!isLogin)} className="w-full min-h-11 text-xs text-zinc-400 hover:text-white">
             {isLogin ? 'Pas encore de compte ? Créer un compte' : 'Déjà un compte ? Se connecter'}
           </button>
-          <button type="button" onClick={() => setShowAuth(false)} className="w-full text-xs text-zinc-500 py-3">
+          <button type="button" onClick={() => setShowAuth(false)} className="w-full min-h-11 text-xs text-zinc-500 hover:text-zinc-300">
             Retour
           </button>
         </form>
