@@ -22,9 +22,9 @@ export default function AuthForm({
   message, onSubmit, busy, onForgot
 }: Props) {
   return (
-    <div className="relative z-10 px-4 sm:px-6 pb-20 sm:pb-24">
+    <div className="relative z-10 px-4 sm:px-6 pb-14 sm:pb-16">
       {!showAuth ? (
-        <div className="max-w-xs sm:max-w-sm mx-auto space-y-3">
+        <div className="max-w-xs mx-auto space-y-3 sm:space-y-0 sm:flex sm:max-w-md sm:gap-3">
           <button
             onClick={() => setShowAuth(true)}
             className="btn-primary w-full min-h-14 rounded-full font-semibold text-base active:scale-[0.98]"

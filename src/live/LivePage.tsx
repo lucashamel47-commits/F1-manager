@@ -188,7 +188,7 @@ export default function LivePage() {
     return (
       <main className="flex-1 w-full pb-28">
         <section className={`${wide} pt-8 pb-6`}>
-          <p className="text-xs font-medium uppercase tracking-[0.22em] text-red-500">Live</p>
+          <p className="text-xs font-medium uppercase tracking-[0.22em] text-accent-400">Live</p>
           <h1 className="mt-2 text-4xl sm:text-5xl font-semibold tracking-tighter leading-none">Pas de session en cours</h1>
           <p className="mt-3 text-zinc-400 max-w-2xl text-sm sm:text-base">Chronos, carte du circuit, stratégie, télémétrie et radios de la F1 en direct — ou rejouez n’importe quelle session passée avec les données d’OpenF1.</p>
           <div className="mt-6 flex flex-wrap gap-3">
@@ -241,7 +241,7 @@ export default function LivePage() {
   return (
     <main className="flex-1 w-full pb-28 lg:pb-10">
       <section className={`${wide} py-3 flex flex-wrap items-center gap-x-4 gap-y-2`}>
-        <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${isLive ? 'bg-red-600 text-white' : 'bg-white/10 text-zinc-200'}`}>
+        <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${isLive ? 'bg-accent-500 text-white' : 'bg-white/10 text-zinc-200'}`}>
           {isLive && <span className="size-2 rounded-full bg-white animate-pulse" />}{isLive ? 'Live' : 'Rejeu'}
         </span>
         <div className="min-w-0">
@@ -266,7 +266,7 @@ export default function LivePage() {
         )}
         <div className={`flex gap-2 ${snap ? '' : 'sm:ml-auto'}`}>
           {isLive && lastRace && <button onClick={() => start(lastRace)} className={toolbarBtn}>Rejouer</button>}
-          {chosen && liveSession && chosen.session.session_key !== liveSession.session_key && <button onClick={() => setChosen(null)} className={`${toolbarBtn} border-red-600`}>Retour au direct</button>}
+          {chosen && liveSession && chosen.session.session_key !== liveSession.session_key && <button onClick={() => setChosen(null)} className={`${toolbarBtn} border-accent-500`}>Retour au direct</button>}
           <button onClick={() => setPicker(true)} className={toolbarBtn}>Sessions</button>
           {chosen && !liveSession && <button onClick={() => { setChosen(null); closeDriver() }} className={toolbarBtn} aria-label="Quitter le rejeu">Fermer</button>}
         </div>
@@ -276,7 +276,7 @@ export default function LivePage() {
         <div className={`${wide} py-16 flex flex-col items-center gap-4 text-center`} role="status" aria-live="polite">
           <Spinner />
           <p className="text-sm text-zinc-300">Chargement de la session… <span className="text-zinc-500">{rt.progress ? `${rt.progress.label} (${rt.progress.done}/${rt.progress.total})` : ''}</span></p>
-          <div className="w-64 max-w-full h-1 bg-zinc-800"><div className="h-full bg-red-600 transition-all" style={{ width: `${rt.progress ? (rt.progress.done / rt.progress.total) * 100 : 5}%` }} /></div>
+          <div className="w-64 max-w-full h-1 bg-zinc-800"><div className="h-full bg-accent-500 transition-all" style={{ width: `${rt.progress ? (rt.progress.done / rt.progress.total) * 100 : 5}%` }} /></div>
         </div>
       )}
 

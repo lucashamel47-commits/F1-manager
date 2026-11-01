@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* ───────────── Design : « terminal futuriste » sombre, verre dépoli, accent rouge F1 ───────────── */
+/* ───────────── Design : « terminal futuriste » sombre, verre dépoli, accent bleu‑violet ───────────── */
 @font-face {
   font-family: "Inter Variable";
   font-style: normal;
@@ -35,9 +35,12 @@
   --color-zinc-200: #e4e5e6;
   --color-zinc-100: #f2f3f3;
 
-  /* Rouge F1 un peu plus lumineux */
+  /* Accent : bleu → violet (comme les dégradés froids du site de référence). Le rouge ne reste que pour les détails F1 (point live, drapeau rouge…) */
+  --color-accent-300: #bcc6ff;
+  --color-accent-400: #94a3ff;
+  --color-accent-500: #5b6bf2;
+  --color-accent-600: #4a56d6;
   --color-red-600: #ea2a1f;
-  --color-red-700: #cf2218;
   --color-red-500: #ff4a3d;
 
   --radius-sm: 0.5rem;
@@ -55,7 +58,7 @@
     background: #08090a;
     color: #f7f8f8;
   }
-  ::selection { background: rgb(234 42 31 / 0.45); }
+  ::selection { background: rgb(99 102 241 / 0.45); }
   button, a, input, select, textarea { transition-property: color, background-color, border-color, box-shadow, opacity, transform; transition-duration: 180ms; transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1); }
   button:not(:disabled), [role="button"] { cursor: pointer; }
   :focus-visible { outline: 2px solid rgb(255 255 255 / 0.7); outline-offset: 2px; border-radius: 0.5rem; }
@@ -71,7 +74,8 @@ body::before {
   pointer-events: none;
   background:
     radial-gradient(ellipse 70% 38% at 50% -6%, rgb(255 255 255 / 0.1), transparent 70%),
-    radial-gradient(ellipse 45% 30% at 88% 0%, rgb(234 42 31 / 0.13), transparent 70%),
+    radial-gradient(ellipse 45% 30% at 88% 0%, rgb(99 102 241 / 0.16), transparent 70%),
+    radial-gradient(ellipse 40% 28% at 8% 4%, rgb(139 92 246 / 0.09), transparent 70%),
     radial-gradient(ellipse 60% 30% at 50% 108%, rgb(255 255 255 / 0.05), transparent 70%);
 }
 
@@ -86,6 +90,13 @@ button.bg-zinc-950:not(:disabled):hover, a.bg-zinc-950:hover { background-image:
   -webkit-backdrop-filter: blur(18px) saturate(140%);
   backdrop-filter: blur(18px) saturate(140%);
 }
+.text-gradient-accent {
+  padding-bottom: 0.12em;
+  background: linear-gradient(100deg, #fff 10%, #b7c4ff 55%, #b9a2ff 95%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
 .text-gradient {
   padding-bottom: 0.12em;
   background: linear-gradient(180deg, #fff 30%, rgb(255 255 255 / 0.55));
@@ -95,8 +106,8 @@ button.bg-zinc-950:not(:disabled):hover, a.bg-zinc-950:hover { background-image:
 }
 .kicker { font-size: 11px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--color-zinc-500); }
 .btn-primary {
-  background: linear-gradient(180deg, #ff4437, #e0261b);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28), 0 8px 28px -8px rgb(234 42 31 / 0.65);
+  background: linear-gradient(135deg, #5b7cff 0%, #7a5cf5 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28), 0 8px 28px -10px rgb(99 102 241 / 0.7);
 }
 .btn-primary:hover { filter: brightness(1.08); }
 .btn-ghost { background: rgb(255 255 255 / 0.04); border: 1px solid rgb(255 255 255 / 0.12); }
@@ -389,4 +400,13 @@ html { overscroll-behavior-y: none; }
     margin-top: calc(-1 * env(safe-area-inset-top, 0px));
     padding-top: env(safe-area-inset-top, 0px);
   }
+}
+
+/* Aperçu interactif (page d'accueil) */
+@keyframes preview-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.animate-fadeIn { animation: preview-in 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+@keyframes preview-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.preview-trace, .preview-line { stroke-dasharray: 1; animation: preview-draw 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-fadeIn, .preview-trace, .preview-line { animation: none; }
 }

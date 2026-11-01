@@ -20,7 +20,7 @@ export default function NewPassword({ onDone }: { onDone: () => void }) {
   return (
     <div className="min-h-dvh text-white flex items-center justify-center px-4">
       <form onSubmit={submit} className="glass w-full max-w-sm space-y-4 rounded-3xl p-6">
-        <p className="text-red-500 text-[11px] font-medium tracking-[0.22em] uppercase">Formula 1</p>
+        <p className="text-accent-400 text-[11px] font-medium tracking-[0.22em] uppercase">Formula 1</p>
         <h1 className="text-2xl font-semibold tracking-tight">Nouveau mot de passe</h1>
         <input
           type="password" autoComplete="new-password" placeholder="Nouveau mot de passe" value={pwd} onChange={(e) => setPwd(e.target.value)}

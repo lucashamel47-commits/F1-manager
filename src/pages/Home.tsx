@@ -1,5 +1,6 @@
 import Hero from '../components/Hero'
 import AuthForm from '../components/AuthForm'
+import AppPreview from '../components/AppPreview'
 import FeatureSection from '../components/FeatureSection'
 
 interface Props {
@@ -29,7 +30,7 @@ export default function Home(props: Props) {
               className="absolute w-1.5 h-1.5 rounded-full animate-confetti"
               style={{
                 left: `${Math.random() * 100}%`,
-                background: ['#e10600', '#fff', '#ffcc00'][i % 3],
+                background: ['#8b9cff', '#fff', '#b08cff'][i % 3],
                 animationDelay: `${i * 0.03}s`,
               }}
             />
@@ -39,6 +40,7 @@ export default function Home(props: Props) {
 
       <Hero />
       <AuthForm {...props} />
+      <AppPreview />
       <FeatureSection />
 
       <div className="relative z-10 text-center pb-20 pt-10 text-zinc-500 text-xs tracking-wide border-t border-white/5">

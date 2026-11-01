@@ -100,7 +100,7 @@ export default function ChatBot() {
           className="fixed z-50 inset-0 sm:inset-auto sm:right-6 sm:bottom-6 sm:w-[420px] sm:h-[620px] sm:max-h-[calc(100dvh-3rem)] flex flex-col bg-[#0b0c0d]/95 backdrop-blur-2xl text-white sm:rounded-3xl overflow-hidden sm:border sm:border-white/10 sm:shadow-[0_30px_80px_rgba(0,0,0,0.75)]"
         >
           <header className="shrink-0 flex items-center gap-3 px-4 h-14 border-b border-white/[0.08] bg-white/[0.03]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-            <span className="bg-red-600 text-white font-bold px-2 py-1 rounded-md text-sm leading-none tracking-tight shadow-[0_0_20px_-4px_rgb(234_42_31_/_0.8)]">F1</span>
+            <span className="bg-white text-black font-bold px-2 py-1 rounded-md text-sm leading-none tracking-tight">F1</span>
             <div className="leading-tight">
               <p className="font-semibold tracking-tight">Assistant</p>
               <p className="text-[11px] text-zinc-500 flex items-center gap-1.5">
@@ -117,7 +117,7 @@ export default function ChatBot() {
               <div key={i} className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div
                   className={`max-w-[88%] px-3.5 py-2.5 text-[15px] leading-relaxed break-words ${
-                    m.from === 'user' ? 'bg-red-600 text-white rounded-2xl rounded-br-md' : 'bg-white/[0.06] text-zinc-200 border border-white/[0.08] rounded-2xl rounded-bl-md'
+                    m.from === 'user' ? 'bg-accent-500 text-white rounded-2xl rounded-br-md' : 'bg-white/[0.06] text-zinc-200 border border-white/[0.08] rounded-2xl rounded-bl-md'
                   }`}
                 >
                   {renderText(m.text)}

@@ -33,7 +33,7 @@ export default function MotorNav({ active, onNavigate, onExit, onBack, crumb, ex
           ‹
         </button>
         <button onClick={() => onNavigate('home')} className="flex items-center gap-2 min-h-11">
-          <span className="bg-red-600 text-white font-bold px-2 py-1 rounded-md text-sm leading-none tracking-tight shadow-[0_0_20px_-4px_rgb(234_42_31_/_0.8)]">F1</span>
+          <span className="bg-white text-black font-bold px-2 py-1 rounded-md text-sm leading-none tracking-tight">F1</span>
           <span className="font-semibold tracking-tight text-lg leading-none">Manager</span>
           <span className="hidden lg:inline whitespace-nowrap ml-2 pl-3 border-l border-white/10 text-zinc-500 text-xs">
             Hors course
@@ -87,8 +87,8 @@ export function SectionTitle({ kicker, title, className = '', h1 = false, desc }
   const Tag = h1 ? 'h1' : 'h2'
   return (
     <div className={className}>
-      <p className="inline-flex items-center gap-2 text-red-500 text-xs font-medium uppercase tracking-[0.2em]">
-        <span className="size-1.5 rounded-full bg-red-500 shadow-[0_0_10px_2px_rgb(234_42_31_/_0.7)]" aria-hidden />
+      <p className="inline-flex items-center gap-2 text-accent-400 text-xs font-medium uppercase tracking-[0.2em]">
+        <span className="size-1.5 rounded-full bg-accent-400 shadow-[0_0_10px_2px_rgb(99_102_241_/_0.7)]" aria-hidden />
         {kicker}
       </p>
       <Tag className="mt-2 text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-[-0.035em] leading-[1.05] text-gradient">{title}</Tag>

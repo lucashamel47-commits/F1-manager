@@ -17,7 +17,7 @@ export default function LiveMode({ onBack }: { onBack: () => void }) {
             <span className="text-sm font-medium">Modes</span>
           </button>
           <div className="flex items-center gap-2">
-            <span className="bg-red-600 text-white font-bold px-2 py-1 rounded-md text-sm leading-none tracking-tight shadow-[0_0_20px_-4px_rgb(234_42_31_/_0.8)]">F1</span>
+            <span className="bg-white text-black font-bold px-2 py-1 rounded-md text-sm leading-none tracking-tight">F1</span>
             <span className="font-semibold tracking-tight text-lg leading-none">Manager</span>
           </div>
           <span className="ml-auto inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium">

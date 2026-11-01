@@ -11,11 +11,11 @@ interface Props {
 export default function ModeSelect({ onSelectHors, onSelectLive, onSelectNotif, onLogout, onInfo }: Props) {
   return (
     <div className="min-h-dvh text-white relative overflow-hidden">
-      <div aria-hidden className="absolute left-1/2 top-[-280px] h-[600px] w-[860px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(234_42_31_/_0.24),transparent)] blur-2xl pointer-events-none" />
+      <div aria-hidden className="absolute left-1/2 top-[-280px] h-[600px] w-[860px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(99_102_241_/_0.24),transparent)] blur-2xl pointer-events-none" />
       <div className="relative flex flex-col items-center justify-center min-h-dvh px-4 sm:px-6 pb-28">
         <div className="text-center mb-10 sm:mb-14">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-xs text-zinc-300 backdrop-blur">
-            <span className="size-1.5 rounded-full bg-red-500 shadow-[0_0_10px_2px_rgb(234_42_31_/_0.8)]" aria-hidden />
+            <span className="size-1.5 rounded-full bg-accent-400 shadow-[0_0_10px_2px_rgb(99_102_241_/_0.8)]" aria-hidden />
             Formula 1
           </span>
           <h1 className="mt-6 text-gradient text-5xl sm:text-6xl md:text-7xl font-semibold tracking-[-0.045em] leading-[0.95]">F1 Manager</h1>
@@ -46,7 +46,7 @@ export default function ModeSelect({ onSelectHors, onSelectLive, onSelectNotif, 
             >
               <span className="size-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_2px_rgb(234_42_31_/_0.8)]" aria-hidden />
               Live Timing
-              <span className="text-[10px] font-bold tracking-[0.15em] bg-red-600 px-2 py-1 rounded-full leading-none">LIVE</span>
+              <span className="text-[10px] font-bold tracking-[0.15em] bg-accent-500 px-2 py-1 rounded-full leading-none">LIVE</span>
             </button>
             <button
               aria-label="Informations"

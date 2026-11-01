@@ -24,7 +24,7 @@ const icons = {
 function Card({ icon, kicker, title, children }: { icon: string; kicker: string; title: React.ReactNode; children: React.ReactNode }) {
   return (
     <div className="glass rounded-3xl p-6 sm:p-7 text-left transition duration-300 hover:-translate-y-0.5 hover:border-white/20">
-      <span className="inline-flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-red-500">
+      <span className="inline-flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-accent-400">
         <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d={icon} /></svg>
       </span>
       <p className="mt-6 kicker">{kicker}</p>

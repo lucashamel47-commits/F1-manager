@@ -237,7 +237,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
             role="tab"
             aria-selected={active === t.key}
             onClick={() => { setSelectedTeamStats(null); setSelectedRace(null); setSubPage(t.page) }}
-            className={`shrink-0 inline-flex items-center gap-2 px-3 sm:px-5 min-h-12 text-xs sm:text-sm font-medium border-b-2 whitespace-nowrap transition-colors active:bg-zinc-900 ${active === t.key ? 'border-red-600 text-white' : 'border-transparent text-zinc-400 hover:text-white'}`}
+            className={`shrink-0 inline-flex items-center gap-2 px-3 sm:px-5 min-h-12 text-xs sm:text-sm font-medium border-b-2 whitespace-nowrap transition-colors active:bg-zinc-900 ${active === t.key ? 'border-accent-500 text-white' : 'border-transparent text-zinc-400 hover:text-white'}`}
           >
             {ico(t.icon)}
             {'short' in t ? (<><span className="sm:hidden">{t.short}</span><span className="hidden sm:inline">{t.label}</span></>) : t.label}
@@ -275,7 +275,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
         {nav(back, crumb)}
         <div className="px-4 sm:px-5 lg:px-6 py-6 w-full flex-1 grid content-start gap-6 md:grid-cols-2 items-start">
           <div className="md:col-span-2">
-            <p className="text-red-500 text-[11px] font-medium tracking-[0.22em] uppercase mb-2">{kicker} · Manche {race.round}</p>
+            <p className="text-accent-400 text-[11px] font-medium tracking-[0.22em] uppercase mb-2">{kicker} · Manche {race.round}</p>
             <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-none mt-1"><span className="mr-3" aria-hidden>{race.flag}</span>{race.name}</h1>
             <p className="text-sm text-zinc-400 mt-2">{race.circuit} · {race.country} · {fmtDay(race.iso)} · <span className={d >= 0 ? 'text-white' : ''}>{state}</span></p>
           </div>
@@ -352,7 +352,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
                 <div className="relative aspect-video overflow-hidden bg-zinc-900">
                   <img src={race.photo} alt="" loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#08090a]/80 to-transparent" />
-                  <span className="absolute top-3 left-3 bg-red-600 text-white text-[11px] font-semibold tracking-wide px-3 py-1 rounded-full">Round {race.round}</span>
+                  <span className="absolute top-3 left-3 bg-accent-500 text-white text-[11px] font-semibold tracking-wide px-3 py-1 rounded-full">Round {race.round}</span>
                 </div>
                 <div className="p-4">
                   <h3 className="text-xl font-semibold tracking-tight">{race.name}</h3>
@@ -418,8 +418,8 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
           <div className="px-4 sm:px-5 lg:px-6 py-6 w-full flex-1">
             <SectionTitle h1 kicker="Championnat 2026" title="Classements" className="mb-6" />
             <div className="flex border-b border-zinc-800 mb-6">
-              <button onClick={() => setStandingsTab('drivers')} className={`px-5 min-h-12 text-sm font-medium border-b-2 transition ${standingsTab === 'drivers' ? 'border-red-600 text-white' : 'border-transparent text-zinc-400'}`}>Pilotes</button>
-              <button onClick={() => setStandingsTab('constructors')} className={`px-5 min-h-12 text-sm font-medium border-b-2 transition ${standingsTab === 'constructors' ? 'border-red-600 text-white' : 'border-transparent text-zinc-400'}`}>Constructeurs</button>
+              <button onClick={() => setStandingsTab('drivers')} className={`px-5 min-h-12 text-sm font-medium border-b-2 transition ${standingsTab === 'drivers' ? 'border-accent-500 text-white' : 'border-transparent text-zinc-400'}`}>Pilotes</button>
+              <button onClick={() => setStandingsTab('constructors')} className={`px-5 min-h-12 text-sm font-medium border-b-2 transition ${standingsTab === 'constructors' ? 'border-accent-500 text-white' : 'border-transparent text-zinc-400'}`}>Constructeurs</button>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {standingsTab === 'drivers' ? (
@@ -648,7 +648,7 @@ if (subPage === 'stats-constructors') {
           <button key={t.Constructor.constructorId} onClick={() => setSelectedTeamStats(t)} className="group text-left bg-zinc-950 border border-white/10 hover:border-white/30 rounded-3xl overflow-hidden transition duration-300 hover:-translate-y-0.5">
             <div className="relative aspect-video overflow-hidden bg-black [container-type:size] flex items-center justify-start">
               <CarStage src={carImageFor(t.Constructor.name)} className="w-[min(86cqw,148.6cqh)] ml-[1%] shrink-0" />
-              <span className="absolute top-3 left-3 bg-red-600 text-white text-[11px] font-semibold tracking-wide px-3 py-1 rounded-full">P{i + 1}</span>
+              <span className="absolute top-3 left-3 bg-accent-500 text-white text-[11px] font-semibold tracking-wide px-3 py-1 rounded-full">P{i + 1}</span>
             </div>
             <div className="p-4 flex items-end justify-between gap-3" style={{ borderTop: `3px solid ${trailColor(t.Constructor.name)}` }}>
               <h3 className="text-lg font-semibold tracking-tight leading-tight">{t.Constructor.name}</h3>
@@ -670,7 +670,7 @@ if (subPage === 'stats-constructors') {
       const failed = dataState === 'error' && liveStandings.length === 0
       const head = (label: string, cta?: string, onClick?: () => void) => (
         <div className="flex items-center justify-between gap-3 mb-3 min-h-9">
-          <p className="text-red-500 text-[11px] font-medium tracking-[0.22em] uppercase">{label}</p>
+          <p className="text-accent-400 text-[11px] font-medium tracking-[0.22em] uppercase">{label}</p>
           {cta && onClick && (
             <button onClick={onClick} className="-mr-2 px-2 min-h-9 text-xs text-zinc-400 hover:text-white active:text-white whitespace-nowrap">{cta} ›</button>
           )}
@@ -711,7 +711,7 @@ if (subPage === 'stats-constructors') {
                     <div className="text-right"><p className="text-xs text-zinc-500">{second.Driver.familyName}</p><p className="text-3xl font-bold text-zinc-400">{second.points}</p><p className="text-xs text-zinc-500 mt-1">{second.wins} victoires</p></div>
                   </div>
                   <div className="flex gap-1 h-1.5 rounded-full overflow-hidden bg-zinc-900 mb-3">
-                    <div className="bg-red-600" style={{ width: `${(Number(leader.points) / (Number(leader.points) + Number(second.points))) * 100}%` }} />
+                    <div className="bg-accent-500" style={{ width: `${(Number(leader.points) / (Number(leader.points) + Number(second.points))) * 100}%` }} />
                     <div className="bg-zinc-700 flex-1" />
                   </div>
                   <p className="text-xs text-zinc-500 text-center">Écart : {gap} points</p>
@@ -843,7 +843,7 @@ if (subPage === 'stats-constructors') {
             <img src={nextRace.photo} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition duration-700" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#08090a] via-[#08090a]/55 to-transparent" />
             <div className="relative min-h-[22rem] sm:min-h-[26rem] lg:min-h-[30rem] xl:min-h-[34rem] flex flex-col justify-end px-4 sm:px-5 lg:px-6 pb-6 sm:pb-10 pt-24">
-              <span className="self-start bg-red-600 text-white text-[11px] font-semibold tracking-wide px-3 py-1 rounded-full">Prochain GP • Round {nextRace.round}</span>
+              <span className="self-start bg-accent-500 text-white text-[11px] font-semibold tracking-wide px-3 py-1 rounded-full">Prochain GP • Round {nextRace.round}</span>
               <h1 className="mt-3 font-semibold leading-[1] tracking-tighter text-5xl sm:text-6xl lg:text-8xl">{nextRace.name}</h1>
               <p className="mt-3 text-zinc-300 text-sm sm:text-base">{nextRace.date} • {nextRace.circuit} • <span className="text-white font-semibold">{getDaysUntilRace()}</span></p>
               <span className="mt-5 self-start inline-flex items-center min-h-11 rounded-full bg-white text-black font-semibold text-sm px-6 shadow-[0_8px_30px_-8px_rgb(255_255_255_/_0.45)] group-hover:bg-zinc-200">Voir le circuit →</span>
@@ -864,7 +864,7 @@ if (subPage === 'stats-constructors') {
                     <img src={t.img} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#08090a] via-[#08090a]/40 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
-                      <span className="inline-block bg-red-600 text-white text-[11px] font-semibold tracking-wide px-3 py-1 rounded-full">{t.tag}</span>
+                      <span className="inline-block bg-accent-500 text-white text-[11px] font-semibold tracking-wide px-3 py-1 rounded-full">{t.tag}</span>
                       <h3 className={`mt-2 font-semibold tracking-tight leading-tight ${t.big ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl'}`}>{t.title}</h3>
                     </div>
                   </button>
@@ -880,7 +880,7 @@ if (subPage === 'stats-constructors') {
                   {liveStandings.slice(0, 5).map((d, i) => (
                     <button key={d.Driver.driverId} onClick={() => setSubPage('standings')} className="w-full flex items-center justify-between gap-3 px-4 min-h-14 text-left hover:bg-zinc-900 transition">
                       <span className="flex items-center gap-3 min-w-0">
-                        <span className="w-6 text-lg font-bold text-red-500">{i + 1}</span>
+                        <span className="w-6 text-lg font-bold text-accent-400">{i + 1}</span>
                         <span className="w-1 h-6 shrink-0" style={{ backgroundColor: getColor(d.Constructors[0]?.name || '') }} />
                         <span className="truncate text-sm font-semibold">{d.Driver.givenName} {d.Driver.familyName}</span>
                       </span>
@@ -923,7 +923,7 @@ if (subPage === 'stats-constructors') {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6 2xl:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
             {drivers.map((d) => (
               <button key={d.id} onClick={() => toggleDriver(d.id)} className="flex flex-col items-center rounded-2xl p-3 border border-transparent hover:bg-white/5 active:scale-[0.98]">
-                <img src={d.photo} alt={d.name} className={`w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full object-cover object-top transition ${selectedDrivers.includes(d.id) ? 'ring-4 ring-red-600' : ''}`} />
+                <img src={d.photo} alt={d.name} className={`w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full object-cover object-top transition ${selectedDrivers.includes(d.id) ? 'ring-4 ring-accent-500' : ''}`} />
                 <p className="mt-2 font-medium text-sm text-center">{d.name}</p>
                 <p className="text-xs text-zinc-500">{d.team}</p>
               </button>

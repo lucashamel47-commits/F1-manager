@@ -74,13 +74,13 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
     <section aria-labelledby="circuits-title" className="col-span-full min-w-0">
       <div className="flex items-end justify-between gap-4 mb-4">
         <div className="min-w-0">
-          <p className="text-red-500 text-[11px] font-medium tracking-[0.22em] uppercase">Calendrier</p>
+          <p className="text-accent-400 text-[11px] font-medium tracking-[0.22em] uppercase">Calendrier</p>
           <h2 id="circuits-title" className="mt-1 text-xl sm:text-2xl font-semibold tracking-tight">Les circuits</h2>
           <p className="mt-1 text-sm text-zinc-400">Faites défiler les {circuits.length} Grands Prix. Touchez un circuit pour ouvrir sa fiche.</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {active !== nextIdx && (
-            <button onClick={() => goTo(nextIdx)} className="min-h-11 px-3 text-xs font-medium text-red-500 hover:text-red-400 active:text-white">
+            <button onClick={() => goTo(nextIdx)} className="min-h-11 px-3 text-xs font-medium text-accent-400 hover:text-accent-400 active:text-white">
               Prochain GP
             </button>
           )}
@@ -116,7 +116,7 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
               onClick={() => onOpen(c)}
               aria-label={`${c.name}, manche ${c.round}, ouvrir la fiche`}
               className={`group snap-start shrink-0 w-[82%] sm:w-[46%] lg:w-[31.5%] xl:w-[23.5%] text-left bg-zinc-950 border rounded-3xl overflow-hidden transition duration-300 active:scale-[0.99] hover:-translate-y-0.5 ${
-                st.kind === 'next' ? 'border-red-500/70 shadow-[0_0_40px_-12px_rgb(234_42_31_/_0.55)]' : 'border-white/10 hover:border-white/30'
+                st.kind === 'next' ? 'border-accent-400/70 shadow-[0_0_40px_-12px_rgb(99_102_241_/_0.55)]' : 'border-white/10 hover:border-white/30'
               }`}
             >
               <div className="relative aspect-video bg-zinc-100 overflow-hidden">
@@ -126,7 +126,7 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
                   <div className="absolute inset-0 grid place-items-center text-xs text-zinc-500 px-4 text-center">Plan bientôt disponible</div>
                 )}
                 <span className="absolute top-2.5 left-2.5 bg-black/80 backdrop-blur text-white text-[11px] font-semibold px-2.5 py-1 rounded-full">R{c.round}</span>
-                {st.kind === 'next' && <span className="absolute top-2.5 right-2.5 bg-red-600 text-white text-[11px] font-semibold tracking-wide px-3 py-1 rounded-full">Prochain GP</span>}
+                {st.kind === 'next' && <span className="absolute top-2.5 right-2.5 bg-accent-500 text-white text-[11px] font-semibold tracking-wide px-3 py-1 rounded-full">Prochain GP</span>}
               </div>
               <div className="p-4">
                 <div className="flex items-center justify-between gap-3">
@@ -139,7 +139,7 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
                   <div><dt className="text-zinc-500">Longueur</dt><dd className="mt-0.5 font-semibold tabular-nums whitespace-nowrap">{c.length.replace(' km', '')} km</dd></div>
                   <div><dt className="text-zinc-500">Record</dt><dd className="mt-0.5 font-semibold tabular-nums">{c.record ?? '—'}</dd></div>
                 </dl>
-                <p className={`mt-3 text-xs truncate ${st.kind === 'next' ? 'text-red-500 font-semibold' : 'text-zinc-400'}`}>
+                <p className={`mt-3 text-xs truncate ${st.kind === 'next' ? 'text-accent-400 font-semibold' : 'text-zinc-400'}`}>
                   {st.kind === 'next' && st.label}
                   {st.kind === 'later' && 'À venir'}
                   {st.kind === 'done' && (w ? <>Vainqueur : <span className="text-white font-semibold">{w.name}</span></> : winnersState === 'loading' ? 'Résultat en chargement…' : 'Course terminée')}
@@ -153,7 +153,7 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
       <div className="flex items-center justify-center gap-0.5 pt-1" role="group" aria-label="Position dans la saison">
         {circuits.map((c, i) => (
           <button key={c.round} onClick={() => goTo(i)} aria-label={`Aller à ${c.name}`} aria-current={active === i} className="h-6 w-3.5 grid place-items-center">
-            <span className={`block rounded-full transition-all ${active === i ? 'h-1.5 w-4 bg-red-600' : c.round === nextRound ? 'size-1.5 bg-red-600/60' : 'size-1.5 bg-zinc-700'}`} />
+            <span className={`block rounded-full transition-all ${active === i ? 'h-1.5 w-4 bg-accent-500' : c.round === nextRound ? 'size-1.5 bg-accent-500/60' : 'size-1.5 bg-zinc-700'}`} />
           </button>
         ))}
       </div>

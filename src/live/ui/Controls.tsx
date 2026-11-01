@@ -36,7 +36,7 @@ export default function Controls({ rt, lap, totalLaps, onLap }: { rt: Runtime; l
           step={1000}
           value={Math.min(Math.max(rt.t, st.t0), st.t1)}
           onChange={(e) => rt.seek(Number(e.target.value))}
-          className="flex-1 h-11 accent-red-600"
+          className="flex-1 h-11 accent-accent-500"
           aria-valuetext={`Tour ${lap}${totalLaps ? ` sur ${totalLaps}` : ''}`}
         />
         <span className="w-28 text-right text-xs text-zinc-400 tabular-nums">{fmtElapsed(rt.t, st.t0)} · T{lap}{totalLaps ? `/${totalLaps}` : ''}</span>

@@ -30,7 +30,7 @@ export default function Picker({ sessions, loading, year, years, onYear, onPick,
           ))}
           <span className="mx-1 h-5 w-px bg-zinc-800" />
           {(['all', 'race'] as const).map((f) => (
-            <button key={f} onClick={() => setFilter(f)} aria-pressed={filter === f} className={`min-h-10 px-4 rounded-full text-xs font-medium border ${filter === f ? 'border-red-500/70 bg-red-600/10 text-white' : 'border-white/10 text-zinc-400 hover:bg-white/5'}`}>{f === 'all' ? 'Toutes les sessions' : 'Courses'}</button>
+            <button key={f} onClick={() => setFilter(f)} aria-pressed={filter === f} className={`min-h-10 px-4 rounded-full text-xs font-medium border ${filter === f ? 'border-accent-400/70 bg-accent-500/10 text-white' : 'border-white/10 text-zinc-400 hover:bg-white/5'}`}>{f === 'all' ? 'Toutes les sessions' : 'Courses'}</button>
           ))}
         </div>
         <div className="overflow-y-auto flex-1">
@@ -48,7 +48,7 @@ export default function Picker({ sessions, loading, year, years, onYear, onPick,
                       disabled={!over}
                       onClick={() => onPick(s)}
                       title={over ? fmtDateFr(s.date_start) : `Pas encore disputée — ${fmtDateFr(s.date_start)}`}
-                      className={`min-h-11 px-4 rounded-full text-xs font-semibold border ${current === s.session_key ? 'border-red-500/70 text-white bg-red-600/10' : 'border-white/15 text-zinc-200 hover:bg-white/5'} disabled:opacity-30 disabled:active:bg-transparent`}
+                      className={`min-h-11 px-4 rounded-full text-xs font-semibold border ${current === s.session_key ? 'border-accent-400/70 text-white bg-accent-500/10' : 'border-white/15 text-zinc-200 hover:bg-white/5'} disabled:opacity-30 disabled:active:bg-transparent`}
                     >
                       {SESSION_SHORT[s.session_name] ?? s.session_name}
                     </button>

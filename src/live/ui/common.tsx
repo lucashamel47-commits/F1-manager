@@ -69,7 +69,7 @@ export function Tabs<T extends string>({ tabs, value, onChange, label }: { tabs:
           role="tab"
           aria-selected={value === t.key}
           onClick={() => onChange(t.key)}
-          className={`shrink-0 px-3 sm:px-4 min-h-11 text-xs sm:text-sm font-medium border-b-2 whitespace-nowrap active:bg-white/5 ${value === t.key ? 'border-red-600 text-white' : 'border-transparent text-zinc-400 hover:text-white'}`}
+          className={`shrink-0 px-3 sm:px-4 min-h-11 text-xs sm:text-sm font-medium border-b-2 whitespace-nowrap active:bg-white/5 ${value === t.key ? 'border-accent-500 text-white' : 'border-transparent text-zinc-400 hover:text-white'}`}
         >
           {t.label}
         </button>

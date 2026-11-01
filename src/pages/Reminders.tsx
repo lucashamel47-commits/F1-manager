@@ -21,7 +21,7 @@ function Toggle({ on, onClick, children, sub }: { on: boolean; onClick: () => vo
         <span className="block text-sm font-semibold">{children}</span>
         {sub && <span className="block text-xs text-zinc-500 mt-0.5">{sub}</span>}
       </span>
-      <span className={`relative w-11 h-6 rounded-full transition ${on ? 'bg-red-600' : 'bg-zinc-700'}`} aria-hidden>
+      <span className={`relative w-11 h-6 rounded-full transition ${on ? 'bg-accent-500' : 'bg-zinc-700'}`} aria-hidden>
         <span className={`absolute top-0.5 size-5 rounded-full bg-white transition-all ${on ? 'left-[22px]' : 'left-0.5'}`} />
       </span>
     </button>
@@ -150,7 +150,7 @@ export default function Reminders({ onBack, user }: { onBack: () => void; user: 
             <span className="text-sm font-medium">Modes</span>
           </button>
           <div className="flex items-center gap-2">
-            <span className="bg-red-600 text-white font-bold px-2 py-1 rounded-md text-sm leading-none tracking-tight shadow-[0_0_20px_-4px_rgb(234_42_31_/_0.8)]">F1</span>
+            <span className="bg-white text-black font-bold px-2 py-1 rounded-md text-sm leading-none tracking-tight">F1</span>
             <span className="font-semibold tracking-tight text-lg leading-none">Manager</span>
           </div>
           <span className="ml-auto rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium">Rappels</span>
@@ -170,7 +170,7 @@ export default function Reminders({ onBack, user }: { onBack: () => void; user: 
                 <p className="text-sm text-zinc-400 mt-0.5">{next.gp} · {next.place}</p>
                 <p className="text-xs text-zinc-500 mt-1 first-letter:uppercase">{formatWhen(next.start)}</p>
                 {started ? (
-                  <p className="mt-5 inline-flex items-center gap-2 text-sm font-semibold tracking-[0.2em] text-red-500"><span className="size-2 rounded-full bg-red-600 animate-pulse" />En cours</p>
+                  <p className="mt-5 inline-flex items-center gap-2 text-sm font-semibold tracking-[0.2em] text-accent-400"><span className="size-2 rounded-full bg-accent-500 animate-pulse" />En cours</p>
                 ) : (
                   <div className="mt-5 flex items-start gap-2" role="timer" aria-label="Compte à rebours">
                     {unit(cd.d, 'jours')}{unit(cd.h, 'heures')}{unit(cd.m, 'min')}{unit(cd.s, 'sec')}
@@ -180,7 +180,7 @@ export default function Reminders({ onBack, user }: { onBack: () => void; user: 
                   <ul className="mt-6 border-t border-white/[0.06]">
                     {weekend.map((s) => (
                       <li key={s.id} className={`flex items-center gap-3 py-2.5 border-b border-white/[0.06] text-sm ${s.start.getTime() + s.minutes * 60000 < now ? 'text-zinc-600 line-through' : ''}`}>
-                        <span className={`size-1.5 rounded-full ${s.kind === 'race' ? 'bg-red-600' : 'bg-zinc-600'}`} aria-hidden />
+                        <span className={`size-1.5 rounded-full ${s.kind === 'race' ? 'bg-accent-500' : 'bg-zinc-600'}`} aria-hidden />
                         <span className="flex-1">{s.label}</span>
                         <span className="text-xs text-zinc-500 tabular-nums first-letter:uppercase">{new Intl.DateTimeFormat('fr-FR', { weekday: 'short', hour: '2-digit', minute: '2-digit' }).format(s.start)}</span>
                       </li>
