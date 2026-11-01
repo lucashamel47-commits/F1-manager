@@ -1,7 +1,9 @@
 import Hero from '../components/Hero'
-import AuthForm from '../components/AuthForm'
+import AuthCard, { AuthCtas } from '../components/AuthForm'
 import AppPreview from '../components/AppPreview'
-import FeatureSection from '../components/FeatureSection'
+import LandingNav, { AnnouncementBar } from '../components/landing/LandingNav'
+import { NumbersStrip, Features, Faq, FinalCta, Footer } from '../components/landing/Sections'
+import Reveal from '../components/landing/Reveal'
 
 interface Props {
   showAuth: boolean
@@ -20,6 +22,11 @@ interface Props {
 }
 
 export default function Home(props: Props) {
+  const open = (login: boolean) => {
+    props.setIsLogin(login)
+    props.setShowAuth(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
   return (
     <div className="min-h-dvh text-white relative">
       {props.showConfetti && (
@@ -38,14 +45,20 @@ export default function Home(props: Props) {
         </div>
       )}
 
-      <Hero />
-      <AuthForm {...props} />
-      <AppPreview />
-      <FeatureSection />
-
-      <div className="relative z-10 text-center pb-20 pt-10 text-zinc-500 text-xs tracking-wide border-t border-white/5">
-        F1 Manager • Saison 2026
-      </div>
+      <AnnouncementBar />
+      <LandingNav onSignup={() => open(false)} onLogin={() => open(true)} />
+      <main>
+        <Hero
+          ctas={<AuthCtas showAuth={props.showAuth} setShowAuth={props.setShowAuth} setIsLogin={props.setIsLogin} />}
+          form={props.showAuth ? <AuthCard {...props} /> : null}
+        />
+        <Reveal><AppPreview /></Reveal>
+        <NumbersStrip />
+        <Features />
+        <Faq />
+        <FinalCta onSignup={() => open(false)} onLogin={() => open(true)} />
+      </main>
+      <Footer />
     </div>
   )
 }

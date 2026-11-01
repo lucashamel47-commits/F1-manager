@@ -316,14 +316,15 @@ export default function AppPreview() {
   const onLeave = () => { const f = frame.current; if (f) { f.style.setProperty('--rx', '0deg'); f.style.setProperty('--ry', '0deg') } }
 
   return (
-    <section ref={root} aria-label="Aperçu interactif de l'application" className="relative z-10 px-3 sm:px-6 pb-20 sm:pb-28">
-      <div className="mx-auto max-w-6xl [perspective:1600px]" onPointerMove={onMove} onPointerLeave={onLeave}>
+    <section ref={root} id="apercu" aria-label="Aperçu interactif de l'application" className="relative z-10 px-3 sm:px-6 scroll-mt-20 pb-16 sm:pb-20">
+      <div className="relative mx-auto max-w-6xl [perspective:1600px]" onPointerMove={onMove} onPointerLeave={onLeave}>
         <div aria-hidden className="absolute inset-x-10 -top-6 h-40 rounded-full bg-[radial-gradient(closest-side,rgb(99_102_241_/_0.35),transparent)] blur-3xl pointer-events-none" />
         <div
           ref={frame}
           className="relative rounded-[1.75rem] border border-white/[0.12] bg-[#0b0c0e]/90 shadow-[0_50px_120px_-30px_rgb(0_0_0_/_0.9),0_0_0_1px_rgb(255_255_255_/_0.03)] overflow-hidden transition-transform duration-300 ease-out will-change-transform"
           style={{ transform: 'rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))', '--mx': '50%', '--my': '0%' } as CSSProperties}
         >
+          <div aria-hidden className="pointer-events-none absolute inset-x-12 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
           <div aria-hidden className="pointer-events-none absolute inset-0 z-10 opacity-70 [background:radial-gradient(500px_circle_at_var(--mx)_var(--my),rgb(255_255_255_/_0.06),transparent_60%)]" />
           {/* barre de fenêtre */}
           <div className="flex items-center gap-3 px-4 h-11 border-b border-white/[0.07] bg-white/[0.02]">
@@ -359,6 +360,9 @@ export default function AppPreview() {
             </div>
           </div>
         </div>
+        {/* reflet / halo sous la fenêtre */}
+        <div aria-hidden className="pointer-events-none mx-auto -mt-2 h-16 w-[86%] rounded-b-[2rem] bg-gradient-to-b from-white/[0.07] to-transparent opacity-60 blur-md [mask-image:linear-gradient(180deg,#000,transparent)] [-webkit-mask-image:linear-gradient(180deg,#000,transparent)]" />
+        <div aria-hidden className="pointer-events-none absolute inset-x-[15%] bottom-0 h-32 translate-y-1/3 rounded-full bg-[radial-gradient(closest-side,rgb(99_102_241_/_0.4),transparent)] blur-3xl" />
       </div>
     </section>
   )
