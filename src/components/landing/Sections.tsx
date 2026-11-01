@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { circuits } from '../../data/circuits'
 import { drivers } from '../../data/divers'
 import Reveal from './Reveal'
+import FooterWordmark from './FooterWordmark'
 
 const reduced = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -182,50 +183,6 @@ export function Features() {
   )
 }
 
-/* ───────── FAQ ───────── */
-const FAQ: { q: string; a: string }[] = [
-  { q: 'Comment créer un compte ?', a: "Clique sur « Créer un compte », entre ton email et un mot de passe (6 caractères minimum). Selon la configuration, un lien de confirmation peut t'être envoyé par email." },
-  { q: 'Que contient le mode Hors Course ?', a: "Les classements pilotes et constructeurs, le calendrier complet de la saison avec la fiche de chaque circuit, les statistiques et records, et tes favoris." },
-  { q: 'Puis-je rejouer une course passée ?', a: "Oui. Dans le mode Live Timing, hors week-end de course, rejoue une course passée à ×1, ×10 ou ×50, avec les positions, les écarts, les pneus et la carte." },
-  { q: 'Comment fonctionnent les rappels par email ?', a: "C'est une option que tu actives toi-même dans « Rappels & calendrier ». Tu choisis les sessions et le délai, puis tu reçois un email avant chacune d'elles." },
-  { q: 'Ça marche sur iPad ?', a: "Oui, l'interface est pensée pour le tactile (grandes zones d'appui) et l'app peut s'installer sur l'écran d'accueil pour s'ouvrir comme une vraie application." },
-  { q: "D'où viennent les données ?", a: "Des API ouvertes OpenF1 (live timing) et Jolpica-F1 (résultats et classements). F1 Manager est un projet indépendant, non affilié à Formula 1." },
-]
-
-export function Faq() {
-  const [open, setOpen] = useState<number | null>(0)
-  return (
-    <section id="faq" className="mx-auto max-w-6xl scroll-mt-24 px-4 pb-24 sm:px-6 sm:pb-32">
-      <div className="grid gap-10 md:grid-cols-[1fr_1.4fr] md:gap-16">
-        <Reveal>
-          <p className="kicker">FAQ</p>
-          <h2 className="text-gradient mt-4 text-4xl font-semibold leading-[1.02] tracking-[-0.04em] sm:text-5xl">Questions fréquentes.</h2>
-          <p className="mt-5 max-w-xs text-base leading-relaxed text-zinc-400">Tout ce qu'il faut savoir avant de te lancer.</p>
-        </Reveal>
-        <Reveal delay={100}>
-          <ul className="divide-y divide-white/[0.08] overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02]">
-            {FAQ.map((f, i) => (
-              <li key={f.q}>
-                <h3>
-                  <button onClick={() => setOpen(open === i ? null : i)} aria-expanded={open === i} aria-controls={`faq-${i}`} className="flex min-h-16 w-full items-center justify-between gap-4 px-6 py-4 text-left text-[15px] font-medium transition hover:bg-white/[0.03]">
-                    {f.q}
-                    <span className={`grid size-7 shrink-0 place-items-center rounded-full border border-white/15 text-zinc-300 transition-transform duration-300 ${open === i ? 'rotate-45' : ''}`} aria-hidden>
-                      <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
-                    </span>
-                  </button>
-                </h3>
-                <div id={`faq-${i}`} role="region" className={`grid transition-[grid-template-rows] duration-300 ease-out ${open === i ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-                  <div className="overflow-hidden"><p className="px-6 pb-5 text-sm leading-relaxed text-zinc-400">{f.a}</p></div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </Reveal>
-      </div>
-    </section>
-  )
-}
-
 /* ───────── Appel final + pied de page ───────── */
 export function FinalCta({ onSignup, onLogin }: { onSignup: () => void; onLogin: () => void }) {
   return (
@@ -268,7 +225,7 @@ export function Footer() {
             <li><a className={a} href="https://github.com/jolpica/jolpica-f1" target="_blank" rel="noopener noreferrer">Jolpica-F1</a></li>
           </ul></nav>
         </div>
-        <div aria-hidden className="select-none overflow-hidden whitespace-nowrap pt-10 text-center text-[clamp(3rem,12.6vw,12rem)] font-semibold leading-[0.8] tracking-[-0.06em] text-white/[0.06] [mask-image:linear-gradient(180deg,#000_30%,transparent_95%)] [-webkit-mask-image:linear-gradient(180deg,#000_30%,transparent_95%)]">F1 Manager</div>
+        <FooterWordmark />
         <div className="flex flex-col gap-2 border-t border-white/[0.07] py-6 text-xs text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
           <p>© 2026 F1 Manager · Projet indépendant, non affilié à Formula 1.</p>
           <p>F1 et les marques associées appartiennent à leurs propriétaires.</p>

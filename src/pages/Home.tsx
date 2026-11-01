@@ -2,7 +2,8 @@ import Hero from '../components/Hero'
 import AuthCard, { AuthCtas } from '../components/AuthForm'
 import AppPreview from '../components/AppPreview'
 import LandingNav from '../components/landing/LandingNav'
-import { NumbersStrip, Features, Faq, FinalCta, Footer } from '../components/landing/Sections'
+import { NumbersStrip, Features, FinalCta, Footer } from '../components/landing/Sections'
+import Faq from '../components/landing/Faq'
 import Reveal from '../components/landing/Reveal'
 
 interface Props {
@@ -54,7 +55,7 @@ export default function Home(props: Props) {
         <Reveal><AppPreview /></Reveal>
         <NumbersStrip />
         <Features />
-        <Faq />
+        <Faq onSignup={() => open(false)} />
         <FinalCta onSignup={() => open(false)} onLogin={() => open(true)} />
       </main>
       <Footer />
