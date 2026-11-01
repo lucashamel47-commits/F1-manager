@@ -98,26 +98,26 @@ export default function Faq({ onSignup }: { onSignup: () => void }) {
   const catOf = (c: Cat) => CATS.find((x) => x.id === c)!
 
   return (
-    <section id="faq" className="mx-auto max-w-6xl scroll-mt-24 px-4 pb-24 sm:px-6 sm:pb-32">
-      <div className="grid gap-10 lg:grid-cols-[0.8fr_1.4fr] lg:gap-16">
+    <section id="faq" className="mx-auto max-w-[77.5rem] scroll-mt-24 px-4 pb-40 sm:px-6 sm:pb-56">
+      <div className="grid gap-16 lg:grid-cols-[0.75fr_1.25fr] lg:gap-28">
         <Reveal className="lg:sticky lg:top-28 lg:self-start">
           <p className="kicker">FAQ</p>
-          <h2 className="text-gradient mt-4 text-4xl font-semibold leading-[1.02] tracking-[-0.04em] sm:text-5xl">Questions fréquentes.</h2>
-          <p className="mt-5 max-w-sm text-base leading-relaxed text-zinc-400">Compte, rappels, live timing, installation : l'essentiel avant de te lancer.</p>
+          <h2 className="text-gradient mt-6 text-[2.6rem] font-semibold leading-[1.04] tracking-[-0.045em] sm:text-6xl">Questions fréquentes.</h2>
+          <p className="mt-6 max-w-xs text-lg leading-relaxed text-zinc-400">L'essentiel avant de te lancer.</p>
 
-          <div className="group relative mt-7 flex items-center rounded-2xl border border-white/10 bg-white/[0.04] transition focus-within:border-accent-400/70 focus-within:ring-4 focus-within:ring-accent-500/20">
+          <div className="group relative mt-12 flex items-center rounded-2xl border border-white/10 bg-white/[0.04] transition focus-within:border-accent-400/70 focus-within:ring-4 focus-within:ring-accent-500/20">
             <svg viewBox="0 0 24 24" className="pointer-events-none absolute left-4 size-[18px] text-zinc-500 transition group-focus-within:text-accent-300" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></svg>
             <label htmlFor={`${uid}-s`} className="sr-only">Rechercher dans la FAQ</label>
             <input id={`${uid}-s`} type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Rechercher une question" className="min-h-12 w-full bg-transparent pl-11 pr-4 text-[15px] outline-none placeholder:text-zinc-500 [&:focus-visible]:outline-none" />
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="Filtrer par thème">
+          <div className="mt-5 flex flex-wrap gap-2.5" role="group" aria-label="Filtrer par thème">
             {[{ id: 'all' as const, label: 'Tout' }, ...CATS].map((c) => (
               <button key={c.id} onClick={() => setCat(c.id)} aria-pressed={cat === c.id} className={`min-h-10 rounded-full border px-4 text-[13px] font-medium transition ${cat === c.id ? 'border-accent-400/60 bg-accent-500/20 text-white' : 'border-white/10 text-zinc-400 hover:border-white/25 hover:text-white'}`}>{c.label}</button>
             ))}
           </div>
 
-          <div className="relative mt-8 hidden overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.015] p-6 lg:block">
+          <div className="relative mt-14 hidden overflow-hidden rounded-3xl bg-gradient-to-b from-white/[0.06] to-white/[0.015] p-8 lg:block">
             <div aria-hidden className="pointer-events-none absolute -right-12 -top-16 size-48 rounded-full bg-[radial-gradient(closest-side,rgb(99_102_241_/_0.35),transparent)] blur-2xl" />
             <p className="text-base font-semibold tracking-tight">Encore une question ?</p>
             <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">Le plus simple, c'est d'essayer : crée ton compte et fais le tour de l'app.</p>
@@ -127,17 +127,17 @@ export default function Faq({ onSignup }: { onSignup: () => void }) {
 
         <Reveal delay={100}>
           <p role="status" className="sr-only">{rows.length} question{rows.length > 1 ? 's' : ''} affichée{rows.length > 1 ? 's' : ''}</p>
-          <ul className="space-y-3">
+          <ul className="space-y-4">
             {rows.map(({ it, i }) => {
               const on = open === i
               const c = catOf(it.cat)
               return (
-                <li key={it.q} className={`overflow-hidden rounded-3xl border transition-colors duration-300 ${on ? 'border-accent-400/40 bg-gradient-to-b from-accent-500/[0.10] to-white/[0.02] shadow-[0_20px_60px_-30px_rgb(99_102_241_/_0.6)]' : 'border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.035]'}`}>
+                <li key={it.q} className={`overflow-hidden rounded-3xl border transition-colors duration-300 ${on ? 'border-accent-400/40 bg-gradient-to-b from-accent-500/[0.10] to-white/[0.02] shadow-[0_20px_60px_-30px_rgb(99_102_241_/_0.6)]' : 'border-transparent bg-white/[0.03] hover:bg-white/[0.05]'}`}>
                   <h3>
-                    <button onClick={() => setOpen(on ? null : i)} aria-expanded={on} aria-controls={`${uid}-p${i}`} id={`${uid}-b${i}`} className="flex min-h-[4.5rem] w-full items-center gap-4 px-5 py-4 text-left sm:px-6">
+                    <button onClick={() => setOpen(on ? null : i)} aria-expanded={on} aria-controls={`${uid}-p${i}`} id={`${uid}-b${i}`} className="flex min-h-[5.5rem] w-full items-center gap-5 px-6 py-5 text-left sm:px-8">
                       <span className={`grid size-10 shrink-0 place-items-center rounded-xl transition duration-300 ${on ? 'bg-gradient-to-br from-[#5b7cff] to-[#7a5cf5] text-white shadow-[0_8px_24px_-8px_rgb(91_124_255_/_0.8)]' : 'bg-white/[0.06] text-zinc-400'}`}>{c.icon}</span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-[15px] font-medium leading-snug sm:text-base">{it.q}</span>
+                        <span className="block text-base font-medium leading-snug sm:text-lg">{it.q}</span>
                         <span className="mt-0.5 block text-xs text-zinc-500">{c.label}</span>
                       </span>
                       <span className={`grid size-8 shrink-0 place-items-center rounded-full border transition duration-300 ${on ? 'rotate-45 border-accent-400/50 text-white' : 'border-white/15 text-zinc-400'}`} aria-hidden>
@@ -147,7 +147,7 @@ export default function Faq({ onSignup }: { onSignup: () => void }) {
                   </h3>
                   <div id={`${uid}-p${i}`} role="region" aria-labelledby={`${uid}-b${i}`} className={`grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(.22,.61,.36,1)] motion-reduce:transition-none ${on ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                     <div className="overflow-hidden">
-                      <div className="space-y-3 pb-6 pl-5 pr-5 text-[15px] leading-relaxed text-zinc-400 sm:pl-20 sm:pr-8">
+                      <div className="space-y-3 pb-8 pl-6 pr-6 text-base leading-relaxed text-zinc-400 sm:pl-[6.25rem] sm:pr-10">
                         {it.a.map((p) => <p key={p}>{p}</p>)}
                         {it.tip && (
                           <p className="flex gap-3 rounded-2xl border border-amber-300/20 bg-amber-300/[0.07] p-4 text-sm leading-relaxed text-amber-100/90">

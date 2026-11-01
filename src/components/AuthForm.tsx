@@ -27,7 +27,7 @@ const eyeOffIcon = <Icon d={<><path d="M3 3l18 18" /><path d="M10.6 5.7A9.6 9.6 
 export function AuthCtas({ showAuth, setShowAuth, setIsLogin }: Pick<Props, 'showAuth' | 'setShowAuth' | 'setIsLogin'>) {
   if (showAuth) return null
   return (
-    <div className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
+    <div className="mt-14 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
       <button
         onClick={() => setShowAuth(true)}
         className="btn-primary min-h-14 rounded-full px-9 text-base font-semibold active:scale-[0.98]"

@@ -20,14 +20,14 @@ export default function Hero({ ctas, form }: { ctas: ReactNode; form: ReactNode 
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#08090a]" />
       </div>
 
-      <div className={`mx-auto max-w-6xl px-4 pb-20 pt-16 sm:px-6 sm:pt-24 lg:pb-24 lg:pt-28 ${form ? 'grid items-center gap-12 lg:grid-cols-[1.15fr_0.85fr]' : ''}`}>
+      <div className={`mx-auto max-w-[77.5rem] px-4 pb-28 pt-24 sm:px-6 sm:pt-36 lg:pb-36 lg:pt-44 ${form ? 'grid items-center gap-12 lg:grid-cols-[1.15fr_0.85fr]' : ''}`}>
         <div className={form ? 'text-center lg:text-left' : 'text-center'}>
           <h1 className={`text-[2.9rem] font-semibold leading-[1] tracking-[-0.045em] min-[420px]:text-6xl sm:text-7xl ${form ? 'lg:text-[4.5rem]' : 'lg:text-[5.5rem]'} ${reveal(100)}`}>
             <span className="text-gradient">Toute la F1,</span>
             <br />
             <span className="text-gradient-accent">au même endroit.</span>
           </h1>
-          <p className={`mt-7 max-w-xl text-base leading-relaxed text-zinc-400 sm:text-lg ${form ? 'mx-auto lg:mx-0' : 'mx-auto'} ${reveal(220)}`}>
+          <p className={`mt-9 max-w-xl text-lg leading-relaxed text-zinc-400 sm:text-xl ${form ? 'mx-auto lg:mx-0' : 'mx-auto'} ${reveal(220)}`}>
             Classements, calendrier, statistiques et live timing de la Formule 1.
           </p>
           <div className={reveal(340)}>{ctas}</div>
