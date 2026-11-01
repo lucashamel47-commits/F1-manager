@@ -43,7 +43,7 @@ export function PositionChart({ store, series, lap, selected, onSelect }: { stor
         {Array.from({ length: N }, (_, i) => <line key={i} x1={L} x2={W - R} y1={y(i + 1)} y2={y(i + 1)} stroke="#18181b" />)}
         {Array.from({ length: N }, (_, i) => <text key={i} x={L - 8} y={y(i + 1) + 4} textAnchor="end" fontSize="11" fill="#71717a">{i + 1}</text>)}
         {ticks.map((l) => <text key={l} x={x(l)} y={H - 8} textAnchor="middle" fontSize="11" fill="#71717a">T{l}</text>)}
-        <line x1={x(cur)} x2={x(cur)} y1={T - 4} y2={H - B + 4} stroke="#ef4444" strokeOpacity=".5" />
+        <line x1={x(cur)} x2={x(cur)} y1={T - 4} y2={H - B + 4} stroke="#8b9cff" strokeOpacity=".5" />
         {lines.map((l) => {
           const on = selected == null || selected === l.n
           return (
@@ -83,7 +83,7 @@ export function GapChart({ store, series, snap, lap, selected }: { store: Store;
         {snap.rows.map((r) => {
           const on = sel.includes(r.n)
           return (
-            <button key={r.n} onClick={() => toggle(r.n)} aria-pressed={on} className={`min-h-9 px-2.5 text-xs font-bold uppercase border ${on ? 'text-white' : 'text-zinc-500 border-zinc-800'}`} style={on ? { borderColor: r.color, background: `${r.color}22` } : undefined}>
+            <button key={r.n} onClick={() => toggle(r.n)} aria-pressed={on} className={`min-h-9 px-3 rounded-full text-xs font-semibold uppercase border ${on ? 'text-white' : 'text-zinc-500 border-white/10'}`} style={on ? { borderColor: r.color, background: `${r.color}22` } : undefined}>
               {r.acr}
             </button>
           )
@@ -97,7 +97,7 @@ export function GapChart({ store, series, snap, lap, selected }: { store: Store;
           </g>
         ))}
         {Array.from({ length: Math.floor(maxLap / 10) }, (_, i) => (i + 1) * 10).map((l) => <text key={l} x={x(l)} y={H - 8} textAnchor="middle" fontSize="11" fill="#71717a">T{l}</text>)}
-        <line x1={x(cur)} x2={x(cur)} y1={T - 4} y2={H - B + 4} stroke="#ef4444" strokeOpacity=".5" />
+        <line x1={x(cur)} x2={x(cur)} y1={T - 4} y2={H - B + 4} stroke="#8b9cff" strokeOpacity=".5" />
         {sel.map((n) => {
           const a = series.gap.get(n) ?? []
           const pts: string[] = []
@@ -148,7 +148,7 @@ export function StrategyChart({ store, snap, lap, selected, onSelect }: { store:
             </g>
           )
         })}
-        <line x1={x(lap)} x2={x(lap)} y1={T - 2} y2={H - B + 2} stroke="#ef4444" strokeWidth="1.5" />
+        <line x1={x(lap)} x2={x(lap)} y1={T - 2} y2={H - B + 2} stroke="#8b9cff" strokeWidth="1.5" />
       </svg>
       <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-zinc-400">
         {['SOFT', 'MEDIUM', 'HARD', 'INTERMEDIATE', 'WET'].map((c) => <span key={c} className="inline-flex items-center gap-1.5"><TyreDot c={c} size={14} />{compound(c).label}</span>)}

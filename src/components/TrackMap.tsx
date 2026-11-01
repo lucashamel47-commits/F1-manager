@@ -42,7 +42,7 @@ export default function TrackMap({ src, alt, unavailable }: { src?: string; alt:
         <img src={src} alt={alt} draggable={false} className="w-full h-auto max-h-[60vh] object-contain p-3 sm:p-5 pointer-events-none" />
         {pt && (
           <>
-            <span className="absolute size-4 -ml-2 -mt-2 rounded-full bg-red-600 ring-4 ring-red-600/30 pointer-events-none" style={{ left: `${pt.x * 100}%`, top: `${pt.y * 100}%` }} />
+            <span className="absolute size-4 -ml-2 -mt-2 rounded-full bg-accent-500 ring-4 ring-accent-500/30 pointer-events-none" style={{ left: `${pt.x * 100}%`, top: `${pt.y * 100}%` }} />
             <div
               className="absolute bg-black text-white rounded-sm px-3 py-1.5 text-center text-xs shadow-xl pointer-events-none whitespace-nowrap"
               style={{ left: `${Math.min(85, Math.max(15, pt.x * 100))}%`, top: pt.y < 0.25 ? `${pt.y * 100 + 8}%` : `${pt.y * 100 - 4}%`, transform: pt.y < 0.25 ? 'translate(-50%, 0)' : 'translate(-50%, -100%)' }}

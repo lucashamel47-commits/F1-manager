@@ -31,7 +31,7 @@ function Switch<T extends string>({ value, options, onChange, label, className =
           role="tab"
           aria-selected={value === o.key}
           onClick={() => onChange(o.key)}
-          className={`min-h-11 text-sm transition-colors border-b ${value === o.key ? 'text-white border-red-600' : 'text-zinc-500 border-transparent hover:text-zinc-200'}`}
+          className={`min-h-11 text-sm transition-colors border-b ${value === o.key ? 'text-white border-accent-500' : 'text-zinc-500 border-transparent hover:text-zinc-200'}`}
         >
           {o.label}
         </button>
@@ -167,7 +167,7 @@ function SeasonDetail({ year, kind }: { year: number; kind: Kind }) {
     return (
       <div className="flex items-center justify-between gap-3 py-2 text-sm text-zinc-400">
         <span>Impossible de charger le classement {year}.</span>
-        <button onClick={() => { setRes({ state: 'loading' }); setTick((t) => t + 1) }} className="min-h-11 px-2 text-white underline underline-offset-4 decoration-red-600">Réessayer</button>
+        <button onClick={() => { setRes({ state: 'loading' }); setTick((t) => t + 1) }} className="min-h-11 px-2 text-white underline underline-offset-4 decoration-accent-500">Réessayer</button>
       </div>
     )
   const { data } = res
@@ -257,7 +257,7 @@ function Champions() {
           <span className="block truncate text-base">
             {live.state === 'loading' ? <span className="inline-block h-4 w-32 bg-zinc-900 animate-pulse align-middle" /> : live.state === 'error' ? 'Saison en cours' : `Leader : ${liveName}`}
           </span>
-          <span className="block text-xs text-red-500">En cours · classement provisoire</span>
+          <span className="block text-xs text-accent-400">En cours · classement provisoire</span>
         </span>
         <span className={`text-zinc-600 transition-transform ${open === season ? 'rotate-90' : ''}`} aria-hidden>›</span>
       </button>
@@ -282,7 +282,7 @@ function Champions() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Rechercher un nom, une écurie, une année"
-          className="w-full min-h-12 bg-transparent border-b border-zinc-800 focus:border-red-600 outline-none text-base placeholder:text-zinc-600"
+          className="w-full min-h-12 bg-transparent border-b border-zinc-800 focus:border-accent-500 outline-none text-base placeholder:text-zinc-600"
         />
       </label>
 
@@ -292,7 +292,7 @@ function Champions() {
           <select
             value={decade ?? ''}
             onChange={(e) => setDecade(e.target.value === '' ? null : Number(e.target.value))}
-            className="min-h-11 bg-black border-b border-zinc-800 text-zinc-200 text-base outline-none focus:border-red-600"
+            className="min-h-11 bg-black border-b border-zinc-800 text-zinc-200 text-base outline-none focus:border-accent-500"
           >
             <option value="">Toutes</option>
             {decades.map((d) => <option key={d} value={d}>{d}s</option>)}
@@ -330,7 +330,7 @@ function Champions() {
         {rows.length === 0 && !showLive && (
           <li className="py-8 text-center text-sm text-zinc-500">
             Aucun résultat pour « {query} ».
-            <button onClick={() => { setQuery(''); setDecade(null) }} className="block mx-auto mt-2 min-h-11 px-3 text-white underline underline-offset-4 decoration-red-600">Réinitialiser</button>
+            <button onClick={() => { setQuery(''); setDecade(null) }} className="block mx-auto mt-2 min-h-11 px-3 text-white underline underline-offset-4 decoration-accent-500">Réinitialiser</button>
           </li>
         )}
       </ul>

@@ -52,11 +52,11 @@ export default function DriverPanel({ store, snap, car, n, t, onClose, issue }: 
       <div className="flex items-center gap-3 p-3 border-b border-zinc-800" style={{ boxShadow: `inset 4px 0 0 ${color}` }}>
         {d.headshot_url ? <img src={d.headshot_url} alt="" loading="lazy" className="size-14 rounded-full bg-zinc-900 object-cover object-top shrink-0" /> : <span className="size-14 rounded-full bg-zinc-900 shrink-0" />}
         <div className="min-w-0 flex-1">
-          <p className="font-black uppercase tracking-tight text-lg leading-tight truncate">{d.first_name} <span style={{ color }}>{d.last_name}</span></p>
+          <p className="font-bold uppercase tracking-tight text-lg leading-tight truncate">{d.first_name} <span style={{ color }}>{d.last_name}</span></p>
           <p className="text-xs text-zinc-400 truncate">#{d.driver_number} · {d.team_name}</p>
         </div>
         <div className="text-right">
-          <p className="text-3xl font-black leading-none tabular-nums">P{r.pos}</p>
+          <p className="text-3xl font-bold leading-none tabular-nums">P{r.pos}</p>
           <p className="text-[11px] text-zinc-500 mt-1">{snap.timingMode === 'race' ? (r.gap === 'Leader' ? 'Leader' : r.gap) : r.gap}</p>
         </div>
         <button onClick={onClose} aria-label="Fermer la fiche pilote" className="min-h-11 min-w-11 flex items-center justify-center text-zinc-400 active:text-white text-xl">✕</button>
@@ -77,15 +77,15 @@ export default function DriverPanel({ store, snap, car, n, t, onClose, issue }: 
 
       <div className="px-3 pt-3">
         <div className="flex items-center justify-between mb-1.5">
-          <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400">Télémétrie</h4>
+          <h4 className="kicker">Télémétrie</h4>
           {cur && !stale && <span className="text-[10px] text-emerald-400 uppercase tracking-wider">● en direct</span>}
         </div>
         {cur ? (
           <div className={stale ? 'opacity-50' : ''}>
             <div className="flex items-end gap-4">
-              <p className="text-5xl font-black tabular-nums leading-none">{cur.speed}<span className="text-sm text-zinc-500 font-bold ml-1">km/h</span></p>
-              <p className="text-3xl font-black text-zinc-300 leading-none tabular-nums" aria-label="Rapport">{cur.gear === 0 ? 'N' : cur.gear}</p>
-              <span className={`ml-auto text-xs font-black px-2 py-1 rounded-sm ${drsState(cur.drs) === 'on' ? 'bg-emerald-500 text-black' : drsState(cur.drs) === 'ready' ? 'bg-emerald-900 text-emerald-300' : 'bg-zinc-900 text-zinc-500'}`}>DRS</span>
+              <p className="text-5xl font-bold tabular-nums leading-none">{cur.speed}<span className="text-sm text-zinc-500 font-bold ml-1">km/h</span></p>
+              <p className="text-3xl font-bold text-zinc-300 leading-none tabular-nums" aria-label="Rapport">{cur.gear === 0 ? 'N' : cur.gear}</p>
+              <span className={`ml-auto text-xs font-bold px-2 py-1 rounded-sm ${drsState(cur.drs) === 'on' ? 'bg-emerald-500 text-black' : drsState(cur.drs) === 'ready' ? 'bg-emerald-900 text-emerald-300' : 'bg-zinc-900 text-zinc-500'}`}>DRS</span>
             </div>
             <div className="mt-3 grid gap-2 text-[10px] uppercase tracking-wider text-zinc-500">
               {[
@@ -111,7 +111,7 @@ export default function DriverPanel({ store, snap, car, n, t, onClose, issue }: 
       </div>
 
       <div className="px-3 pt-4">
-        <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-1.5">Secteurs du tour en cours</h4>
+        <h4 className="kicker mb-1.5">Secteurs du tour en cours</h4>
         <div className="grid grid-cols-3 gap-2">
           {r.sectors.map((s, i) => (
             <div key={i}>
@@ -124,7 +124,7 @@ export default function DriverPanel({ store, snap, car, n, t, onClose, issue }: 
       </div>
 
       <div className="px-3 pt-4">
-        <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-1.5">Derniers tours</h4>
+        <h4 className="kicker mb-1.5">Derniers tours</h4>
         {laps.length ? (
           <ul className="text-sm tabular-nums">
             {laps.map((l) => (
@@ -140,7 +140,7 @@ export default function DriverPanel({ store, snap, car, n, t, onClose, issue }: 
       </div>
 
       <div className="px-3 py-4">
-        <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-1.5">Stratégie & stands</h4>
+        <h4 className="kicker mb-1.5">Stratégie & stands</h4>
         <div className="flex flex-wrap items-center gap-2">
           {stints.map((s) => (
             <span key={s.stint} className="inline-flex items-center gap-1.5 text-xs text-zinc-300 bg-zinc-900 px-2 py-1">

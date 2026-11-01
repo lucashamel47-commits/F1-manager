@@ -43,7 +43,7 @@ export default function PwaStatus() {
           className="fixed inset-x-0 bottom-0 z-[60] flex justify-center px-3 pointer-events-none"
           style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
         >
-          <p className="pointer-events-auto flex items-center gap-2 bg-zinc-900 border border-zinc-700 text-zinc-100 text-sm px-4 py-2.5 shadow-xl">
+          <p className="pointer-events-auto flex items-center gap-2 glass rounded-full bg-[#0e0f11]/85 text-zinc-100 text-sm px-5 py-2.5">
             <span className="size-2 rounded-full bg-amber-400" aria-hidden />
             Hors ligne — données enregistrées affichées
           </p>
@@ -56,12 +56,12 @@ export default function PwaStatus() {
           className="fixed inset-x-0 top-0 z-[60] flex justify-center px-3 pointer-events-none"
           style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
         >
-          <div className="pointer-events-auto w-full max-w-md flex items-center gap-3 bg-zinc-950 border border-zinc-700 border-l-4 border-l-red-600 px-4 py-3 shadow-2xl">
+          <div className="pointer-events-auto w-full max-w-md flex items-center gap-3 glass rounded-2xl bg-[#0e0f11]/85 pl-5 pr-3 py-2.5">
             {showUpdate ? (
               <>
                 <p className="flex-1 text-sm text-zinc-100">Une nouvelle version de F1 Manager est disponible.</p>
                 <button onClick={() => setUpdDismissed(true)} className="min-h-11 px-2 text-xs text-zinc-400 active:text-white">Plus tard</button>
-                <button onClick={() => updateServiceWorker(true)} className="min-h-11 px-4 text-xs font-bold uppercase tracking-wider bg-white text-black active:bg-zinc-300">Mettre à jour</button>
+                <button onClick={() => updateServiceWorker(true)} className="min-h-11 px-5 rounded-full text-xs font-semibold bg-white text-black active:bg-zinc-300">Mettre à jour</button>
               </>
             ) : (
               <>

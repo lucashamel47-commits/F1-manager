@@ -41,7 +41,7 @@ export function CountryBars() {
       <div className="flex gap-x-6" role="tablist" aria-label="Pilotes ou constructeurs">
         {(['drivers', 'constructors'] as const).map((k) => (
           <button key={k} role="tab" aria-selected={kind === k} onClick={() => { setKind(k); setSel(null) }}
-            className={`min-h-11 text-sm border-b ${kind === k ? 'text-white border-red-600' : 'text-zinc-500 border-transparent hover:text-zinc-200'}`}>
+            className={`min-h-11 text-sm border-b ${kind === k ? 'text-white border-accent-500' : 'text-zinc-500 border-transparent hover:text-zinc-200'}`}>
             {k === 'drivers' ? 'Pilotes' : 'Constructeurs'}
           </button>
         ))}

@@ -135,8 +135,8 @@ export default function LivePage() {
     if (at != null) rt.seek(at + 500)
   }, [store, snap, rt])
 
-  const toolbarBtn = 'min-h-11 px-4 text-xs font-bold uppercase tracking-wider border border-zinc-700 text-zinc-200 active:bg-zinc-900'
-  const whiteBtn = 'min-h-11 px-4 text-xs font-bold uppercase tracking-wider border border-white bg-white text-black active:bg-zinc-300'
+  const toolbarBtn = 'btn-ghost min-h-11 px-5 rounded-full text-xs sm:text-sm font-medium text-zinc-100'
+  const whiteBtn = 'min-h-11 px-5 rounded-full text-xs sm:text-sm font-semibold bg-white text-black hover:bg-zinc-200 active:bg-zinc-300'
 
   const driverTab = sel != null && store && snap ? (
     <DriverPanel store={store} snap={snap} car={rt.car} n={sel} t={rt.t} onClose={closeDriver} issue={rt.liveIssue} />
@@ -187,13 +187,12 @@ export default function LivePage() {
     const cd = next ? countdown(ms(next.date_start) - now) : null
     return (
       <main className="flex-1 w-full pb-28">
-        <div className="h-1 bg-red-600" />
         <section className={`${wide} pt-8 pb-6`}>
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-red-500">Live</p>
-          <h1 className="mt-2 text-4xl sm:text-5xl font-black uppercase tracking-tighter leading-none">Pas de session en cours</h1>
+          <p className="text-xs font-medium uppercase tracking-[0.22em] text-accent-400">Live</p>
+          <h1 className="mt-2 text-4xl sm:text-5xl font-semibold tracking-tighter leading-none">Pas de session en cours</h1>
           <p className="mt-3 text-zinc-400 max-w-2xl text-sm sm:text-base">Chronos, carte du circuit, stratégie, télémétrie et radios de la F1 en direct — ou rejouez n’importe quelle session passée avec les données d’OpenF1.</p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <button disabled={!lastRace} onClick={() => lastRace && start(lastRace)} className="min-h-12 px-6 inline-flex items-center gap-2.5 bg-red-600 active:bg-red-500 disabled:opacity-40 text-white text-sm font-black uppercase tracking-wider">
+            <button disabled={!lastRace} onClick={() => lastRace && start(lastRace)} className="btn-primary min-h-12 px-7 rounded-full inline-flex items-center gap-2.5 active:scale-[0.98] disabled:opacity-40 text-white text-sm font-semibold">
               <svg viewBox="0 0 24 24" className="size-4" fill="currentColor" aria-hidden><path d="M7 4l13 8-13 8z" /></svg>
               Rejouer une course{lastRace ? ` — ${gpLabel(lastRace)} ${lastRace.year}` : ''}
             </button>
@@ -209,11 +208,11 @@ export default function LivePage() {
             <Card title="Prochaine session">
               <div className="p-4 sm:p-6">
                 <p className="text-sm text-zinc-400 uppercase tracking-wider">{gpLabel(next)} · {next.circuit_short_name}</p>
-                <p className="mt-1 text-2xl sm:text-3xl font-black uppercase tracking-tight">{sessionFr(next.session_name)}</p>
+                <p className="mt-1 text-2xl sm:text-3xl font-semibold tracking-tight">{sessionFr(next.session_name)}</p>
                 <p className="mt-1 text-sm text-zinc-400">{fmtDateFr(next.date_start)} (heure de Paris)</p>
-                <div className="mt-5 grid grid-cols-4 gap-px bg-zinc-800 max-w-md text-center" role="timer" aria-label="Compte à rebours">
+                <div className="mt-5 grid grid-cols-4 gap-px bg-white/10 max-w-md text-center rounded-2xl overflow-hidden" role="timer" aria-label="Compte à rebours">
                   {([['j', cd.d], ['h', cd.h], ['min', cd.m], ['s', cd.s]] as const).map(([u, v]) => (
-                    <div key={u} className="bg-black py-4"><p className="text-3xl sm:text-4xl font-black tabular-nums">{String(v).padStart(2, '0')}</p><p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">{u}</p></div>
+                    <div key={u} className="bg-[#0b0c0d] py-4"><p className="text-3xl sm:text-4xl font-bold tabular-nums">{String(v).padStart(2, '0')}</p><p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">{u}</p></div>
                   ))}
                 </div>
               </div>
@@ -241,24 +240,23 @@ export default function LivePage() {
   const s = active.session
   return (
     <main className="flex-1 w-full pb-28 lg:pb-10">
-      <div className={`h-1 ${isLive ? 'bg-red-600' : 'bg-zinc-700'}`} />
       <section className={`${wide} py-3 flex flex-wrap items-center gap-x-4 gap-y-2`}>
-        <span className={`inline-flex items-center gap-2 px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.18em] ${isLive ? 'bg-red-600 text-white' : 'bg-zinc-800 text-zinc-200'}`}>
+        <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${isLive ? 'bg-accent-500 text-white' : 'bg-white/10 text-zinc-200'}`}>
           {isLive && <span className="size-2 rounded-full bg-white animate-pulse" />}{isLive ? 'Live' : 'Rejeu'}
         </span>
         <div className="min-w-0">
-          <h1 className="font-black uppercase tracking-tight text-xl sm:text-2xl leading-tight truncate">{gpLabel(s)} {s.year} · {sessionFr(s.session_name)}</h1>
+          <h1 className="font-semibold tracking-tight text-xl sm:text-2xl leading-tight truncate">{gpLabel(s)} {s.year} · {sessionFr(s.session_name)}</h1>
           <p className="text-xs text-zinc-500 truncate">{s.circuit_short_name}{s.location && s.location !== s.circuit_short_name ? ` · ${s.location}` : ''}</p>
         </div>
         {snap && (
           <div className="flex items-center gap-3 sm:ml-auto flex-wrap">
             <div className="flex items-baseline gap-2 tabular-nums" aria-label="Compteur de tours">
               <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">Tour</span>
-              <span className="text-3xl font-black leading-none">{snap.lap || '—'}</span>
+              <span className="text-3xl font-bold leading-none">{snap.lap || '—'}</span>
               {snap.totalLaps && <span className="text-zinc-500 text-lg font-bold">/ {snap.totalLaps}</span>}
             </div>
             {track && (
-              <span className={`inline-flex items-center gap-2 px-3 min-h-9 text-xs font-black uppercase tracking-wider ${track.cls}`}>
+              <span className={`inline-flex items-center gap-2 rounded-full px-3.5 min-h-9 text-xs font-semibold ${track.cls}`}>
                 {snap.track.kind !== 'NONE' && <FlagIcon flag={snap.track.kind === 'GREEN' ? 'GREEN' : snap.track.kind === 'YELLOW' ? 'YELLOW' : snap.track.kind === 'RED' ? 'RED' : snap.track.kind === 'CHEQUERED' ? 'CHEQUERED' : null} cat={snap.track.kind === 'SC' ? 'SafetyCar' : snap.track.kind === 'VSC' ? 'SafetyCar' : 'Flag'} msg={snap.track.kind === 'VSC' ? 'VSC' : snap.track.kind === 'SC' ? 'SAFETY CAR' : ''} size={16} />}
                 {track.label}{snap.track.yellowSectors.length > 0 && snap.track.kind !== 'YELLOW' ? ` · jaune S${snap.track.yellowSectors.join(', S')}` : ''}
               </span>
@@ -268,7 +266,7 @@ export default function LivePage() {
         )}
         <div className={`flex gap-2 ${snap ? '' : 'sm:ml-auto'}`}>
           {isLive && lastRace && <button onClick={() => start(lastRace)} className={toolbarBtn}>Rejouer</button>}
-          {chosen && liveSession && chosen.session.session_key !== liveSession.session_key && <button onClick={() => setChosen(null)} className={`${toolbarBtn} border-red-600`}>Retour au direct</button>}
+          {chosen && liveSession && chosen.session.session_key !== liveSession.session_key && <button onClick={() => setChosen(null)} className={`${toolbarBtn} border-accent-500`}>Retour au direct</button>}
           <button onClick={() => setPicker(true)} className={toolbarBtn}>Sessions</button>
           {chosen && !liveSession && <button onClick={() => { setChosen(null); closeDriver() }} className={toolbarBtn} aria-label="Quitter le rejeu">Fermer</button>}
         </div>
@@ -278,7 +276,7 @@ export default function LivePage() {
         <div className={`${wide} py-16 flex flex-col items-center gap-4 text-center`} role="status" aria-live="polite">
           <Spinner />
           <p className="text-sm text-zinc-300">Chargement de la session… <span className="text-zinc-500">{rt.progress ? `${rt.progress.label} (${rt.progress.done}/${rt.progress.total})` : ''}</span></p>
-          <div className="w-64 max-w-full h-1 bg-zinc-800"><div className="h-full bg-red-600 transition-all" style={{ width: `${rt.progress ? (rt.progress.done / rt.progress.total) * 100 : 5}%` }} /></div>
+          <div className="w-64 max-w-full h-1 bg-zinc-800"><div className="h-full bg-accent-500 transition-all" style={{ width: `${rt.progress ? (rt.progress.done / rt.progress.total) * 100 : 5}%` }} /></div>
         </div>
       )}
 

@@ -6,7 +6,7 @@ export function TyreDot({ c, size = 18 }: { c?: string | null; size?: number }) 
   const k = compound(c)
   return (
     <span
-      className="inline-flex items-center justify-center rounded-full font-black leading-none shrink-0"
+      className="inline-flex items-center justify-center rounded-full font-bold leading-none shrink-0"
       style={{ width: size, height: size, fontSize: size * 0.55, border: `2.5px solid ${k.color}`, color: k.color }}
       title={k.label}
       aria-label={k.label}
@@ -22,7 +22,7 @@ export function FlagIcon({ flag, cat, msg, size = 18 }: { flag?: string | null; 
   const s = { width: size, height: size * 0.72 }
   if (cat === 'SafetyCar') {
     const v = /VSC|VIRTUAL/i.test(msg ?? '')
-    return <span className="inline-flex items-center justify-center rounded-sm bg-orange-500 text-black font-black shrink-0" style={{ ...s, width: size * 1.5, fontSize: size * 0.5 }}>{v ? 'VSC' : 'SC'}</span>
+    return <span className="inline-flex items-center justify-center rounded-sm bg-orange-500 text-black font-bold shrink-0" style={{ ...s, width: size * 1.5, fontSize: size * 0.5 }}>{v ? 'VSC' : 'SC'}</span>
   }
   if (f === 'CHEQUERED') {
     return (
@@ -48,10 +48,10 @@ export function FlagIcon({ flag, cat, msg, size = 18 }: { flag?: string | null; 
 
 export function Card({ title, right, children, className = '' }: { title?: string; right?: ReactNode; children: ReactNode; className?: string }) {
   return (
-    <section className={`bg-zinc-950 border border-zinc-800 ${className}`}>
+    <section className={`bg-zinc-950 border border-white/10 rounded-2xl overflow-hidden shadow-glow ${className}`}>
       {(title || right) && (
-        <header className="flex items-center justify-between gap-3 px-3 sm:px-4 h-10 border-b border-zinc-800">
-          {title && <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400">{title}</h3>}
+        <header className="flex items-center justify-between gap-3 px-3 sm:px-4 h-11 border-b border-white/[0.07]">
+          {title && <h3 className="kicker">{title}</h3>}
           {right}
         </header>
       )}
@@ -62,14 +62,14 @@ export function Card({ title, right, children, className = '' }: { title?: strin
 
 export function Tabs<T extends string>({ tabs, value, onChange, label }: { tabs: { key: T; label: string }[]; value: T; onChange: (k: T) => void; label: string }) {
   return (
-    <div role="tablist" aria-label={label} className="flex overflow-x-auto border-b border-zinc-800 [scrollbar-width:none]">
+    <div role="tablist" aria-label={label} className="flex overflow-x-auto border-b border-white/[0.08] [scrollbar-width:none]">
       {tabs.map((t) => (
         <button
           key={t.key}
           role="tab"
           aria-selected={value === t.key}
           onClick={() => onChange(t.key)}
-          className={`shrink-0 px-3 sm:px-4 min-h-11 text-xs font-bold uppercase tracking-wider border-b-[3px] whitespace-nowrap active:bg-zinc-900 ${value === t.key ? 'border-red-600 text-white' : 'border-transparent text-zinc-400 hover:text-white'}`}
+          className={`shrink-0 px-3 sm:px-4 min-h-11 text-xs sm:text-sm font-medium border-b-2 whitespace-nowrap active:bg-white/5 ${value === t.key ? 'border-accent-500 text-white' : 'border-transparent text-zinc-400 hover:text-white'}`}
         >
           {t.label}
         </button>

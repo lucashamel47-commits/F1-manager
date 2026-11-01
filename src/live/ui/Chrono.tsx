@@ -30,7 +30,7 @@ export default function Chrono({ snap, selected, onSelect }: { snap: Snapshot; s
               <li key={r.n}>
                 <button onClick={() => onSelect(r.n)} className={`w-full flex items-center min-h-10 px-3 text-sm text-left border-b border-zinc-900 tabular-nums ${selected === r.n ? 'bg-zinc-900' : 'active:bg-zinc-900'}`}>
                   <span className="w-8 text-zinc-400">{i + 1}</span>
-                  <span className="w-14 font-black uppercase" style={{ color: r.color }}>{r.acr}</span>
+                  <span className="w-14 font-bold uppercase" style={{ color: r.color }}>{r.acr}</span>
                   <span className={`w-20 text-right ${i === 0 ? 'text-fuchsia-400 font-semibold' : ''}`}>{fmtLap(r.best)}</span>
                   <span className="w-16 text-right text-zinc-400">{i === 0 ? '—' : fmtGap((r.best as number) - lead)}</span>
                   <span className={`w-16 text-right ${sc(0)}`}>{fmtSec(r.pbSec[0])}</span>

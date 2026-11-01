@@ -30,9 +30,9 @@ export function OvertakesFeed({ store, snap }: { store: Store; snap: Snapshot })
         const a = c(o.by), b = c(o.over)
         return (
           <li key={o.t + ':' + i} className="flex items-center gap-2 px-3 min-h-11 border-b border-zinc-900 text-sm">
-            <span className="font-black uppercase" style={{ color: a.col }}>{a.a}</span>
+            <span className="font-bold uppercase" style={{ color: a.col }}>{a.a}</span>
             <span className="text-zinc-500">dépasse</span>
-            <span className="font-black uppercase" style={{ color: b.col }}>{b.a}</span>
+            <span className="font-bold uppercase" style={{ color: b.col }}>{b.a}</span>
             <span className="ml-auto text-xs text-zinc-400 tabular-nums">P{o.pos} · {fmtElapsed(o.t, store.t0)}</span>
           </li>
         )
@@ -52,7 +52,7 @@ export function RadioFeed({ store, snap }: { store: Store; snap: Snapshot }) {
         return (
           <li key={r.t + ':' + i} className="px-3 py-2.5 border-b border-zinc-900">
             <div className="flex items-center justify-between text-sm">
-              <span className="font-black uppercase" style={{ color: d ? `#${d.team_colour}` : undefined }}>{d?.name_acronym ?? r.n} <span className="text-zinc-500 font-normal normal-case">{d?.last_name}</span></span>
+              <span className="font-bold uppercase" style={{ color: d ? `#${d.team_colour}` : undefined }}>{d?.name_acronym ?? r.n} <span className="text-zinc-500 font-normal normal-case">{d?.last_name}</span></span>
               <span className="text-[11px] text-zinc-500 tabular-nums">{fmtClock(r.t)}</span>
             </div>
             <audio className="mt-1.5 w-full h-9" controls preload="none" src={r.url} />
@@ -86,7 +86,7 @@ export function WeatherPanel({ store, w, t }: { store: Store; w: Weather | null;
       {cells.map((c) => (
         <div key={c.k} className="bg-zinc-950 p-3">
           <p className="text-[10px] uppercase tracking-[0.18em] text-zinc-500">{c.k}</p>
-          <p className="mt-1 text-xl font-black tabular-nums flex items-center gap-2" style={{ color: c.k === 'Pluie' ? c.color : undefined }}>
+          <p className="mt-1 text-xl font-bold tabular-nums flex items-center gap-2" style={{ color: c.k === 'Pluie' ? c.color : undefined }}>
             {c.v}
             {c.k === 'Vent' && (
               <svg viewBox="0 0 24 24" className="size-5 text-zinc-300" style={{ transform: `rotate(${w.dir + 180}deg)` }} fill="currentColor" aria-label={`Vent à ${Math.round(w.dir)}°`}><path d="M12 2l5 16-5-3-5 3z" /></svg>
