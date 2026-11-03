@@ -61,7 +61,7 @@ export default function PwaStatus() {
               <>
                 <p className="flex-1 text-sm text-zinc-100">Une nouvelle version de F1 Manager est disponible.</p>
                 <button onClick={() => setUpdDismissed(true)} className="min-h-11 px-2 text-xs text-zinc-400 active:text-white">Plus tard</button>
-                <button onClick={() => updateServiceWorker(true)} className="min-h-11 px-5 rounded-full text-xs font-semibold bg-white text-black active:bg-zinc-300">Mettre à jour</button>
+                <button onClick={() => updateServiceWorker(true)} className="min-h-11 px-5 rounded-full text-xs font-semibold btn-primary text-white">Mettre à jour</button>
               </>
             ) : (
               <>

@@ -26,7 +26,7 @@ export default function Picker({ sessions, loading, year, years, onYear, onPick,
         </header>
         <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/[0.06] shrink-0 overflow-x-auto [scrollbar-width:none]">
           {years.map((y) => (
-            <button key={y} onClick={() => onYear(y)} aria-pressed={y === year} className={`min-h-10 px-4 rounded-full text-sm font-semibold border ${y === year ? 'bg-white text-black border-white' : 'border-white/15 text-zinc-300 hover:bg-white/5'}`}>{y}</button>
+            <button key={y} onClick={() => onYear(y)} aria-pressed={y === year} className={`min-h-10 px-4 rounded-full text-sm font-semibold border ${y === year ? 'bg-gradient-to-br from-[#5b7cff] to-[#7a5cf5] text-white border-transparent' : 'border-white/15 text-zinc-300 hover:bg-white/5'}`}>{y}</button>
           ))}
           <span className="mx-1 h-5 w-px bg-zinc-800" />
           {(['all', 'race'] as const).map((f) => (

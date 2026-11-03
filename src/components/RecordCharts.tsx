@@ -17,7 +17,7 @@ function useWidth<T extends HTMLElement>(): [React.RefObject<T | null>, number] 
 }
 
 const Readout = ({ children }: { children: React.ReactNode }) => (
-  <p className="min-h-10 mt-3 text-sm text-zinc-300 leading-snug" aria-live="polite">{children}</p>
+  <p className="min-h-10 mt-6 text-sm text-zinc-300 leading-snug" aria-live="polite">{children}</p>
 )
 
 /* ---------------------------------------------------------------------------
@@ -38,27 +38,27 @@ export function CountryBars() {
 
   return (
     <div className="min-w-0">
-      <div className="flex gap-x-6" role="tablist" aria-label="Pilotes ou constructeurs">
+      <div className="seg" role="tablist" aria-label="Pilotes ou constructeurs">
         {(['drivers', 'constructors'] as const).map((k) => (
           <button key={k} role="tab" aria-selected={kind === k} onClick={() => { setKind(k); setSel(null) }}
-            className={`min-h-11 text-sm border-b ${kind === k ? 'text-white border-accent-500' : 'text-zinc-500 border-transparent hover:text-zinc-200'}`}>
+            className="seg-item">
             {k === 'drivers' ? 'Pilotes' : 'Constructeurs'}
           </button>
         ))}
       </div>
-      <ul className="mt-2 space-y-1" key={kind}>
+      <ul className="mt-6 space-y-1.5" key={kind}>
         {data.map(([nat, n], i) => (
           <li key={nat}>
             <button
               onClick={() => setSel(sel === nat ? null : nat)}
               onMouseEnter={() => setSel(nat)}
               onFocus={() => setSel(nat)}
-              className="w-full text-left grid grid-cols-[7.5rem_1fr_1.75rem] sm:grid-cols-[8.5rem_1fr_2rem] items-center gap-3 min-h-9"
+              className="w-full text-left grid grid-cols-[7.5rem_1fr_1.75rem] sm:grid-cols-[8.5rem_1fr_2rem] items-center gap-3 min-h-11"
               aria-label={`${nat} : ${n} titres`}
             >
               <span className={`truncate text-sm ${sel === nat ? 'text-white' : 'text-zinc-400'}`}>{nat}</span>
-              <span className="h-2 bg-zinc-900 block overflow-hidden">
-                <span className={`grow-x block h-full ${sel === nat || (sel === null && i === 0) ? 'bg-zinc-200' : 'bg-zinc-600'}`} style={{ width: `${(n / max) * 100}%`, animationDelay: `${i * 60}ms` }} />
+              <span className="h-2.5 block bar-rail">
+                <span className={`grow-x block h-full rounded-full ${sel === nat || (sel === null && i === 0) ? 'bar-fill' : 'bg-white/20'}`} style={{ width: `${(n / max) * 100}%`, animationDelay: `${i * 60}ms` }} />
               </span>
               <span className="text-right text-sm tabular-nums text-zinc-300">{n}</span>
             </button>
@@ -98,8 +98,8 @@ export function DecadeChart() {
     return out
   }, [])
   const order = [...DYNASTY_TEAMS, 'Autres']
-  const H = 190
-  const mT = 8, mB = 26, mL = 22
+  const H = 260
+  const mT = 10, mB = 30, mL = 26
   const innerH = H - mT - mB
   const innerW = Math.max(0, w - mL)
   const slot = innerW / decades.length
@@ -111,10 +111,21 @@ export function DecadeChart() {
     <div className="min-w-0" ref={ref}>
       {w > 0 && (
         <svg width={w} height={H} role="img" aria-label="Titres constructeurs par décennie, par écurie">
+          <defs>
+            {order.map((t) => {
+              const c = t === 'Autres' ? '#71717a' : colorFor(t)
+              return (
+                <linearGradient key={t} id={`dg-${t.replace(/\s/g, '')}`} x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0" stopColor={c} stopOpacity="0.95" />
+                  <stop offset="1" stopColor={c} stopOpacity="0.6" />
+                </linearGradient>
+              )
+            })}
+          </defs>
           {[0, 5, 10].map((v) => (
             <g key={v}>
-              <line x1={mL} x2={w} y1={y(v)} y2={y(v)} stroke="#27272a" strokeWidth="1" />
-              <text x={mL - 6} y={y(v) + 3.5} textAnchor="end" fontSize="10" fill="#71717a">{v}</text>
+              <line x1={mL} x2={w} y1={y(v)} y2={y(v)} stroke="rgb(255 255 255 / 0.07)" strokeDasharray="3 5" />
+              <text x={mL - 8} y={y(v) + 3.5} textAnchor="end" fontSize="11" fill="#8d9092">{v}</text>
             </g>
           ))}
           {decades.map((d, i) => {
@@ -140,18 +151,18 @@ export function DecadeChart() {
                     const top = y(acc + v)
                     const h = y(acc) - top
                     acc += v
-                    return <rect key={t} x={x} y={top} width={bw} height={Math.max(0, h - 1)} fill={t === 'Autres' ? '#52525b' : colorFor(t)} fillOpacity={0.8} />
+                    return <rect key={t} x={x} y={top} width={bw} height={Math.max(0, h - 2)} rx={4} fill={`url(#dg-${t.replace(/\s/g, '')})`} />
                   })}
                 </g>
-                <text x={mL + slot * i + slot / 2} y={H - 8} textAnchor="middle" fontSize="11" fill={sel === d.decade ? '#fff' : '#a1a1aa'}>{String(d.decade).slice(2)}s</text>
+                <text x={mL + slot * i + slot / 2} y={H - 8} textAnchor="middle" fontSize="12" fill={sel === d.decade ? '#fff' : '#8d9092'}>{String(d.decade).slice(2)}s</text>
               </g>
             )
           })}
         </svg>
       )}
-      <ul className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-zinc-500">
+      <ul className="flex flex-wrap gap-x-5 gap-y-2 mt-4 text-xs text-zinc-500">
         {order.map((t) => (
-          <li key={t} className="flex items-center gap-1.5"><span className="h-2 w-2 inline-block" style={{ background: t === 'Autres' ? '#52525b' : colorFor(t) }} />{t}</li>
+          <li key={t} className="flex items-center gap-1.5"><span className="h-2 w-2 inline-block rounded-full" style={{ background: t === 'Autres' ? '#71717a' : colorFor(t) }} />{t}</li>
         ))}
       </ul>
       <Readout>
@@ -183,8 +194,8 @@ export function TitlesRace() {
   const [ref, w] = useWidth<HTMLDivElement>()
   const [year, setYear] = useState<number | null>(null)
   const Y0 = 1950, Y1 = 2025
-  const H = w >= 700 ? 280 : 230
-  const mT = 10, mB = 24, mL = 22, mR = 6
+  const H = w >= 700 ? 340 : 250
+  const mT = 12, mB = 28, mL = 26, mR = 10
   const innerW = Math.max(0, w - mL - mR)
   const innerH = H - mT - mB
   const x = (yr: number) => mL + ((yr - Y0) / (Y1 - Y0)) * innerW
@@ -234,30 +245,30 @@ export function TitlesRace() {
         >
           {[0, 2, 4, 6].map((v) => (
             <g key={v}>
-              <line x1={mL} x2={w - mR} y1={y(v)} y2={y(v)} stroke="#27272a" strokeWidth="1" />
-              <text x={mL - 6} y={y(v) + 3.5} textAnchor="end" fontSize="10" fill="#71717a">{v}</text>
+              <line x1={mL} x2={w - mR} y1={y(v)} y2={y(v)} stroke="rgb(255 255 255 / 0.07)" strokeDasharray="3 5" />
+              <text x={mL - 8} y={y(v) + 3.5} textAnchor="end" fontSize="11" fill="#8d9092">{v}</text>
             </g>
           ))}
-          <line x1={mL} x2={w - mR} y1={y(7)} y2={y(7)} stroke="#27272a" strokeDasharray="2 4" />
-          <text x={mL - 6} y={y(7) + 3.5} textAnchor="end" fontSize="10" fill="#71717a">7</text>
+          <line x1={mL} x2={w - mR} y1={y(7)} y2={y(7)} stroke="rgb(139 156 255 / 0.35)" strokeDasharray="2 5" />
+          <text x={mL - 8} y={y(7) + 3.5} textAnchor="end" fontSize="11" fill="#9aa8ff">7</text>
           {[1950, 1970, 1990, 2010, 2025].map((yr) => (
-            <text key={yr} x={x(yr)} y={H - 6} textAnchor={yr === 1950 ? 'start' : yr === 2025 ? 'end' : 'middle'} fontSize="10" fill="#71717a">{yr}</text>
+            <text key={yr} x={x(yr)} y={H - 6} textAnchor={yr === 1950 ? 'start' : yr === 2025 ? 'end' : 'middle'} fontSize="11" fill="#8d9092">{yr}</text>
           ))}
           {series.map((s) => (
-            <path key={s.name} d={toPath(s.d)} pathLength={1} fill="none" stroke={s.color} strokeWidth={1.8} strokeLinejoin="round" className="draw-line" opacity={year === null ? 0.9 : 0.85} />
+            <path key={s.name} d={toPath(s.d)} pathLength={1} fill="none" stroke={s.color} strokeWidth={2.4} strokeLinejoin="round" strokeLinecap="round" className="draw-line chart-glow" opacity={year === null ? 0.9 : 0.85} />
           ))}
           {year !== null && (
             <g>
-              <line x1={x(year)} x2={x(year)} y1={mT} y2={H - mB} stroke="#e4e4e7" strokeOpacity="0.5" />
-              {series.map((s) => <circle key={s.name} cx={x(year)} cy={y(countAt(s.years, year))} r="3" fill={s.color} />)}
+              <line x1={x(year)} x2={x(year)} y1={mT} y2={H - mB} stroke="#9aa8ff" strokeOpacity="0.55" strokeDasharray="3 4" />
+              {series.map((s) => <circle key={s.name} cx={x(year)} cy={y(countAt(s.years, year))} r="4.5" fill={s.color} stroke="#08090a" strokeWidth="2" />)}
             </g>
           )}
         </svg>
       )}
-      <ul className="mt-1 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1 text-xs">
+      <ul className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-2.5 text-sm">
         {rows.map((r) => (
           <li key={r.name} className="flex items-center gap-1.5 text-zinc-400">
-            <span className="h-0.5 w-3 inline-block" style={{ background: r.color }} />
+            <span className="h-1 w-4 inline-block rounded-full" style={{ background: r.color, boxShadow: `0 0 10px -1px ${r.color}aa` }} />
             <span className="truncate">{r.short}</span>
             <span className="ml-auto tabular-nums text-zinc-200">{r.n}</span>
           </li>

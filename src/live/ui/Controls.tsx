@@ -20,7 +20,7 @@ export default function Controls({ rt, lap, totalLaps, onLap }: { rt: Runtime; l
       </button>
       <div className="flex rounded-full border border-white/10 bg-white/[0.04] p-0.5" role="radiogroup" aria-label="Vitesse de lecture">
         {speeds.map((s) => (
-          <button key={s} role="radio" aria-checked={rt.speed === s} onClick={() => rt.setSpeed(s)} className={`min-h-10 min-w-12 px-3 rounded-full text-sm font-semibold tabular-nums ${rt.speed === s ? 'bg-white text-black' : 'text-zinc-300 hover:bg-white/5'}`}>×{s}</button>
+          <button key={s} role="radio" aria-checked={rt.speed === s} onClick={() => rt.setSpeed(s)} className={`min-h-10 min-w-12 px-3 rounded-full text-sm font-semibold tabular-nums ${rt.speed === s ? 'bg-gradient-to-br from-[#5b7cff] to-[#7a5cf5] text-white' : 'text-zinc-300 hover:bg-white/5'}`}>×{s}</button>
         ))}
       </div>
       <div className="flex rounded-full border border-white/10 bg-white/[0.04] p-0.5">

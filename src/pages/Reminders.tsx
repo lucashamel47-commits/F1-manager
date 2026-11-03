@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { LogoMark, TopBar, SectionTitle } from '../components/MotorNav'
 import { getCalendar, type Race } from '../lib/f1api'
 import { allSessions, buildIcs, countdown, formatWhen, KIND_LABEL, nextSession, type SessionKind } from '../lib/sessions'
 import { DEFAULT_PREFS, fetchRemote, LEAD_CHOICES, loadLocal, saveLocal, saveRemote, type Prefs } from '../lib/reminders'
@@ -15,13 +16,13 @@ function Toggle({ on, onClick, children, sub }: { on: boolean; onClick: () => vo
       role="switch"
       aria-checked={on}
       onClick={onClick}
-      className="w-full min-h-14 flex items-center gap-4 px-4 text-left border-b border-white/[0.06] hover:bg-white/[0.03] active:bg-white/[0.05]"
+      className="w-full min-h-16 flex items-center gap-4 px-7 text-left border-b border-white/[0.06] hover:bg-white/[0.03] active:bg-white/[0.05]"
     >
       <span className="flex-1">
         <span className="block text-sm font-semibold">{children}</span>
         {sub && <span className="block text-xs text-zinc-500 mt-0.5">{sub}</span>}
       </span>
-      <span className={`relative w-11 h-6 rounded-full transition ${on ? 'bg-accent-500' : 'bg-zinc-700'}`} aria-hidden>
+      <span className={`relative w-11 h-6 rounded-full transition ${on ? 'bg-gradient-to-r from-[#5b7cff] to-[#7a5cf5] shadow-[0_0_16px_-2px_rgb(99_102_241_/_0.7)]' : 'bg-white/15'}`} aria-hidden>
         <span className={`absolute top-0.5 size-5 rounded-full bg-white transition-all ${on ? 'left-[22px]' : 'left-0.5'}`} />
       </span>
     </button>
@@ -30,8 +31,8 @@ function Toggle({ on, onClick, children, sub }: { on: boolean; onClick: () => vo
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="glass rounded-3xl overflow-hidden">
-      <h2 className="px-5 pt-5 pb-3 kicker">{title}</h2>
+    <section className="glass rounded-[1.75rem] overflow-hidden">
+      <h2 className="px-7 pt-7 pb-4 kicker">{title}</h2>
       {children}
     </section>
   )
@@ -117,7 +118,7 @@ export default function Reminders({ onBack, user }: { onBack: () => void; user: 
           </Toggle>
         ))}
       </div>
-      <div className="px-4 py-4">
+      <div className="px-7 py-6">
         <p className="text-sm font-semibold">Combien de temps avant ?</p>
         <p className="text-xs text-zinc-500 mt-0.5 mb-3">Tu peux en choisir plusieurs.</p>
         <div className="flex flex-wrap gap-2">
@@ -136,43 +137,39 @@ export default function Reminders({ onBack, user }: { onBack: () => void; user: 
 
   const unit = (v: number, u: string) => (
     <div className="flex-1 text-center">
-      <div className="text-4xl sm:text-6xl font-semibold tabular-nums tracking-tighter text-gradient">{String(v).padStart(2, '0')}</div>
+      <div className="text-5xl sm:text-7xl font-semibold tabular-nums tracking-[-0.05em] text-gradient">{String(v).padStart(2, '0')}</div>
       <div className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mt-1">{u}</div>
     </div>
   )
 
   return (
-    <div className="min-h-dvh w-full text-white">
-      <header className="sticky top-0 z-30 w-full bg-[#08090a]/75 backdrop-blur-xl backdrop-saturate-150 border-b border-white/[0.08]">
-        <div className="flex items-center gap-3 px-4 sm:px-5 lg:px-6 h-14 lg:h-16">
-          <button onClick={onBack} aria-label="Changer de mode" className="-ml-2 min-h-11 px-2 flex items-center gap-1.5 text-zinc-400 hover:text-white active:text-white">
-            <span className="text-xl leading-none">‹</span>
-            <span className="text-sm font-medium">Modes</span>
-          </button>
-          <div className="flex items-center gap-2">
-            <span className="bg-white text-black font-bold px-2 py-1 rounded-md text-sm leading-none tracking-tight">F1</span>
-            <span className="font-semibold tracking-tight text-lg leading-none">Manager</span>
-          </div>
-          <span className="ml-auto rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium">Rappels</span>
+    <div className="min-h-dvh w-full text-white pb-20">
+      <TopBar>
+        <div className="app-wrap flex items-center gap-3 h-16 lg:h-[4.5rem]">
+          <button onClick={onBack} aria-label="Changer de mode" className="-ml-2 min-h-11 min-w-11 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/5 text-xl active:text-white">‹</button>
+          <LogoMark />
+          <span className="ml-auto chip">Rappels</span>
         </div>
-      </header>
+      </TopBar>
 
-      <main className="w-full px-4 sm:px-5 lg:px-6 py-6 grid gap-6 lg:grid-cols-2 items-start">
+      <main className="app-page">
+      <SectionTitle h1 kicker="Rappels" title="Ne rate plus une session" desc="Compte à rebours, alertes et calendrier." />
+      <div className="grid gap-8 lg:gap-10 lg:grid-cols-2 items-start">
         {/* Compte à rebours : fonctionne sans serveur ni autorisation */}
         <Section title="Prochaine session">
-          <div className="px-5 pb-5">
+          <div className="px-7 pb-7">
             {calErr && <p className="text-sm text-zinc-400">Calendrier indisponible pour le moment (hors ligne ?).</p>}
             {!calendar && !calErr && <p className="text-sm text-zinc-500">Chargement du calendrier…</p>}
             {calendar && !next && <p className="text-sm text-zinc-400">Plus aucune session cette saison. Le calendrier de la prochaine saison arrive bientôt.</p>}
             {next && cd && (
               <>
-                <p className="text-xl font-bold">{next.label}</p>
+                <p className="text-2xl font-semibold tracking-[-0.03em]">{next.label}</p>
                 <p className="text-sm text-zinc-400 mt-0.5">{next.gp} · {next.place}</p>
                 <p className="text-xs text-zinc-500 mt-1 first-letter:uppercase">{formatWhen(next.start)}</p>
                 {started ? (
                   <p className="mt-5 inline-flex items-center gap-2 text-sm font-semibold tracking-[0.2em] text-accent-400"><span className="size-2 rounded-full bg-accent-500 animate-pulse" />En cours</p>
                 ) : (
-                  <div className="mt-5 flex items-start gap-2" role="timer" aria-label="Compte à rebours">
+                  <div className="mt-8 flex items-start gap-2" role="timer" aria-label="Compte à rebours">
                     {unit(cd.d, 'jours')}{unit(cd.h, 'heures')}{unit(cd.m, 'min')}{unit(cd.s, 'sec')}
                   </div>
                 )}
@@ -203,7 +200,7 @@ export default function Reminders({ onBack, user }: { onBack: () => void; user: 
               <div className={prefs.enabled ? '' : 'opacity-40 pointer-events-none'} aria-disabled={!prefs.enabled}>
                 {choices}
               </div>
-              <div className="px-4 pb-4">
+              <div className="px-7 pb-7">
                 <button
                   onClick={save}
                   disabled={!dirty || status === 'saving' || loading || (prefs.enabled && noKind)}
@@ -227,7 +224,7 @@ export default function Reminders({ onBack, user }: { onBack: () => void; user: 
           )}
 
           <Section title="Ton calendrier">
-            <div className="px-4 pb-4 text-sm">
+            <div className="px-7 pb-7 text-sm">
               <p className="text-zinc-400 leading-relaxed">Ajoute les sessions choisies ({nbIcs || '…'}) à l'app Calendrier de l'iPad, avec une alerte aux délais choisis. Ça marche toujours, sans compte.</p>
               <button onClick={downloadIcs} disabled={!calendar} className="btn-ghost mt-4 w-full min-h-12 rounded-full font-medium disabled:opacity-40">
                 Ajouter au Calendrier (.ics)
@@ -235,6 +232,7 @@ export default function Reminders({ onBack, user }: { onBack: () => void; user: 
             </div>
           </Section>
         </div>
+      </div>
       </main>
     </div>
   )

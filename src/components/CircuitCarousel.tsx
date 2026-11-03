@@ -72,11 +72,11 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
 
   return (
     <section aria-labelledby="circuits-title" className="col-span-full min-w-0">
-      <div className="flex items-end justify-between gap-4 mb-4">
+      <div className="flex items-end justify-between gap-4 mb-10">
         <div className="min-w-0">
-          <p className="text-accent-400 text-[11px] font-medium tracking-[0.22em] uppercase">Calendrier</p>
-          <h2 id="circuits-title" className="mt-1 text-xl sm:text-2xl font-semibold tracking-tight">Les circuits</h2>
-          <p className="mt-1 text-sm text-zinc-400">Faites défiler les {circuits.length} Grands Prix. Touchez un circuit pour ouvrir sa fiche.</p>
+          <p className="kicker inline-flex items-center gap-2.5 !text-accent-400"><span className="size-1.5 rounded-full bg-accent-400 shadow-[0_0_10px_2px_rgb(99_102_241_/_0.7)]" aria-hidden />Calendrier</p>
+          <h2 id="circuits-title" className="text-gradient mt-5 text-3xl sm:text-5xl font-semibold tracking-[-0.045em] leading-[1.08]">Les circuits</h2>
+          <p className="mt-4 text-base text-zinc-400">Faites défiler les {circuits.length} Grands Prix. Touchez un circuit pour ouvrir sa fiche.</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {active !== nextIdx && (
@@ -105,7 +105,7 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
         onScroll={onScroll}
         role="region"
         aria-label="Circuits de la saison"
-        className="relative -mx-4 sm:-mx-5 lg:-mx-6 px-4 sm:px-5 lg:px-6 scroll-pl-4 sm:scroll-pl-5 lg:scroll-pl-6 flex gap-3 sm:gap-4 overflow-x-auto snap-x snap-mandatory overscroll-x-contain pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="relative -mx-5 sm:-mx-8 lg:-mx-10 px-5 sm:px-8 lg:px-10 scroll-pl-5 sm:scroll-pl-8 lg:scroll-pl-10 flex gap-5 sm:gap-6 py-2 overflow-x-auto snap-x snap-mandatory overscroll-x-contain pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {circuits.map((c) => {
           const st = status(c, nextRound)
@@ -115,26 +115,26 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
               key={c.round}
               onClick={() => onOpen(c)}
               aria-label={`${c.name}, manche ${c.round}, ouvrir la fiche`}
-              className={`group snap-start shrink-0 w-[82%] sm:w-[46%] lg:w-[31.5%] xl:w-[23.5%] text-left bg-zinc-950 border rounded-3xl overflow-hidden transition duration-300 active:scale-[0.99] hover:-translate-y-0.5 ${
+              className={`group snap-start shrink-0 w-[82%] sm:w-[46%] lg:w-[31.5%] xl:w-[23.5%] text-left bg-zinc-950 border rounded-3xl overflow-hidden transition duration-300 active:scale-[0.99] hover:-translate-y-1 ${
                 st.kind === 'next' ? 'border-accent-400/70 shadow-[0_0_40px_-12px_rgb(99_102_241_/_0.55)]' : 'border-white/10 hover:border-white/30'
               }`}
             >
-              <div className="relative aspect-video bg-zinc-100 overflow-hidden">
+              <div className="relative aspect-video bg-[#e9ebf5] overflow-hidden">
                 {c.map ? (
                   <img src={c.map} alt="" loading="lazy" draggable={false} className="absolute inset-0 w-full h-full object-contain p-3 group-hover:scale-105 transition duration-500" />
                 ) : (
                   <div className="absolute inset-0 grid place-items-center text-xs text-zinc-500 px-4 text-center">Plan bientôt disponible</div>
                 )}
                 <span className="absolute top-2.5 left-2.5 bg-black/80 backdrop-blur text-white text-[11px] font-semibold px-2.5 py-1 rounded-full">R{c.round}</span>
-                {st.kind === 'next' && <span className="absolute top-2.5 right-2.5 bg-accent-500 text-white text-[11px] font-semibold tracking-wide px-3 py-1 rounded-full">Prochain GP</span>}
+                {st.kind === 'next' && <span className="absolute top-2.5 right-2.5 chip">Prochain GP</span>}
               </div>
-              <div className="p-4">
+              <div className="p-6">
                 <div className="flex items-center justify-between gap-3">
                   <h3 className="min-w-0 truncate text-lg font-semibold tracking-tight"><span className="mr-2" aria-hidden>{c.flag}</span>{c.name}</h3>
                   <span className="text-zinc-500 group-hover:text-white transition shrink-0"><Chevron dir="r" /></span>
                 </div>
                 <p className="mt-0.5 text-xs text-zinc-400 truncate">{c.circuit} · {c.country} · {fmtDay(c.iso)}</p>
-                <dl className="mt-3 grid grid-cols-3 gap-2 border-t border-white/[0.07] pt-3 text-xs">
+                <dl className="mt-5 grid grid-cols-3 gap-2 border-t border-white/[0.07] pt-4 text-xs">
                   <div><dt className="text-zinc-500">Tours</dt><dd className="mt-0.5 font-semibold tabular-nums">{c.laps ?? '—'}</dd></div>
                   <div><dt className="text-zinc-500">Longueur</dt><dd className="mt-0.5 font-semibold tabular-nums whitespace-nowrap">{c.length.replace(' km', '')} km</dd></div>
                   <div><dt className="text-zinc-500">Record</dt><dd className="mt-0.5 font-semibold tabular-nums">{c.record ?? '—'}</dd></div>

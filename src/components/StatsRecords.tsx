@@ -24,14 +24,14 @@ const CATS: { key: RecordCat; label: string; unit: string }[] = [
 /** Petit sélecteur texte souligné (calme, sans fond coloré). */
 function Switch<T extends string>({ value, options, onChange, label, className = '' }: { value: T; options: { key: T; label: string }[]; onChange: (k: T) => void; label: string; className?: string }) {
   return (
-    <div role="tablist" aria-label={label} className={`flex gap-x-6 gap-y-1 flex-wrap ${className}`}>
+    <div role="tablist" aria-label={label} className={`seg ${className}`}>
       {options.map((o) => (
         <button
           key={o.key}
           role="tab"
           aria-selected={value === o.key}
           onClick={() => onChange(o.key)}
-          className={`min-h-11 text-sm transition-colors border-b ${value === o.key ? 'text-white border-accent-500' : 'text-zinc-500 border-transparent hover:text-zinc-200'}`}
+          className="seg-item"
         >
           {o.label}
         </button>
@@ -41,9 +41,9 @@ function Switch<T extends string>({ value, options, onChange, label, className =
 }
 
 const Heading = ({ id, kicker, title }: { id: string; kicker: string; title: string }) => (
-  <div className="mb-5">
-    <p className="text-zinc-500 text-xs uppercase tracking-[0.2em]">{kicker}</p>
-    <h2 id={id} className="mt-1 text-xl sm:text-2xl font-bold tracking-tight">{title}</h2>
+  <div className="mb-8">
+    <p className="kicker">{kicker}</p>
+    <h2 id={id} className="text-gradient mt-3 text-2xl sm:text-3xl font-semibold tracking-[-0.035em] leading-[1.1]">{title}</h2>
   </div>
 )
 
@@ -63,21 +63,21 @@ function RecordBoard() {
   return (
     <section aria-labelledby="rec-board" className="min-w-0">
       <Heading id="rec-board" kicker="Classements all-time" title="Les plus grands de l’histoire" />
-      <Switch value={kind} onChange={setKind} label="Pilotes ou écuries" options={[{ key: 'drivers', label: 'Pilotes' }, { key: 'constructors', label: 'Écuries' }]} />
-      <div role="tablist" aria-label="Catégorie de record" className="mt-1 mb-2 grid grid-cols-3 sm:grid-cols-6 xl:grid-cols-3 2xl:grid-cols-6 border border-zinc-800 divide-x divide-y sm:divide-y-0 xl:divide-y 2xl:divide-y-0 divide-zinc-800">
+      <Switch className="" value={kind} onChange={setKind} label="Pilotes ou écuries" options={[{ key: 'drivers', label: 'Pilotes' }, { key: 'constructors', label: 'Écuries' }]} />
+      <div role="tablist" aria-label="Catégorie de record" className="seg mt-4 mb-6">
         {cats.map((c) => (
           <button
             key={c.key}
             role="tab"
             aria-selected={active === c.key}
             onClick={() => setCat(c.key)}
-            className={`min-h-11 px-1 text-[12px] sm:text-xs transition-colors ${active === c.key ? 'bg-zinc-100 text-black font-semibold' : 'text-zinc-400 hover:text-white'}`}
+            className="seg-item !min-h-9 !px-3.5 !text-xs"
           >
             {c.label}
           </button>
         ))}
       </div>
-      <ol className="divide-y divide-zinc-900" key={`${kind}-${active}`}>
+      <ol className="divide-y divide-white/[0.06]" key={`${kind}-${active}`}>
         {rows.map((r, i) => (
           <li key={r.name}>
             <button
@@ -87,21 +87,21 @@ function RecordBoard() {
               onFocus={() => setSel(r.name)}
               onBlur={() => setSel(null)}
               aria-label={`${r.name} : ${r.value} ${unit}, ${Math.round((r.value / max) * 100)} % du record`}
-              className={`w-full text-left py-3 transition-opacity ${sel && sel !== r.name ? 'opacity-50' : ''}`}
+              className={`w-full text-left py-4 transition-opacity ${sel && sel !== r.name ? 'opacity-50' : ''}`}
             >
               <span className="flex items-baseline gap-4">
                 <span className="w-5 shrink-0 text-sm text-zinc-600 tabular-nums">{i + 1}</span>
                 <span className="min-w-0 flex-1">
-                  <span className={`block truncate ${i === 0 ? 'text-lg font-bold' : 'text-base text-zinc-200'}`}>{r.name}</span>
+                  <span className={`block truncate ${i === 0 ? 'text-xl font-semibold tracking-[-0.02em]' : 'text-base text-zinc-300'}`}>{r.name}</span>
                   {(r.note || r.team) && <span className="block text-xs text-zinc-500 truncate">{r.note ?? r.team}</span>}
                 </span>
-                <span className={`shrink-0 tabular-nums ${i === 0 ? 'text-2xl font-bold text-white' : 'text-lg font-semibold text-zinc-300'}`}>
+                <span className={`shrink-0 tabular-nums ${i === 0 ? 'text-gradient text-3xl font-semibold tracking-[-0.03em]' : 'text-lg font-semibold text-zinc-300'}`}>
                   {r.value}
                   <span className="sr-only"> {unit}</span>
                 </span>
               </span>
-              <span className="mt-2 ml-9 block h-1 bg-zinc-900 overflow-hidden" aria-hidden>
-                <span className="grow-x block h-full" style={{ width: `${(r.value / max) * 100}%`, background: colorFor(r.team), opacity: sel === r.name || i === 0 ? 0.9 : 0.55, animationDelay: `${i * 50}ms` }} />
+              <span className="mt-3 ml-9 block h-1.5 bar-rail" aria-hidden>
+                <span className="grow-x block h-full rounded-full" style={{ width: `${(r.value / max) * 100}%`, background: `linear-gradient(90deg, ${colorFor(r.team)}55, ${colorFor(r.team)})`, boxShadow: `0 0 12px -2px ${colorFor(r.team)}99`, opacity: sel === r.name || i === 0 ? 1 : 0.7, animationDelay: `${i * 50}ms` }} />
               </span>
             </button>
           </li>
@@ -119,10 +119,10 @@ function Facts() {
   return (
     <section aria-labelledby="rec-facts" className="min-w-0">
       <Heading id="rec-facts" kicker="Records de référence" title="Faits marquants" />
-      <dl className="grid md:grid-cols-2 xl:grid-cols-1 md:gap-x-10 border-t border-zinc-900">
+      <dl className="grid md:grid-cols-2 md:gap-x-16 border-t border-white/[0.06]">
         {list.map((f) => (
-          <div key={f.label} className="flex items-baseline gap-4 py-3.5 border-b border-zinc-900">
-            <dt className="w-20 sm:w-24 shrink-0 text-xl sm:text-2xl font-bold tabular-nums whitespace-nowrap">{f.value}</dt>
+          <div key={f.label} className="flex items-baseline gap-5 py-5 border-b border-white/[0.06]">
+            <dt className="w-20 sm:w-24 shrink-0 text-gradient text-2xl sm:text-3xl font-semibold tracking-[-0.03em] tabular-nums whitespace-nowrap">{f.value}</dt>
             <dd className="min-w-0 flex-1">
               <p className="text-sm sm:text-base text-zinc-200">{f.label}</p>
               <p className="text-xs text-zinc-500">{f.holder}</p>
@@ -173,7 +173,7 @@ function SeasonDetail({ year, kind }: { year: number; kind: Kind }) {
   const { data } = res
   return (
     <div className="pb-4">
-      <ol className="divide-y divide-zinc-900 text-sm">
+      <ol className="divide-y divide-white/[0.06] text-sm">
         {data.top.map((t, i) => (
           <li key={t.name} className="flex items-baseline gap-3 py-2.5">
             <span className="w-4 text-zinc-600 tabular-nums">{i + 1}</span>
@@ -251,7 +251,7 @@ function Champions() {
 
   const liveRow = (
     <li key="live">
-      <button onClick={() => setOpen(open === season ? null : season)} aria-expanded={open === season} className="w-full text-left flex items-baseline gap-4 min-h-14 py-3.5">
+      <button onClick={() => setOpen(open === season ? null : season)} aria-expanded={open === season} className="w-full text-left flex items-baseline gap-4 min-h-16 py-4">
         <span className="w-12 shrink-0 text-base tabular-nums text-zinc-500">{season}</span>
         <span className="min-w-0 flex-1">
           <span className="block truncate text-base">
@@ -275,24 +275,24 @@ function Champions() {
         options={[{ key: 'drivers', label: 'Pilotes' }, { key: 'constructors', label: 'Constructeurs' }]}
       />
 
-      <label className="block mt-1">
+      <label className="block">
         <span className="sr-only">Rechercher un champion, une écurie ou une année</span>
         <input
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Rechercher un nom, une écurie, une année"
-          className="w-full min-h-12 bg-transparent border-b border-zinc-800 focus:border-accent-500 outline-none text-base placeholder:text-zinc-600"
+          className="mt-6 w-full min-h-12 rounded-full bg-white/[0.03] border border-white/10 px-5 focus:border-accent-400/70 focus:bg-white/[0.05] outline-none text-base placeholder:text-zinc-600"
         />
       </label>
 
-      <div className="mt-2 flex items-center justify-between gap-3">
+      <div className="mt-3 mb-4 flex items-center justify-between gap-3">
         <label className="flex items-center gap-2 text-sm text-zinc-500">
           <span>Décennie</span>
           <select
             value={decade ?? ''}
             onChange={(e) => setDecade(e.target.value === '' ? null : Number(e.target.value))}
-            className="min-h-11 bg-black border-b border-zinc-800 text-zinc-200 text-base outline-none focus:border-accent-500"
+            className="min-h-11 rounded-full bg-[#0e0f11] border border-white/10 px-4 text-zinc-200 text-sm outline-none focus:border-accent-400/70"
           >
             <option value="">Toutes</option>
             {decades.map((d) => <option key={d} value={d}>{d}s</option>)}
@@ -304,14 +304,14 @@ function Champions() {
       </div>
 
       <p className="text-xs text-zinc-600 mb-1" aria-live="polite">{total} saison{total > 1 ? 's' : ''}</p>
-      <ul className="divide-y divide-zinc-900 border-y border-zinc-900">
+      <ul className="divide-y divide-white/[0.06] border-y border-white/[0.06]">
         {desc && showLive && liveRow}
         {shown.map((c: Champion) => {
           const n = counts.get(c.year) ?? 1
           const isOpen = open === c.year
           return (
             <li key={c.year}>
-              <button onClick={() => setOpen(isOpen ? null : c.year)} aria-expanded={isOpen} className="w-full text-left flex items-baseline gap-4 min-h-14 py-3.5">
+              <button onClick={() => setOpen(isOpen ? null : c.year)} aria-expanded={isOpen} className="w-full text-left flex items-baseline gap-4 min-h-16 py-4">
                 <span className="w-12 shrink-0 text-base tabular-nums text-zinc-500">{c.year}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-base">{c.name}</span>
@@ -353,54 +353,54 @@ export default function StatsRecords() {
     { big: String(constructorRecords.titles?.[0]?.value ?? ''), label: 'titres constructeurs', who: constructorRecords.titles?.[0]?.name ?? '' },
   ]
   return (
-    <div className="px-4 sm:px-5 lg:px-6 py-6 sm:py-8 w-full flex-1 space-y-12 sm:space-y-14">
+    <div className="app-page flex-1 space-y-24 sm:space-y-32">
       <SectionTitle h1 kicker="Statistiques" title="Records & Historique" />
 
-      <dl className="grid grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-6 border-t border-zinc-900 pt-8">
+      <dl className="grid grid-cols-2 gap-5 lg:grid-cols-4 lg:gap-6">
         {heroes.map((h) => (
-          <div key={h.label}>
-            <dt className="text-xs text-zinc-500 uppercase tracking-[0.15em]">{h.label}</dt>
-            <dd className="mt-1">
-              <span className="block text-4xl sm:text-5xl font-light tabular-nums leading-none">{h.big}</span>
-              <span className="block mt-2 text-sm text-zinc-400 truncate">{h.who}</span>
+          <div key={h.label} className="panel !p-6 sm:!p-8">
+            <dt className="kicker">{h.label}</dt>
+            <dd className="mt-6">
+              <span className="text-gradient block text-6xl sm:text-7xl font-semibold tabular-nums leading-none tracking-[-0.05em]">{h.big}</span>
+              <span className="block mt-5 text-sm text-zinc-400 truncate">{h.who}</span>
             </dd>
           </div>
         ))}
       </dl>
 
-      <div className="grid gap-12 md:grid-cols-2 md:gap-x-8 lg:gap-x-10 xl:grid-cols-3 items-start">
-        <RecordBoard />
-        <Champions />
-        <div className="min-w-0 md:col-span-2 xl:col-span-1">
+      <div className="grid gap-8 lg:grid-cols-2 lg:gap-10 items-start">
+        <div className="panel"><RecordBoard /></div>
+        <div className="panel"><Champions /></div>
+        <div className="panel lg:col-span-2">
           <Facts />
         </div>
       </div>
 
       <section aria-labelledby="rec-charts" className="min-w-0">
-        <div className="mb-6">
-          <p className="text-zinc-500 text-xs uppercase tracking-[0.2em]">En graphiques</p>
-          <h2 id="rec-charts" className="mt-1 text-xl sm:text-2xl font-bold tracking-tight">70 ans de Formule 1 en un coup d’œil</h2>
+        <div className="mb-10 sm:mb-14">
+          <p className="kicker inline-flex items-center gap-2.5 !text-accent-400"><span className="size-1.5 rounded-full bg-accent-400 shadow-[0_0_10px_2px_rgb(99_102_241_/_0.7)]" aria-hidden />En graphiques</p>
+          <h2 id="rec-charts" className="text-gradient mt-5 text-3xl sm:text-5xl font-semibold tracking-[-0.045em] leading-[1.08]">70 ans de F1 en un coup d’œil</h2>
         </div>
-        <div className="grid gap-12 lg:grid-cols-3 md:gap-x-8 lg:gap-x-10">
-          <div className="min-w-0 md:col-span-2 lg:col-span-1">
-            <h3 className="text-sm font-semibold text-zinc-200">La course aux titres</h3>
-            <p className="text-xs text-zinc-500 mb-3">Titres pilote cumulés, 1950 → 2025</p>
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-10">
+          <div className="panel lg:col-span-2">
+            <h3 className="text-lg font-semibold tracking-[-0.02em]">La course aux titres</h3>
+            <p className="text-sm text-zinc-500 mb-6 mt-1">Titres pilote cumulés, 1950 → 2025</p>
             <TitlesRace />
           </div>
-          <div className="min-w-0">
-            <h3 className="text-sm font-semibold text-zinc-200">Les dynasties par décennie</h3>
-            <p className="text-xs text-zinc-500 mb-3">Titres constructeurs par écurie</p>
+          <div className="panel">
+            <h3 className="text-lg font-semibold tracking-[-0.02em]">Les dynasties par décennie</h3>
+            <p className="text-sm text-zinc-500 mb-6 mt-1">Titres constructeurs par écurie</p>
             <DecadeChart />
           </div>
-          <div className="min-w-0">
-            <h3 className="text-sm font-semibold text-zinc-200">Titres par pays</h3>
-            <p className="text-xs text-zinc-500 mb-3">Les 7 nations les plus titrées</p>
+          <div className="panel">
+            <h3 className="text-lg font-semibold tracking-[-0.02em]">Titres par pays</h3>
+            <p className="text-sm text-zinc-500 mb-6 mt-1">Les 7 nations les plus titrées</p>
             <CountryBars />
           </div>
         </div>
       </section>
 
-      <p className="text-xs text-zinc-600 leading-relaxed border-t border-zinc-900 pt-5 max-w-3xl">{RECORDS_AS_OF}</p>
+      <p className="text-xs text-zinc-600 leading-relaxed border-t border-white/[0.06] pt-8 max-w-3xl">{RECORDS_AS_OF}</p>
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react'
+import { LogoMark, TopBar } from '../components/MotorNav'
 
 const LivePage = lazy(() => import('../live/LivePage'))
 
@@ -6,26 +7,13 @@ const LivePage = lazy(() => import('../live/LivePage'))
 export default function LiveMode({ onBack }: { onBack: () => void }) {
   return (
     <div className="min-h-dvh w-full flex flex-col text-white">
-      <header className="sticky top-0 z-30 w-full bg-[#08090a]/75 backdrop-blur-xl backdrop-saturate-150 border-b border-white/[0.08]">
-        <div className="flex items-center gap-3 px-4 sm:px-5 lg:px-6 h-14 lg:h-16">
-          <button
-            onClick={onBack}
-            aria-label="Changer de mode"
-            className="-ml-2 min-h-11 px-2 flex items-center gap-1.5 text-zinc-400 hover:text-white active:text-white"
-          >
-            <span className="text-xl leading-none">‹</span>
-            <span className="text-sm font-medium">Modes</span>
-          </button>
-          <div className="flex items-center gap-2">
-            <span className="bg-white text-black font-bold px-2 py-1 rounded-md text-sm leading-none tracking-tight">F1</span>
-            <span className="font-semibold tracking-tight text-lg leading-none">Manager</span>
-          </div>
-          <span className="ml-auto inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium">
-            <span className="size-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_2px_rgb(234_42_31_/_0.8)]" aria-hidden />
-            Live Timing
-          </span>
+      <TopBar>
+        <div className="app-wrap flex items-center gap-3 h-16 lg:h-[4.5rem]">
+          <button onClick={onBack} aria-label="Changer de mode" className="-ml-2 min-h-11 min-w-11 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/5 text-xl active:text-white">‹</button>
+          <LogoMark />
+          <span className="ml-auto inline-flex items-center gap-2 chip"><span className="size-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_2px_rgb(234_42_31_/_0.8)]" aria-hidden />Live Timing</span>
         </div>
-      </header>
+      </TopBar>
       <Suspense fallback={<p className="p-8 text-sm text-zinc-500">Chargement du live…</p>}>
         <LivePage />
       </Suspense>
