@@ -316,8 +316,8 @@ export default function AppPreview() {
   const onLeave = () => { const f = frame.current; if (f) { f.style.setProperty('--rx', '0deg'); f.style.setProperty('--ry', '0deg') } }
 
   return (
-    <section ref={root} id="apercu" aria-label="Aperçu interactif de l'application" className="relative z-10 px-3 sm:px-6 scroll-mt-20 pb-16 sm:pb-20">
-      <div className="relative mx-auto max-w-6xl [perspective:1600px]" onPointerMove={onMove} onPointerLeave={onLeave}>
+    <section ref={root} id="apercu" aria-label="Aperçu interactif de l'application" className="relative z-10 px-3 sm:px-6 scroll-mt-20 pb-32 sm:pb-44">
+      <div className="relative mx-auto max-w-[77.5rem] [perspective:1600px]" onPointerMove={onMove} onPointerLeave={onLeave}>
         <div aria-hidden className="absolute inset-x-10 -top-6 h-40 rounded-full bg-[radial-gradient(closest-side,rgb(99_102_241_/_0.35),transparent)] blur-3xl pointer-events-none" />
         <div
           ref={frame}

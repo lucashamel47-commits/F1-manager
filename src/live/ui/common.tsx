@@ -48,9 +48,9 @@ export function FlagIcon({ flag, cat, msg, size = 18 }: { flag?: string | null; 
 
 export function Card({ title, right, children, className = '' }: { title?: string; right?: ReactNode; children: ReactNode; className?: string }) {
   return (
-    <section className={`bg-zinc-950 border border-white/10 rounded-2xl overflow-hidden shadow-glow ${className}`}>
+    <section className={`bg-zinc-950 border border-white/10 rounded-3xl overflow-hidden ${className}`}>
       {(title || right) && (
-        <header className="flex items-center justify-between gap-3 px-3 sm:px-4 h-11 border-b border-white/[0.07]">
+        <header className="flex items-center justify-between gap-3 px-4 sm:px-5 h-12 border-b border-white/[0.07]">
           {title && <h3 className="kicker">{title}</h3>}
           {right}
         </header>
@@ -62,14 +62,14 @@ export function Card({ title, right, children, className = '' }: { title?: strin
 
 export function Tabs<T extends string>({ tabs, value, onChange, label }: { tabs: { key: T; label: string }[]; value: T; onChange: (k: T) => void; label: string }) {
   return (
-    <div role="tablist" aria-label={label} className="flex overflow-x-auto border-b border-white/[0.08] [scrollbar-width:none]">
+    <div role="tablist" aria-label={label} className="seg m-3 !flex overflow-x-auto [scrollbar-width:none]">
       {tabs.map((t) => (
         <button
           key={t.key}
           role="tab"
           aria-selected={value === t.key}
           onClick={() => onChange(t.key)}
-          className={`shrink-0 px-3 sm:px-4 min-h-11 text-xs sm:text-sm font-medium border-b-2 whitespace-nowrap active:bg-white/5 ${value === t.key ? 'border-accent-500 text-white' : 'border-transparent text-zinc-400 hover:text-white'}`}
+          className="seg-item shrink-0 !min-h-9 !px-3.5 !text-xs sm:!text-sm"
         >
           {t.label}
         </button>

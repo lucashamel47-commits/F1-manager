@@ -136,7 +136,7 @@ export default function LivePage() {
   }, [store, snap, rt])
 
   const toolbarBtn = 'btn-ghost min-h-11 px-5 rounded-full text-xs sm:text-sm font-medium text-zinc-100'
-  const whiteBtn = 'min-h-11 px-5 rounded-full text-xs sm:text-sm font-semibold bg-white text-black hover:bg-zinc-200 active:bg-zinc-300'
+  const whiteBtn = 'btn-primary min-h-11 px-5 rounded-full text-xs sm:text-sm font-semibold text-white'
 
   const driverTab = sel != null && store && snap ? (
     <DriverPanel store={store} snap={snap} car={rt.car} n={sel} t={rt.t} onClose={closeDriver} issue={rt.liveIssue} />
@@ -187,11 +187,11 @@ export default function LivePage() {
     const cd = next ? countdown(ms(next.date_start) - now) : null
     return (
       <main className="flex-1 w-full pb-28">
-        <section className={`${wide} pt-8 pb-6`}>
-          <p className="text-xs font-medium uppercase tracking-[0.22em] text-accent-400">Live</p>
-          <h1 className="mt-2 text-4xl sm:text-5xl font-semibold tracking-tighter leading-none">Pas de session en cours</h1>
-          <p className="mt-3 text-zinc-400 max-w-2xl text-sm sm:text-base">Chronos, carte du circuit, stratégie, télémétrie et radios de la F1 en direct — ou rejouez n’importe quelle session passée avec les données d’OpenF1.</p>
-          <div className="mt-6 flex flex-wrap gap-3">
+        <section className={`app-wrap pt-14 pb-12 app-in`}>
+          <p className="kicker inline-flex items-center gap-2.5 !text-accent-400"><span className="size-1.5 rounded-full bg-accent-400 shadow-[0_0_10px_2px_rgb(99_102_241_/_0.7)]" aria-hidden />Live</p>
+          <h1 className="text-gradient mt-5 text-5xl sm:text-7xl font-semibold tracking-[-0.045em] leading-[1.02]">Pas de session en cours</h1>
+          <p className="mt-6 text-zinc-400 max-w-2xl text-base sm:text-lg leading-relaxed">Chronos, carte du circuit, stratégie, télémétrie et radios de la F1 en direct — ou rejouez n’importe quelle session passée avec les données d’OpenF1.</p>
+          <div className="mt-9 flex flex-wrap gap-3">
             <button disabled={!lastRace} onClick={() => lastRace && start(lastRace)} className="btn-primary min-h-12 px-7 rounded-full inline-flex items-center gap-2.5 active:scale-[0.98] disabled:opacity-40 text-white text-sm font-semibold">
               <svg viewBox="0 0 24 24" className="size-4" fill="currentColor" aria-hidden><path d="M7 4l13 8-13 8z" /></svg>
               Rejouer une course{lastRace ? ` — ${gpLabel(lastRace)} ${lastRace.year}` : ''}
@@ -204,15 +204,15 @@ export default function LivePage() {
           )}
         </section>
         {next && cd && (
-          <section className={`${wide} grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] gap-3`}>
+          <section className={`app-wrap grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] gap-6`}>
             <Card title="Prochaine session">
-              <div className="p-4 sm:p-6">
+              <div className="p-6 sm:p-8">
                 <p className="text-sm text-zinc-400 uppercase tracking-wider">{gpLabel(next)} · {next.circuit_short_name}</p>
                 <p className="mt-1 text-2xl sm:text-3xl font-semibold tracking-tight">{sessionFr(next.session_name)}</p>
                 <p className="mt-1 text-sm text-zinc-400">{fmtDateFr(next.date_start)} (heure de Paris)</p>
-                <div className="mt-5 grid grid-cols-4 gap-px bg-white/10 max-w-md text-center rounded-2xl overflow-hidden" role="timer" aria-label="Compte à rebours">
+                <div className="mt-5 grid grid-cols-4 gap-px bg-white/10 max-w-md text-center rounded-2xl overflow-hidden mt-8" role="timer" aria-label="Compte à rebours">
                   {([['j', cd.d], ['h', cd.h], ['min', cd.m], ['s', cd.s]] as const).map(([u, v]) => (
-                    <div key={u} className="bg-[#0b0c0d] py-4"><p className="text-3xl sm:text-4xl font-bold tabular-nums">{String(v).padStart(2, '0')}</p><p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">{u}</p></div>
+                    <div key={u} className="bg-[#0b0c0d] py-5"><p className="text-gradient text-3xl sm:text-4xl font-semibold tabular-nums tracking-[-0.04em]">{String(v).padStart(2, '0')}</p><p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">{u}</p></div>
                   ))}
                 </div>
               </div>
@@ -220,7 +220,7 @@ export default function LivePage() {
             <Card title="Programme du week-end">
               <ul>
                 {weekend.map((s) => (
-                  <li key={s.session_key} className={`flex items-center justify-between gap-3 px-4 min-h-12 border-b border-zinc-900 text-sm ${s.session_key === next.session_key ? 'bg-zinc-900' : ''}`}>
+                  <li key={s.session_key} className={`flex items-center justify-between gap-3 px-4 min-h-12 border-b border-white/[0.06] text-sm ${s.session_key === next.session_key ? 'bg-white/[0.05]' : ''}`}>
                     <span className="font-bold uppercase tracking-tight">{sessionFr(s.session_name)}</span>
                     <span className="text-zinc-400 tabular-nums">{fmtDateFr(s.date_start)}</span>
                   </li>
@@ -230,7 +230,7 @@ export default function LivePage() {
           </section>
         )}
         {!next && list.status === 'ok' && <section className={wide}><Card><Empty>Aucune session à venir au calendrier pour le moment.</Empty></Card></section>}
-        <p className={`${wide} mt-6 text-xs text-zinc-500 max-w-3xl`}>Données : OpenF1 (api.openf1.org). Les données en direct pendant une session nécessitent un abonnement OpenF1 ; les sessions terminées sont gratuites et mises en cache sur cet appareil.</p>
+        <p className={`app-wrap mt-6 text-xs text-zinc-500 max-w-3xl`}>Données : OpenF1 (api.openf1.org). Les données en direct pendant une session nécessitent un abonnement OpenF1 ; les sessions terminées sont gratuites et mises en cache sur cet appareil.</p>
         {picker && <Picker sessions={sessions} loading={list.status === 'loading'} year={pickerYear} years={[thisYear, thisYear - 1, thisYear - 2, thisYear - 3]} onYear={onYear} onPick={(s) => start(s)} onClose={() => setPicker(false)} current={null} now={now} />}
       </main>
     )

@@ -16,7 +16,7 @@ export default function LandingNav({ onSignup, onLogin }: { onSignup: () => void
   }, [])
   return (
     <header className={`sticky top-0 z-40 transition-[background-color,border-color,backdrop-filter] duration-300 border-b ${scrolled ? 'border-white/[0.08] bg-[#08090a]/70 backdrop-blur-xl' : 'border-transparent bg-transparent'}`}>
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-[77.5rem] items-center gap-6 px-4 sm:px-6">
         <a href="#top" className="flex items-center gap-2.5" aria-label="F1 Manager, haut de page">
           <span className="rounded-md bg-gradient-to-br from-[#5b7cff] to-[#7a5cf5] px-2 py-1 text-sm font-bold leading-none tracking-tight text-white">F1</span>
           <span className="text-[15px] font-semibold tracking-tight">Manager</span>

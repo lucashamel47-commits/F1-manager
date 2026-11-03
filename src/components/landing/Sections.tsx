@@ -8,12 +8,12 @@ const reduced = () => typeof window !== 'undefined' && window.matchMedia('(prefe
 
 function SectionHead({ kicker, title, children }: { kicker: string; title: ReactNode; children: ReactNode }) {
   return (
-    <Reveal className="mb-12 grid items-end gap-6 md:grid-cols-[1.3fr_1fr] md:gap-16">
+    <Reveal className="mb-20 grid items-end gap-8 sm:mb-28 md:grid-cols-[1.5fr_1fr] md:gap-24">
       <div>
         <p className="kicker">{kicker}</p>
-        <h2 className="text-gradient mt-4 text-4xl font-semibold leading-[1.02] tracking-[-0.04em] sm:text-5xl">{title}</h2>
+        <h2 className="text-gradient mt-6 text-[2.6rem] font-semibold leading-[1.04] tracking-[-0.045em] sm:text-6xl lg:text-[4.25rem]">{title}</h2>
       </div>
-      <p className="max-w-sm text-base leading-relaxed text-zinc-400 md:justify-self-end">{children}</p>
+      <p className="max-w-[18rem] text-lg leading-relaxed text-zinc-400 sm:text-xl md:justify-self-end">{children}</p>
     </Reveal>
   )
 }
@@ -42,18 +42,18 @@ function CountUp({ to }: { to: number }) {
 
 export function NumbersStrip() {
   const items = [
-    { n: circuits.length, l: 'Grands Prix au calendrier' },
-    { n: 22, l: 'pilotes sur la grille' },
+    { n: circuits.length, l: 'Grands Prix' },
+    { n: 22, l: 'pilotes' },
     { n: 11, l: 'écuries' },
-    { n: 9, l: 'vues en live timing' },
+    { n: 9, l: 'vues en direct' },
   ]
   return (
-    <Reveal className="mx-auto max-w-6xl px-4 pb-24 sm:px-6 sm:pb-32">
-      <dl className="grid grid-cols-2 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] md:grid-cols-4">
-        {items.map((it, i) => (
-          <div key={it.l} className={`px-6 py-8 text-center sm:py-10 ${i % 2 === 1 ? 'border-l border-white/10' : ''} ${i > 1 ? 'border-t border-white/10 md:border-t-0' : ''} ${i > 0 ? 'md:border-l md:border-white/10' : ''}`}>
-            <dt className="order-2 mt-2 text-sm text-zinc-500">{it.l}</dt>
-            <dd className="text-gradient text-5xl font-semibold tracking-[-0.04em] sm:text-6xl"><CountUp to={it.n} /></dd>
+    <Reveal className="mx-auto max-w-[77.5rem] px-4 pb-40 pt-12 sm:px-6 sm:pb-56 sm:pt-20">
+      <dl className="grid grid-cols-2 gap-x-6 gap-y-16 text-center md:grid-cols-4">
+        {items.map((it) => (
+          <div key={it.l} className="flex flex-col-reverse items-center gap-4">
+            <dt className="text-base text-zinc-500">{it.l}</dt>
+            <dd className="text-gradient text-6xl font-semibold tracking-[-0.05em] sm:text-7xl lg:text-8xl"><CountUp to={it.n} /></dd>
           </div>
         ))}
       </dl>
@@ -145,15 +145,17 @@ function MiniFavs() {
   )
 }
 
-function Card({ id, kicker, title, text, className = '', children }: { id?: string; kicker: string; title: string; text: string; className?: string; children: ReactNode }) {
+function Card({ kicker, title, text, wide = false, className = '', children }: { kicker: string; title: string; text: string; wide?: boolean; className?: string; children: ReactNode }) {
   return (
     <Reveal className={className}>
-      <article id={id} className="group relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-gradient-to-b from-white/[0.05] to-white/[0.015] p-6 transition duration-300 hover:-translate-y-0.5 hover:border-white/25 sm:p-8">
-        <div aria-hidden className="pointer-events-none absolute -right-20 -top-24 size-64 rounded-full bg-[radial-gradient(closest-side,rgb(99_102_241_/_0.22),transparent)] opacity-0 blur-2xl transition duration-500 group-hover:opacity-100" />
-        <p className="kicker">{kicker}</p>
-        <h3 className="mt-3 text-2xl font-semibold leading-tight tracking-tight">{title}</h3>
-        <p className="mt-2.5 max-w-md text-sm leading-relaxed text-zinc-400">{text}</p>
-        <div className="mt-8 flex flex-1 items-end">{<div className="w-full">{children}</div>}</div>
+      <article className={`group relative h-full overflow-hidden rounded-[2rem] border border-white/[0.06] bg-white/[0.025] p-8 transition duration-500 hover:bg-white/[0.04] sm:p-12 ${wide ? 'lg:grid lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:gap-20 lg:p-16' : 'flex flex-col'}`}>
+        <div aria-hidden className="pointer-events-none absolute -right-24 -top-28 size-72 rounded-full bg-[radial-gradient(closest-side,rgb(99_102_241_/_0.2),transparent)] opacity-0 blur-2xl transition duration-700 group-hover:opacity-100" />
+        <div>
+          <p className="kicker">{kicker}</p>
+          <h3 className="mt-5 text-3xl font-semibold leading-[1.1] tracking-[-0.035em] sm:text-4xl">{title}</h3>
+          <p className="mt-4 max-w-xs text-base leading-relaxed text-zinc-400 sm:text-lg">{text}</p>
+        </div>
+        <div className={wide ? 'mt-14 lg:mt-0' : 'mt-14 flex flex-1 items-end'}><div className="w-full">{children}</div></div>
       </article>
     </Reveal>
   )
@@ -161,21 +163,21 @@ function Card({ id, kicker, title, text, className = '', children }: { id?: stri
 
 export function Features() {
   return (
-    <section id="fonctionnalites" className="mx-auto max-w-6xl scroll-mt-24 px-4 pb-24 sm:px-6 sm:pb-32">
-      <SectionHead kicker="Fonctionnalités" title={<>Tout ce qu'il te faut pour suivre la saison.</>}>
-        Un seul endroit pour les résultats, le direct et les rappels, pensé pour l'iPad comme pour l'ordinateur.
+    <section id="fonctionnalites" className="mx-auto max-w-[77.5rem] scroll-mt-24 px-4 pb-40 sm:px-6 sm:pb-56">
+      <SectionHead kicker="Fonctionnalités" title={<>Tout pour suivre la saison.</>}>
+        Résultats, direct et rappels, au même endroit.
       </SectionHead>
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2" kicker="Live timing" title="La course en direct, tour par tour." text="Positions, écarts, pneus, secteurs et carte du circuit. Rejoue aussi n'importe quelle session passée à ×1, ×10 ou ×50.">
+      <div className="grid gap-6 sm:gap-8 lg:grid-cols-2">
+        <Card wide className="lg:col-span-2" kicker="Live timing" title="La course en direct." text="Positions, écarts, pneus et carte du circuit. Rejeu des courses passées.">
           <MiniTower />
         </Card>
-        <Card kicker="Statistiques" title="Les chiffres qui comptent." text="Évolution des points, records et palmarès des champions depuis 1950.">
+        <Card kicker="Statistiques" title="Les chiffres qui comptent." text="Points, records et palmarès depuis 1950.">
           <MiniChart />
         </Card>
-        <Card kicker="Rappels par email" title="Ne rate plus une session." text="Active les rappels (c'est toi qui choisis) et reçois un email avant les sessions qui t'intéressent.">
+        <Card kicker="Rappels par email" title="Ne rate plus une session." text="Un email avant les sessions que tu choisis.">
           <MiniReminder />
         </Card>
-        <Card className="lg:col-span-2" kicker="Favoris" title="Tes pilotes. Ton écurie." text="Choisis une fois tes favoris : ils reviennent en haut de ton accueil, avec leurs classements et leurs résultats.">
+        <Card wide className="lg:col-span-2" kicker="Favoris" title="Tes pilotes. Ton écurie." text="Tes favoris reviennent en haut de ton accueil.">
           <MiniFavs />
         </Card>
       </div>
@@ -186,14 +188,14 @@ export function Features() {
 /* ───────── Appel final + pied de page ───────── */
 export function FinalCta({ onSignup, onLogin }: { onSignup: () => void; onLogin: () => void }) {
   return (
-    <section className="relative mx-auto max-w-6xl px-4 pb-24 sm:px-6 sm:pb-32">
+    <section className="relative mx-auto max-w-[77.5rem] px-4 pb-40 sm:px-6 sm:pb-56">
       <Reveal>
-        <div className="relative isolate overflow-hidden rounded-[2.25rem] border border-white/10 bg-gradient-to-b from-white/[0.05] to-white/[0.01] px-6 py-16 text-center sm:py-24">
+        <div className="relative isolate overflow-hidden rounded-[2.5rem] border border-white/[0.06] bg-gradient-to-b from-white/[0.04] to-transparent px-6 py-28 text-center sm:py-44">
           <div aria-hidden className="absolute left-1/2 top-[-12rem] -z-10 h-[26rem] w-[44rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(99_102_241_/_0.38),transparent)] blur-3xl" />
           <div aria-hidden className="noise absolute inset-0 -z-10 opacity-[0.06] mix-blend-overlay" />
-          <h2 className="text-gradient mx-auto max-w-2xl text-4xl font-semibold leading-[1.02] tracking-[-0.045em] sm:text-6xl">Prêt pour le prochain Grand Prix ?</h2>
-          <p className="mx-auto mt-5 max-w-md text-base text-zinc-400">Crée ton compte en quelques secondes et choisis tes favoris.</p>
-          <div className="mt-9 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+          <h2 className="text-gradient mx-auto max-w-3xl text-[2.7rem] font-semibold leading-[1.02] tracking-[-0.05em] sm:text-7xl">Prêt pour le prochain Grand Prix ?</h2>
+          <p className="mx-auto mt-7 max-w-md text-lg text-zinc-400">Crée ton compte en quelques secondes.</p>
+          <div className="mt-14 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
             <button onClick={onSignup} className="min-h-14 rounded-full bg-white px-9 text-base font-semibold text-black transition hover:bg-zinc-200 active:scale-[0.98]">Créer un compte</button>
             <button onClick={onLogin} className="btn-ghost min-h-14 rounded-full px-9 text-base font-medium text-zinc-100 active:scale-[0.98]">Se connecter</button>
           </div>
@@ -207,9 +209,9 @@ export function Footer() {
   const col = 'space-y-1'
   const a = 'inline-flex min-h-9 items-center text-sm text-zinc-400 transition hover:text-white'
   return (
-    <footer className="relative overflow-hidden border-t border-white/[0.07]">
-      <div className="mx-auto max-w-6xl px-4 pt-14 sm:px-6">
-        <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+    <footer className="relative overflow-hidden border-t border-white/[0.05]">
+      <div className="mx-auto max-w-[77.5rem] px-4 pt-24 sm:px-6 sm:pt-32">
+        <div className="grid gap-14 sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
             <a href="#top" className="inline-flex items-center gap-2.5"><span className="rounded-md bg-gradient-to-br from-[#5b7cff] to-[#7a5cf5] px-2 py-1 text-sm font-bold leading-none tracking-tight text-white">F1</span><span className="text-[15px] font-semibold tracking-tight">Manager</span></a>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-zinc-500">Classements, calendrier, statistiques et live timing de la Formule 1.</p>
@@ -226,7 +228,7 @@ export function Footer() {
           </ul></nav>
         </div>
         <FooterWordmark />
-        <div className="flex flex-col gap-2 border-t border-white/[0.07] py-6 text-xs text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-2 border-t border-white/[0.05] py-8 text-xs text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
           <p>© 2026 F1 Manager · Projet indépendant, non affilié à Formula 1.</p>
           <p>F1 et les marques associées appartiennent à leurs propriétaires.</p>
         </div>
