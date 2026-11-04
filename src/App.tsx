@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Home from './pages/Home'
+import AuthPage from './pages/AuthPage'
+import { useRoute, replaceRoute, clearRoute } from './lib/route'
 import ModeSelect from './pages/ModeSelect'
 import HorsCourse from './pages/HorsCourse'
 import LiveMode from './pages/LiveMode'
@@ -30,8 +32,9 @@ const authError = (m: string): string => {
 }
 
 function App() {
-  const [showAuth, setShowAuth] = useState(false)
-  const [isLogin, setIsLogin] = useState(false)
+  const route = useRoute()
+  const isLogin = route === 'connexion'
+  const keepMessage = useRef(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [message, setMessage] = useState('')
@@ -45,6 +48,18 @@ function App() {
   const [favDriver, setFavDriver] = useState<string | null>(null)
   const [favTeam, setFavTeam] = useState<string | null>(null)
   const loggedIn = user !== null
+
+  // Changer de page (connexion ↔ inscription ↔ accueil) efface l'ancien message d'erreur ; on revient en haut de page.
+  useEffect(() => {
+    if (keepMessage.current) keepMessage.current = false
+    else setMessage('')
+    window.scrollTo(0, 0)
+  }, [route])
+
+  // Une fois connecté, la route #/connexion n'a plus de sens : on la retire de l'URL.
+  useEffect(() => {
+    if (loggedIn) clearRoute()
+  }, [loggedIn])
 
   // Comptes en ligne : session restaurée au démarrage, puis suivie (connexion, déconnexion, lien « mot de passe oublié »).
   useEffect(() => {
@@ -78,7 +93,8 @@ function App() {
         else if (data.user && data.user.identities?.length === 0) setMessage('Cet email a déjà un compte. Connecte-toi.')
         else if (!data.session) {
           setMessage('Compte créé ! Clique sur le lien reçu par email pour le confirmer, puis connecte-toi.')
-          setIsLogin(true)
+          keepMessage.current = true
+          replaceRoute('connexion')
         }
       }
       setBusy(false)
@@ -188,23 +204,24 @@ function App() {
     )
   }
 
-  return (
-    <Home
-      showAuth={showAuth}
-      setShowAuth={setShowAuth}
-      isLogin={isLogin}
-      setIsLogin={(v) => { setIsLogin(v); setMessage('') }}
-      email={email}
-      setEmail={setEmail}
-      password={password}
-      setPassword={setPassword}
-      message={message}
-      showConfetti={showConfetti}
-      onSubmit={handleSubmit}
-      busy={busy}
-      onForgot={supabase ? handleForgot : undefined}
-    />
-  )
+  if (route === 'connexion' || route === 'inscription') {
+    return (
+      <AuthPage
+        isLogin={isLogin}
+        email={email}
+        setEmail={setEmail}
+        password={password}
+        setPassword={setPassword}
+        message={message}
+        showConfetti={showConfetti}
+        onSubmit={handleSubmit}
+        busy={busy}
+        onForgot={supabase ? handleForgot : undefined}
+      />
+    )
+  }
+
+  return <Home />
 }
 
 export default App

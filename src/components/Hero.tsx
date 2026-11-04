@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 
-/** Hero : fond animé (aurore + grille + grain), titre en dégradé, centré ; quand le formulaire est ouvert, texte à gauche et formulaire à droite. */
-export default function Hero({ ctas, form }: { ctas: ReactNode; form: ReactNode }) {
+/** Hero : fond animé (aurore + grille + grain), titre en dégradé, centré. Les boutons d'entrée mènent aux pages Connexion / Inscription. */
+export default function Hero({ ctas }: { ctas: ReactNode }) {
   const [visible, setVisible] = useState(false)
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 80)
@@ -20,19 +20,18 @@ export default function Hero({ ctas, form }: { ctas: ReactNode; form: ReactNode 
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#08090a]" />
       </div>
 
-      <div className={`mx-auto max-w-[77.5rem] px-4 pb-28 pt-24 sm:px-6 sm:pt-36 lg:pb-36 lg:pt-44 ${form ? 'grid items-center gap-12 lg:grid-cols-[1.15fr_0.85fr]' : ''}`}>
-        <div className={form ? 'text-center lg:text-left' : 'text-center'}>
-          <h1 className={`text-[2.9rem] font-semibold leading-[1] tracking-[-0.045em] min-[420px]:text-6xl sm:text-7xl ${form ? 'lg:text-[4.5rem]' : 'lg:text-[5.5rem]'} ${reveal(100)}`}>
+      <div className="mx-auto max-w-[77.5rem] px-4 pb-28 pt-24 sm:px-6 sm:pt-36 lg:pb-36 lg:pt-44">
+        <div className="text-center">
+          <h1 className={`text-[2.9rem] font-semibold leading-[1] tracking-[-0.045em] min-[420px]:text-6xl sm:text-7xl lg:text-[5.5rem] ${reveal(100)}`}>
             <span className="text-gradient">Toute la F1,</span>
             <br />
             <span className="text-gradient-accent">au même endroit.</span>
           </h1>
-          <p className={`mt-9 max-w-xl text-lg leading-relaxed text-zinc-400 sm:text-xl ${form ? 'mx-auto lg:mx-0' : 'mx-auto'} ${reveal(220)}`}>
+          <p className={`mt-9 max-w-xl text-lg leading-relaxed text-zinc-400 sm:text-xl mx-auto ${reveal(220)}`}>
             Classements, calendrier, statistiques et live timing de la Formule 1.
           </p>
           <div className={reveal(340)}>{ctas}</div>
         </div>
-        {form && <div className={reveal(0)}>{form}</div>}
       </div>
     </section>
   )

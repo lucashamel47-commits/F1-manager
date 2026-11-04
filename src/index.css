@@ -542,3 +542,6 @@ button.bg-zinc-950:not(:disabled):hover, a.bg-zinc-950:hover { border-color: rgb
 /* .seg est hors couche : on réaffirme les utilitaires responsive de masquage. */
 @media (max-width: 767.98px) { .seg.hidden { display: none; } }
 @media (min-width: 768px) { .seg.md\:hidden { display: none; } }
+
+/* Pages Connexion / Inscription : fond neutre, sans halos. */
+body:has(.auth-page)::before { display: none; }

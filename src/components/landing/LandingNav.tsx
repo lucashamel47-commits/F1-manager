@@ -6,7 +6,7 @@ const links = [
   { href: '#faq', label: 'FAQ' },
 ]
 
-export default function LandingNav({ onSignup, onLogin }: { onSignup: () => void; onLogin: () => void }) {
+export default function LandingNav() {
   const [scrolled, setScrolled] = useState(false)
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 24)
@@ -27,8 +27,8 @@ export default function LandingNav({ onSignup, onLogin }: { onSignup: () => void
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
-          <button onClick={onLogin} className="min-h-11 rounded-full px-4 text-sm font-medium text-zinc-300 transition hover:bg-white/[0.06] hover:text-white">Se connecter</button>
-          <button onClick={onSignup} className="btn-primary min-h-11 rounded-full px-5 text-sm font-semibold active:scale-[0.97]">Créer un compte</button>
+          <a href="#/connexion" className="inline-flex min-h-11 items-center rounded-full px-4 text-sm font-medium text-zinc-300 transition hover:bg-white/[0.06] hover:text-white">Se connecter</a>
+          <a href="#/inscription" className="btn-primary inline-flex min-h-11 items-center rounded-full px-5 text-sm font-semibold active:scale-[0.97]">Créer un compte</a>
         </div>
       </div>
     </header>

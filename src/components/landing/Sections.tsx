@@ -186,7 +186,7 @@ export function Features() {
 }
 
 /* ───────── Appel final + pied de page ───────── */
-export function FinalCta({ onSignup, onLogin }: { onSignup: () => void; onLogin: () => void }) {
+export function FinalCta() {
   return (
     <section className="relative mx-auto max-w-[77.5rem] px-4 pb-40 sm:px-6 sm:pb-56">
       <Reveal>
@@ -196,8 +196,8 @@ export function FinalCta({ onSignup, onLogin }: { onSignup: () => void; onLogin:
           <h2 className="text-gradient mx-auto max-w-3xl text-[2.7rem] font-semibold leading-[1.02] tracking-[-0.05em] sm:text-7xl">Prêt pour le prochain Grand Prix ?</h2>
           <p className="mx-auto mt-7 max-w-md text-lg text-zinc-400">Crée ton compte en quelques secondes.</p>
           <div className="mt-14 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
-            <button onClick={onSignup} className="min-h-14 rounded-full bg-white px-9 text-base font-semibold text-black transition hover:bg-zinc-200 active:scale-[0.98]">Créer un compte</button>
-            <button onClick={onLogin} className="btn-ghost min-h-14 rounded-full px-9 text-base font-medium text-zinc-100 active:scale-[0.98]">Se connecter</button>
+            <a href="#/inscription" className="inline-flex min-h-14 items-center justify-center rounded-full bg-white px-9 text-base font-semibold text-black transition hover:bg-zinc-200 active:scale-[0.98]">Créer un compte</a>
+            <a href="#/connexion" className="btn-ghost inline-flex min-h-14 items-center justify-center rounded-full px-9 text-base font-medium text-zinc-100 active:scale-[0.98]">Se connecter</a>
           </div>
         </div>
       </Reveal>

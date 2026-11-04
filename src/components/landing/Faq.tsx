@@ -86,7 +86,7 @@ const ITEMS: Item[] = [
 
 const norm = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
 
-export default function Faq({ onSignup }: { onSignup: () => void }) {
+export default function Faq() {
   const [open, setOpen] = useState<number | null>(0)
   const [cat, setCat] = useState<Cat | 'all'>('all')
   const [query, setQuery] = useState('')
@@ -121,7 +121,7 @@ export default function Faq({ onSignup }: { onSignup: () => void }) {
             <div aria-hidden className="pointer-events-none absolute -right-12 -top-16 size-48 rounded-full bg-[radial-gradient(closest-side,rgb(99_102_241_/_0.35),transparent)] blur-2xl" />
             <p className="text-base font-semibold tracking-tight">Encore une question ?</p>
             <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">Le plus simple, c'est d'essayer : crée ton compte et fais le tour de l'app.</p>
-            <button onClick={onSignup} className="btn-primary mt-5 min-h-12 rounded-full px-6 text-sm font-semibold active:scale-[0.98]">Créer un compte</button>
+            <a href="#/inscription" className="btn-primary mt-5 inline-flex min-h-12 items-center justify-center rounded-full px-6 text-sm font-semibold active:scale-[0.98]">Créer un compte</a>
           </div>
         </Reveal>
 
@@ -172,7 +172,7 @@ export default function Faq({ onSignup }: { onSignup: () => void }) {
           <div className="mt-6 rounded-3xl border border-white/10 bg-white/[0.03] p-6 text-center lg:hidden">
             <p className="text-base font-semibold">Encore une question ?</p>
             <p className="mt-1.5 text-sm text-zinc-400">Le plus simple, c'est d'essayer : crée ton compte.</p>
-            <button onClick={onSignup} className="btn-primary mt-4 min-h-12 rounded-full px-6 text-sm font-semibold">Créer un compte</button>
+            <a href="#/inscription" className="btn-primary mt-4 inline-flex min-h-12 items-center justify-center rounded-full px-6 text-sm font-semibold">Créer un compte</a>
           </div>
         </Reveal>
       </div>
