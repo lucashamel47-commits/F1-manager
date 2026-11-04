@@ -46,7 +46,7 @@ export default function Tower({ snap, selected, onSelect }: { snap: Snapshot; se
   if (!snap.rows.length) return <Empty>En attente des pilotes…</Empty>
   return (
     <div>
-      <div className="flex items-center h-9 pr-2 sm:pr-3 text-[10px] uppercase tracking-[0.15em] text-zinc-500 border-b border-zinc-800 bg-black/60">
+      <div className="flex items-center h-9 pr-2 sm:pr-3 text-[10px] uppercase tracking-[0.15em] text-zinc-500 border-b border-zinc-800 bg-black/70">
         <span className="w-8 sm:w-10 text-center">P</span>
         <span className="w-1" />
         <span className="w-16 sm:w-20 pl-2 sm:pl-3">Pilote</span>

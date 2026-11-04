@@ -24,7 +24,7 @@ interface Props {
 export function LogoMark({ className = '' }: { className?: string }) {
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
-      <span className="grid h-7 place-items-center rounded-lg bg-gradient-to-br from-[#5b7cff] to-[#7a5cf5] px-2 text-[13px] font-bold leading-none tracking-tight text-white shadow-[inset_0_1px_0_rgb(255_255_255_/_0.3),0_6px_18px_-6px_rgb(99_102_241_/_0.8)]">F1</span>
+      <span className="grid h-7 place-items-center rounded-lg bg-white text-[#0a0a0a] px-2 text-[13px] font-bold leading-none tracking-tight">F1</span>
       <span className="text-[1.05rem] font-semibold leading-none tracking-[-0.02em]">Manager</span>
     </span>
   )
@@ -33,7 +33,7 @@ export function LogoMark({ className = '' }: { className?: string }) {
 /** Barre du haut : verre sombre, sans fond blanc, contenu centré à la largeur de la page. */
 export function TopBar({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <header className={`sticky top-0 z-30 w-full border-b border-white/[0.05] bg-[#08090a]/55 backdrop-blur-2xl backdrop-saturate-150 ${className}`}>
+    <header className={`sticky top-0 z-30 w-full border-b border-[#2b2c2d] bg-[#08090a]  ${className}`}>
       {children}
     </header>
   )
@@ -102,11 +102,11 @@ export function SectionTitle({ kicker, title, className = '', h1 = false, desc }
   const Tag = h1 ? 'h1' : 'h2'
   return (
     <div className={`${h1 ? 'mb-12 sm:mb-16 app-in' : 'mb-8 sm:mb-10'} ${className}`}>
-      <p className="kicker inline-flex items-center gap-2.5 !text-accent-400">
-        <span className="size-1.5 rounded-full bg-accent-400 shadow-[0_0_10px_2px_rgb(99_102_241_/_0.7)]" aria-hidden />
+      <p className="kicker">
+        
         {kicker}
       </p>
-      <Tag className={`text-gradient mt-5 font-semibold tracking-[-0.045em] ${h1 ? 'text-[2.6rem] leading-[1.04] sm:text-6xl lg:text-[4.25rem]' : 'text-3xl leading-[1.08] sm:text-5xl'}`}>{title}</Tag>
+      <Tag className={`text-gradient mt-5 font-medium tracking-[-0.035em] ${h1 ? 'text-[2rem] leading-[1.06] sm:text-[2.75rem]' : 'text-[1.75rem] leading-[1.1] sm:text-[2.625rem]'}`}>{title}</Tag>
       {desc && <p className="mt-5 max-w-xl text-base leading-relaxed text-zinc-400 sm:text-lg">{desc}</p>}
     </div>
   )

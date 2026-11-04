@@ -17,7 +17,7 @@ export default function Chrono({ snap, selected, onSelect }: { snap: Snapshot; s
   return (
     <div className="overflow-x-auto">
       <div className="min-w-[640px]">
-        <div className="flex items-center h-9 px-3 text-[10px] uppercase tracking-[0.15em] text-zinc-500 border-b border-zinc-800 bg-black/60">
+        <div className="flex items-center h-9 px-3 text-[10px] uppercase tracking-[0.15em] text-zinc-500 border-b border-zinc-800 bg-black/70">
           <span className="w-8">P</span><span className="w-14">Pilote</span><span className="w-20 text-right">Meilleur tour</span><span className="w-16 text-right">Écart</span>
           <span className="w-16 text-right">S1</span><span className="w-16 text-right">S2</span><span className="w-16 text-right">S3</span><span className="w-20 text-right">Tour idéal</span>
           <span className="w-12 text-right">I1</span><span className="w-12 text-right">I2</span><span className="w-14 text-right">Pointe</span>

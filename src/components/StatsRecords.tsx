@@ -378,8 +378,8 @@ export default function StatsRecords() {
 
       <section aria-labelledby="rec-charts" className="min-w-0">
         <div className="mb-10 sm:mb-14">
-          <p className="kicker inline-flex items-center gap-2.5 !text-accent-400"><span className="size-1.5 rounded-full bg-accent-400 shadow-[0_0_10px_2px_rgb(99_102_241_/_0.7)]" aria-hidden />En graphiques</p>
-          <h2 id="rec-charts" className="text-gradient mt-5 text-3xl sm:text-5xl font-semibold tracking-[-0.045em] leading-[1.08]">70 ans de F1 en un coup d’œil</h2>
+          <p className="kicker">En graphiques</p>
+          <h2 id="rec-charts" className="text-gradient mt-5 text-[1.75rem] sm:text-[2.625rem] font-medium tracking-[-0.035em] leading-[1.1]">70 ans de F1 en un coup d’œil</h2>
         </div>
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-10">
           <div className="panel lg:col-span-2">

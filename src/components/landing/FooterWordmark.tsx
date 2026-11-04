@@ -5,7 +5,7 @@ const reduced = () => typeof window !== 'undefined' && window.matchMedia('(prefe
 
 /**
  * Grand logo du pied de page, interactif :
- * - un projecteur bleu-violet suit le doigt / le curseur et allume les lettres au passage ;
+ * - un projecteur blanc suit le doigt / le curseur et allume les lettres au passage ;
  * - chaque lettre se soulève selon sa distance au pointeur (effet vague) ;
  * - un clic ou un appui lance le « départ » : 5 feux rouges s'allument un à un, s'éteignent, et les lettres
  *   s'illuminent d'un éclair de gauche à droite.
@@ -82,10 +82,10 @@ export default function FooterWordmark() {
   }
 
   return (
-    <div className="relative select-none pt-24">
+    <div className="relative select-none pt-16 sm:pt-24">
       <button type="button" onClick={start} aria-label="Lancer le départ : animation des feux" className="mx-auto mb-5 flex min-h-11 items-center justify-center gap-2.5 rounded-full px-4 outline-offset-4">
         {[1, 2, 3, 4, 5].map((n) => (
-          <i key={n} aria-hidden className={`size-3 rounded-full transition duration-150 ${lights >= n ? 'bg-[#ff2a1f] shadow-[0_0_16px_3px_rgb(255_42_31_/_0.65)]' : 'bg-white/[0.08]'}`} />
+          <i key={n} aria-hidden className={`size-3 rounded-full transition duration-150 ${lights >= n ? 'bg-[#ff2a1f]' : 'bg-[#2b2c2d]'}`} />
         ))}
       </button>
       <div

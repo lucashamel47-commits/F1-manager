@@ -74,8 +74,8 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
     <section aria-labelledby="circuits-title" className="col-span-full min-w-0">
       <div className="flex items-end justify-between gap-4 mb-10">
         <div className="min-w-0">
-          <p className="kicker inline-flex items-center gap-2.5 !text-accent-400"><span className="size-1.5 rounded-full bg-accent-400 shadow-[0_0_10px_2px_rgb(99_102_241_/_0.7)]" aria-hidden />Calendrier</p>
-          <h2 id="circuits-title" className="text-gradient mt-5 text-3xl sm:text-5xl font-semibold tracking-[-0.045em] leading-[1.08]">Les circuits</h2>
+          <p className="kicker">Calendrier</p>
+          <h2 id="circuits-title" className="text-gradient mt-5 text-[1.75rem] sm:text-[2.625rem] font-medium tracking-[-0.035em] leading-[1.1]">Les circuits</h2>
           <p className="mt-4 text-base text-zinc-400">Faites défiler les {circuits.length} Grands Prix. Touchez un circuit pour ouvrir sa fiche.</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -116,7 +116,7 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
               onClick={() => onOpen(c)}
               aria-label={`${c.name}, manche ${c.round}, ouvrir la fiche`}
               className={`group snap-start shrink-0 w-[82%] sm:w-[46%] lg:w-[31.5%] xl:w-[23.5%] text-left bg-zinc-950 border rounded-3xl overflow-hidden transition duration-300 active:scale-[0.99] hover:-translate-y-1 ${
-                st.kind === 'next' ? 'border-accent-400/70 shadow-[0_0_40px_-12px_rgb(99_102_241_/_0.55)]' : 'border-white/10 hover:border-white/30'
+                st.kind === 'next' ? 'border-accent-400/70' : 'border-white/10 hover:border-white/30'
               }`}
             >
               <div className="relative aspect-video bg-[#e9ebf5] overflow-hidden">
@@ -125,7 +125,7 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
                 ) : (
                   <div className="absolute inset-0 grid place-items-center text-xs text-zinc-500 px-4 text-center">Plan bientôt disponible</div>
                 )}
-                <span className="absolute top-2.5 left-2.5 bg-black/80 backdrop-blur text-white text-[11px] font-semibold px-2.5 py-1 rounded-full">R{c.round}</span>
+                <span className="absolute top-2.5 left-2.5 bg-black/80 text-white text-[11px] font-semibold px-2.5 py-1 rounded-full">R{c.round}</span>
                 {st.kind === 'next' && <span className="absolute top-2.5 right-2.5 chip">Prochain GP</span>}
               </div>
               <div className="p-6">

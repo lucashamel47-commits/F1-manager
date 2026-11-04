@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { circuits } from '../data/circuits'
 
 /* ───────── Aperçu interactif de l'app (données de démonstration) ─────────
@@ -234,7 +234,7 @@ function Live() {
         <p className="mt-3 text-[11px] text-zinc-500">Air 24° · Piste 31° · Vent 8 km/h</p>
         <div className="mt-3 space-y-2">
           {['S1', 'S2', 'S3'].map((s, i) => (
-            <div key={s} className="flex items-center gap-2 text-[11px] text-zinc-400"><span className="w-5">{s}</span><span className="h-1.5 flex-1 rounded-full bg-white/[0.06] overflow-hidden"><span className="block h-full rounded-full bg-gradient-to-r from-accent-500 to-violet-400 transition-[width] duration-700" style={{ width: `${40 + ((tick * 17 + i * 31) % 55)}%` }} /></span></div>
+            <div key={s} className="flex items-center gap-2 text-[11px] text-zinc-400"><span className="w-5">{s}</span><span className="h-1.5 flex-1 rounded-full bg-white/[0.06] overflow-hidden"><span className="block h-full rounded-full bg-zinc-100 transition-[width] duration-700" style={{ width: `${40 + ((tick * 17 + i * 31) % 55)}%` }} /></span></div>
           ))}
         </div>
       </aside>
@@ -303,29 +303,15 @@ export default function AppPreview() {
 
   const choose = (k: TabKey) => { setAuto(false); setTab(k) }
 
-  const onMove = (e: React.PointerEvent) => {
-    const f = frame.current
-    if (!f || e.pointerType !== 'mouse' || reduced()) return
-    const r = f.getBoundingClientRect()
-    const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height
-    f.style.setProperty('--rx', `${((0.5 - py) * 5).toFixed(2)}deg`)
-    f.style.setProperty('--ry', `${((px - 0.5) * 7).toFixed(2)}deg`)
-    f.style.setProperty('--mx', `${(px * 100).toFixed(1)}%`)
-    f.style.setProperty('--my', `${(py * 100).toFixed(1)}%`)
-  }
-  const onLeave = () => { const f = frame.current; if (f) { f.style.setProperty('--rx', '0deg'); f.style.setProperty('--ry', '0deg') } }
-
   return (
-    <section ref={root} id="apercu" aria-label="Aperçu interactif de l'application" className="relative z-10 px-3 sm:px-6 scroll-mt-20 pb-32 sm:pb-44">
-      <div className="relative mx-auto max-w-[77.5rem] [perspective:1600px]" onPointerMove={onMove} onPointerLeave={onLeave}>
-        <div aria-hidden className="absolute inset-x-10 -top-6 h-40 rounded-full bg-[radial-gradient(closest-side,rgb(99_102_241_/_0.35),transparent)] blur-3xl pointer-events-none" />
+    <section ref={root} id="apercu" aria-label="Aperçu interactif de l'application" className="relative z-10 scroll-mt-20 px-4 sm:px-6 lg:px-10">
+      <div className="mx-auto max-w-[77.5rem]">
+        {/* Cadre Novex : grand conteneur arrondi, fond --surface, fenêtre coupée en bas */}
+        <div className="overflow-hidden rounded-[1.5rem] border border-[#2b2c2d] bg-gradient-to-b from-[#1a1b1c] to-[#0d0e0f] px-3 pt-3 sm:px-8 sm:pt-8 lg:px-14 lg:pt-14">
         <div
           ref={frame}
-          className="relative rounded-[1.75rem] border border-white/[0.12] bg-[#0b0c0e]/90 shadow-[0_50px_120px_-30px_rgb(0_0_0_/_0.9),0_0_0_1px_rgb(255_255_255_/_0.03)] overflow-hidden transition-transform duration-300 ease-out will-change-transform"
-          style={{ transform: 'rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))', '--mx': '50%', '--my': '0%' } as CSSProperties}
+          className="relative -mb-px overflow-hidden rounded-t-[0.875rem] border border-b-0 border-[#2b2c2d] bg-[#0b0c0d]"
         >
-          <div aria-hidden className="pointer-events-none absolute inset-x-12 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
-          <div aria-hidden className="pointer-events-none absolute inset-0 z-10 opacity-70 [background:radial-gradient(500px_circle_at_var(--mx)_var(--my),rgb(255_255_255_/_0.06),transparent_60%)]" />
           {/* barre de fenêtre */}
           <div className="flex items-center gap-3 px-4 h-11 border-b border-white/[0.07] bg-white/[0.02]">
             <span className="flex gap-1.5" aria-hidden><i className="size-2.5 rounded-full bg-white/15" /><i className="size-2.5 rounded-full bg-white/15" /><i className="size-2.5 rounded-full bg-white/15" /></span>
@@ -337,7 +323,7 @@ export default function AppPreview() {
             <nav role="tablist" aria-label="Sections de l'aperçu" aria-orientation="vertical" className="hidden md:flex w-48 shrink-0 flex-col gap-1 border-r border-white/[0.07] p-3">
               <div className="flex items-center gap-2 px-2 pb-3 pt-1"><span className="bg-white text-black font-bold px-1.5 py-0.5 rounded text-[11px] leading-none">F1</span><span className="text-sm font-semibold tracking-tight">Manager</span></div>
               {TABS.map((t) => (
-                <button key={t.key} role="tab" aria-selected={tab === t.key} onClick={() => choose(t.key)} className={`flex items-center gap-2.5 rounded-xl px-3 min-h-10 text-[13px] text-left transition ${tab === t.key ? 'bg-white/[0.09] text-white' : 'text-zinc-400 hover:bg-white/[0.05] hover:text-white'}`}>
+                <button key={t.key} role="tab" aria-selected={tab === t.key} onClick={() => choose(t.key)} className={`flex items-center gap-2.5 rounded-xl px-3 min-h-10 text-[13px] text-left transition ${tab === t.key ? 'bg-[#222324] text-white' : 'text-zinc-400 hover:bg-white/[0.05] hover:text-white'}`}>
                   <Icon k={t.key} />{t.label}
                   {t.key === 'live' && <span className="ml-auto size-1.5 rounded-full bg-red-500 animate-pulse" aria-hidden />}
                 </button>
@@ -360,9 +346,7 @@ export default function AppPreview() {
             </div>
           </div>
         </div>
-        {/* reflet / halo sous la fenêtre */}
-        <div aria-hidden className="pointer-events-none mx-auto -mt-2 h-16 w-[86%] rounded-b-[2rem] bg-gradient-to-b from-white/[0.07] to-transparent opacity-60 blur-md [mask-image:linear-gradient(180deg,#000,transparent)] [-webkit-mask-image:linear-gradient(180deg,#000,transparent)]" />
-        <div aria-hidden className="pointer-events-none absolute inset-x-[15%] bottom-0 h-32 translate-y-1/3 rounded-full bg-[radial-gradient(closest-side,rgb(99_102_241_/_0.4),transparent)] blur-3xl" />
+        </div>
       </div>
     </section>
   )

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Brand } from './Sections'
 
 const links = [
   { href: '#apercu', label: 'Aperçu' },
@@ -6,29 +7,27 @@ const links = [
   { href: '#faq', label: 'FAQ' },
 ]
 
-export default function LandingNav({ onSignup, onLogin }: { onSignup: () => void; onLogin: () => void }) {
+/** Barre du haut calquée sur Novex : fond --background, liens 13 px gris, « Se connecter » gris, bouton pilule blanc 32 px. Pas de bandeau blanc. */
+export default function LandingNav() {
   const [scrolled, setScrolled] = useState(false)
   useEffect(() => {
-    const on = () => setScrolled(window.scrollY > 24)
+    const on = () => setScrolled(window.scrollY > 8)
     on()
     window.addEventListener('scroll', on, { passive: true })
     return () => window.removeEventListener('scroll', on)
   }, [])
   return (
-    <header className={`sticky top-0 z-40 transition-[background-color,border-color,backdrop-filter] duration-300 border-b ${scrolled ? 'border-white/[0.08] bg-[#08090a]/70 backdrop-blur-xl' : 'border-transparent bg-transparent'}`}>
-      <div className="mx-auto flex h-16 max-w-[77.5rem] items-center gap-6 px-4 sm:px-6">
-        <a href="#top" className="flex items-center gap-2.5" aria-label="F1 Manager, haut de page">
-          <span className="rounded-md bg-gradient-to-br from-[#5b7cff] to-[#7a5cf5] px-2 py-1 text-sm font-bold leading-none tracking-tight text-white">F1</span>
-          <span className="text-[15px] font-semibold tracking-tight">Manager</span>
-        </a>
-        <nav aria-label="Sections de la page" className="ml-4 hidden items-center gap-1 md:flex">
+    <header className={`sticky top-0 z-40 border-b bg-[#08090a] ${scrolled ? 'border-[#2b2c2d]' : 'border-transparent'}`}>
+      <div className="mx-auto flex h-16 w-full max-w-[82.5rem] items-center gap-8 px-6 lg:px-10">
+        <a href="#top" aria-label="F1 Manager, haut de page"><Brand /></a>
+        <nav aria-label="Sections de la page" className="hidden items-center md:flex">
           {links.map((l) => (
-            <a key={l.href} href={l.href} className="rounded-full px-3.5 py-2 text-sm text-zinc-400 transition hover:bg-white/[0.06] hover:text-white">{l.label}</a>
+            <a key={l.href} href={l.href} className="inline-flex h-8 items-center rounded-lg px-2.5 text-[13px] tracking-[-0.01em] text-[#636464] hover:text-[#f7f8f8]">{l.label}</a>
           ))}
         </nav>
-        <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
-          <button onClick={onLogin} className="min-h-11 rounded-full px-4 text-sm font-medium text-zinc-300 transition hover:bg-white/[0.06] hover:text-white">Se connecter</button>
-          <button onClick={onSignup} className="btn-primary min-h-11 rounded-full px-5 text-sm font-semibold active:scale-[0.97]">Créer un compte</button>
+        <div className="ml-auto flex items-center gap-1">
+          <a href="#/connexion" className="inline-flex h-8 items-center rounded-full px-3.5 text-[13px] font-medium tracking-[-0.01em] text-[#939494] hover:text-white">Se connecter</a>
+          <a href="#/inscription" className="inline-flex h-8 items-center rounded-full bg-white px-3.5 text-[13px] font-medium tracking-[-0.01em] text-[#0a0a0a] hover:bg-[#e4e5e5]">Créer un compte</a>
         </div>
       </div>
     </header>

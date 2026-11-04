@@ -18,7 +18,7 @@ export default function Picker({ sessions, loading, year, years, onYear, onPick,
     return [...m.values()].sort((a, b) => b[0].date_start.localeCompare(a[0].date_start))
   }, [sessions, year])
   return (
-    <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center" onClick={onClose} role="presentation">
+    <div className="fixed inset-0 z-[70] bg-black/70 flex items-end sm:items-center justify-center" onClick={onClose} role="presentation">
       <div role="dialog" aria-modal="true" aria-label="Choisir une session" onClick={(e) => e.stopPropagation()} className="w-full sm:max-w-3xl max-h-[88dvh] glass flex flex-col bg-[#0e0f11]/95 rounded-t-3xl sm:rounded-3xl overflow-hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <header className="flex items-center gap-3 px-4 h-14 border-b border-white/[0.08] shrink-0">
           <h2 className="font-semibold tracking-tight">Choisir une session à rejouer</h2>
@@ -26,7 +26,7 @@ export default function Picker({ sessions, loading, year, years, onYear, onPick,
         </header>
         <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/[0.06] shrink-0 overflow-x-auto [scrollbar-width:none]">
           {years.map((y) => (
-            <button key={y} onClick={() => onYear(y)} aria-pressed={y === year} className={`min-h-10 px-4 rounded-full text-sm font-semibold border ${y === year ? 'bg-gradient-to-br from-[#5b7cff] to-[#7a5cf5] text-white border-transparent' : 'border-white/15 text-zinc-300 hover:bg-white/5'}`}>{y}</button>
+            <button key={y} onClick={() => onYear(y)} aria-pressed={y === year} className={`min-h-10 px-4 rounded-full text-sm font-semibold border ${y === year ? 'bg-white text-[#0a0a0a] border-transparent' : 'border-white/15 text-zinc-300 hover:bg-white/5'}`}>{y}</button>
           ))}
           <span className="mx-1 h-5 w-px bg-zinc-800" />
           {(['all', 'race'] as const).map((f) => (
