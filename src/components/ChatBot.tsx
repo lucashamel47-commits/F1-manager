@@ -97,10 +97,10 @@ export default function ChatBot() {
         <section
           role="dialog"
           aria-label="Assistant F1"
-          className="fixed z-50 inset-0 sm:inset-auto sm:right-6 sm:bottom-6 sm:w-[420px] sm:h-[620px] sm:max-h-[calc(100dvh-3rem)] flex flex-col bg-[#0b0c0d]/95 backdrop-blur-2xl text-white sm:rounded-3xl overflow-hidden sm:border sm:border-white/10 sm:shadow-[0_30px_80px_rgba(0,0,0,0.75)]"
+          className="fixed z-50 inset-0 sm:inset-auto sm:right-6 sm:bottom-6 sm:w-[420px] sm:h-[620px] sm:max-h-[calc(100dvh-3rem)] flex flex-col bg-[#0b0c0d] text-white sm:rounded-3xl overflow-hidden sm:border sm:border-white/10"
         >
           <header className="shrink-0 flex items-center gap-3 px-4 h-14 border-b border-white/[0.08] bg-white/[0.03]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-            <span className="grid h-7 place-items-center rounded-lg bg-gradient-to-br from-[#5b7cff] to-[#7a5cf5] px-2 text-[13px] font-bold leading-none text-white">F1</span>
+            <span className="grid h-7 place-items-center rounded-lg bg-white text-[#0a0a0a] px-2 text-[13px] font-bold leading-none">F1</span>
             <div className="leading-tight">
               <p className="font-semibold tracking-tight">Assistant</p>
               <p className="text-[11px] text-zinc-500 flex items-center gap-1.5">
@@ -112,12 +112,12 @@ export default function ChatBot() {
             </button>
           </header>
 
-          <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 space-y-3 bg-[radial-gradient(ellipse_at_top,rgba(220,38,38,0.08),transparent_60%)]" aria-live="polite">
+          <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 space-y-3" aria-live="polite">
             {msgs.map((m, i) => (
               <div key={i} className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div
                   className={`max-w-[88%] px-3.5 py-2.5 text-[15px] leading-relaxed break-words ${
-                    m.from === 'user' ? 'bg-accent-500 text-white rounded-2xl rounded-br-md' : 'bg-white/[0.06] text-zinc-200 border border-white/[0.08] rounded-2xl rounded-bl-md'
+                    m.from === 'user' ? 'bg-white text-[#0a0a0a] rounded-2xl rounded-br-md' : 'bg-white/[0.06] text-zinc-200 border border-white/[0.08] rounded-2xl rounded-bl-md'
                   }`}
                 >
                   {renderText(m.text)}

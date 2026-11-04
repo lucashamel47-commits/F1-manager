@@ -275,8 +275,8 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
         {nav(back, crumb)}
         <div className="app-page flex-1 grid content-start gap-8 md:grid-cols-2 md:gap-10 items-start">
           <div className="md:col-span-2 mb-4 app-in">
-            <p className="kicker inline-flex items-center gap-2.5 !text-accent-400"><span className="size-1.5 rounded-full bg-accent-400 shadow-[0_0_10px_2px_rgb(99_102_241_/_0.7)]" aria-hidden />{kicker} · Manche {race.round}</p>
-            <h1 className="text-gradient mt-5 text-[2.6rem] sm:text-6xl lg:text-[4.25rem] font-semibold tracking-[-0.045em] leading-[1.04]"><span className="mr-3" aria-hidden>{race.flag}</span>{race.name}</h1>
+            <p className="kicker">{kicker} · Manche {race.round}</p>
+            <h1 className="text-gradient mt-5 text-[2rem] sm:text-[2.75rem] font-medium tracking-[-0.035em] leading-[1.04]"><span className="mr-3" aria-hidden>{race.flag}</span>{race.name}</h1>
             <p className="text-base text-zinc-400 mt-5">{race.circuit} · {race.country} · {fmtDay(race.iso)} · <span className={d >= 0 ? 'text-white' : ''}>{state}</span></p>
           </div>
           <TrackMap src={race.map} alt={`Plan du circuit de ${race.circuit}`} unavailable={race.circuit} />
@@ -315,7 +315,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
       const text = 'Bienvenue dans le mode Hors Course'
       return (
         <div className="min-h-dvh text-white flex items-center justify-center">
-          <h1 className="text-3xl sm:text-5xl md:text-7xl font-semibold tracking-[-0.045em] leading-[1.05] text-center px-6">
+          <h1 className="text-3xl sm:text-5xl md:text-7xl font-medium tracking-[-0.035em] leading-[1.05] text-center px-6">
             {text.split('').map((char, i) => (
               <span key={i} className="inline-block opacity-0 animate-fadeIn" style={{ animationDelay: `${i * 40}ms` }}>
                 {char === ' ' ? '\u00A0' : char}
@@ -377,7 +377,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
                 <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full mx-auto mb-8 flex items-center justify-center text-5xl font-bold text-white" style={{ backgroundColor: getColor(teamName), boxShadow: `0 0 0 6px ${getColor(teamName)}22, 0 20px 60px -12px ${getColor(teamName)}88` }}>
                   {selectedDriver.Driver.familyName.charAt(0)}
                 </div>
-                <h1 className="text-gradient text-4xl sm:text-5xl font-semibold tracking-[-0.045em] leading-[1.05]">{selectedDriver.Driver.givenName} {selectedDriver.Driver.familyName}</h1>
+                <h1 className="text-gradient text-4xl sm:text-5xl font-medium tracking-[-0.035em] leading-[1.05]">{selectedDriver.Driver.givenName} {selectedDriver.Driver.familyName}</h1>
                 <p className="text-base text-zinc-500 mt-3">{teamName}</p>
               </div>
               <div className="bg-zinc-950 border border-white/[0.08] rounded-3xl p-6 lg:col-span-2">
@@ -400,7 +400,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
           <div className="min-h-dvh w-full flex flex-col text-white">
             {nav(() => setSelectedConstructor(null), "Écurie")}
             <div className="app-page flex-1 space-y-12 content-start">
-              <h1 className="text-gradient text-4xl sm:text-6xl font-semibold tracking-[-0.045em] text-center leading-[1.05]">{selectedConstructor.Constructor.name}</h1>
+              <h1 className="text-gradient text-4xl sm:text-6xl font-medium tracking-[-0.035em] text-center leading-[1.05]">{selectedConstructor.Constructor.name}</h1>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:col-span-2">
                 <div className="bg-zinc-950 border border-white/[0.08] rounded-3xl p-6 text-center"><p className="text-xs text-zinc-500">Points</p><p className="text-gradient text-3xl font-semibold tracking-[-0.03em] mt-2">{selectedConstructor.points}</p></div>
                 <div className="bg-zinc-950 border border-white/[0.08] rounded-3xl p-6 text-center"><p className="text-xs text-zinc-500">Victoires</p><p className="text-gradient text-3xl font-semibold tracking-[-0.03em] mt-2">{selectedConstructor.wins}</p></div>
@@ -670,7 +670,7 @@ if (subPage === 'stats-constructors') {
       const failed = dataState === 'error' && liveStandings.length === 0
       const head = (label: string, cta?: string, onClick?: () => void) => (
         <div className="flex items-center justify-between gap-3 mb-6 min-h-9">
-          <p className="kicker inline-flex items-center gap-2.5 !text-accent-400"><span className="size-1.5 rounded-full bg-accent-400 shadow-[0_0_10px_2px_rgb(99_102_241_/_0.7)]" aria-hidden />{label}</p>
+          <p className="kicker">{label}</p>
           {cta && onClick && (
             <button onClick={onClick} className="-mr-2 px-2 min-h-9 text-xs text-zinc-400 hover:text-white active:text-white whitespace-nowrap">{cta} ›</button>
           )}
@@ -806,7 +806,7 @@ if (subPage === 'stats-constructors') {
             {driver && (
               <div className="bg-zinc-950 border border-white/[0.08] rounded-3xl p-6">
                 <div className="flex items-center gap-5 mb-8">
-                  <img src={driver.photo} alt={driver.name} className="w-20 h-20 shrink-0 rounded-full object-cover object-top ring-2 ring-accent-500/60 shadow-[0_0_30px_-4px_rgb(99_102_241_/_0.6)]" />
+                  <img src={driver.photo} alt={driver.name} className="w-20 h-20 shrink-0 rounded-full object-cover object-top ring-2 ring-accent-500/60" />
                   <div><p className="text-2xl font-semibold tracking-[-0.03em]">{driver.name}</p><p className="text-sm text-zinc-500 mt-1">{driver.team}</p></div>
                 </div>
                 <a href={`https://www.formula1.com/en/drivers/${driver.name.toLowerCase().replace(/ /g, '-')}.html`} target="_blank" rel="noreferrer" className="btn-ghost block w-full py-3 min-h-12 rounded-full text-center text-sm font-medium">Voir les actualités</a>
@@ -843,10 +843,9 @@ if (subPage === 'stats-constructors') {
             >
               <img src={nextRace.photo} alt="" className="absolute inset-0 w-full h-full object-cover opacity-55 group-hover:scale-105 transition duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#08090a] via-[#08090a]/55 to-[#08090a]/10" />
-              <div aria-hidden className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-[radial-gradient(closest-side,rgb(99_102_241_/_0.35),transparent)] blur-2xl" />
               <div className="relative min-h-[24rem] sm:min-h-[30rem] lg:min-h-[34rem] flex flex-col justify-end p-6 sm:p-12 lg:p-16 pt-24">
                 <span className="self-start chip">Prochain GP • Round {nextRace.round}</span>
-                <h1 className="text-gradient mt-6 font-semibold leading-[1] tracking-[-0.05em] text-5xl sm:text-7xl lg:text-[6.5rem]">{nextRace.name}</h1>
+                <h1 className="text-gradient mt-6 font-medium leading-[1.04] tracking-[-0.04em] text-[2.5rem] sm:text-[4rem] lg:text-[4.5rem]">{nextRace.name}</h1>
                 <p className="mt-6 text-zinc-300 text-base sm:text-lg">{nextRace.date} • {nextRace.circuit} • <span className="text-white font-semibold">{getDaysUntilRace()}</span></p>
                 <span className="btn-primary mt-8 self-start inline-flex items-center min-h-12 rounded-full text-white font-semibold text-sm px-7">Voir le circuit →</span>
               </div>
@@ -930,7 +929,7 @@ if (subPage === 'stats-constructors') {
             {drivers.map((d) => {
               const on = selectedDrivers.includes(d.id)
               return (
-                <button key={d.id} onClick={() => toggleDriver(d.id)} aria-pressed={on} className={`flex flex-col items-center rounded-3xl px-3 py-6 border transition active:scale-[0.98] hover:-translate-y-0.5 ${on ? 'border-accent-400/60 bg-accent-500/10 shadow-[0_0_40px_-10px_rgb(99_102_241_/_0.7)]' : 'border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.05]'}`}>
+                <button key={d.id} onClick={() => toggleDriver(d.id)} aria-pressed={on} className={`flex flex-col items-center rounded-3xl px-3 py-6 border transition active:scale-[0.98] hover:-translate-y-0.5 ${on ? 'border-accent-400/60 bg-accent-500/10' : 'border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.05]'}`}>
                   <img src={d.photo} alt={d.name} className={`w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover object-top transition ${on ? 'ring-4 ring-accent-500' : 'ring-1 ring-white/10'}`} />
                   <p className="mt-4 font-semibold text-sm text-center">{d.name}</p>
                   <p className="text-xs text-zinc-500 mt-0.5">{d.team}</p>
@@ -957,7 +956,7 @@ if (subPage === 'stats-constructors') {
         <SectionTitle h1 kicker="Étape 2 sur 2" title="Choisis ton écurie" desc="Une seule, celle de ton cœur." />
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
           {teams.map((t) => (
-            <button key={t.id} onClick={() => { setFavTeam(t.id); localStorage.setItem(teamKey, t.id); scrollToValidate() }} aria-pressed={favTeam === t.id} className={`flex flex-col items-center gap-4 px-4 py-8 rounded-3xl border transition active:scale-[0.98] hover:-translate-y-0.5 ${favTeam === t.id ? 'border-accent-400/60 bg-accent-500/10 shadow-[0_0_40px_-10px_rgb(99_102_241_/_0.7)]' : 'bg-white/[0.02] border-white/[0.08] hover:bg-white/[0.05]'}`}>
+            <button key={t.id} onClick={() => { setFavTeam(t.id); localStorage.setItem(teamKey, t.id); scrollToValidate() }} aria-pressed={favTeam === t.id} className={`flex flex-col items-center gap-4 px-4 py-8 rounded-3xl border transition active:scale-[0.98] hover:-translate-y-0.5 ${favTeam === t.id ? 'border-accent-400/60 bg-accent-500/10' : 'bg-white/[0.02] border-white/[0.08] hover:bg-white/[0.05]'}`}>
               <img src={t.logo} alt={t.name} className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-contain" />
               <p className="font-semibold text-sm text-center">{t.name}</p>
             </button>

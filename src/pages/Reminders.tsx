@@ -22,8 +22,8 @@ function Toggle({ on, onClick, children, sub }: { on: boolean; onClick: () => vo
         <span className="block text-sm font-semibold">{children}</span>
         {sub && <span className="block text-xs text-zinc-500 mt-0.5">{sub}</span>}
       </span>
-      <span className={`relative w-11 h-6 rounded-full transition ${on ? 'bg-gradient-to-r from-[#5b7cff] to-[#7a5cf5] shadow-[0_0_16px_-2px_rgb(99_102_241_/_0.7)]' : 'bg-white/15'}`} aria-hidden>
-        <span className={`absolute top-0.5 size-5 rounded-full bg-white transition-all ${on ? 'left-[22px]' : 'left-0.5'}`} />
+      <span className={`relative w-11 h-6 rounded-full transition ${on ? 'bg-white' : 'bg-[#3d3e3f]'}`} aria-hidden>
+        <span className={`absolute top-0.5 size-5 rounded-full transition-all ${on ? 'bg-[#0a0a0a]' : 'bg-white'} ${on ? 'left-[22px]' : 'left-0.5'}`} />
       </span>
     </button>
   )

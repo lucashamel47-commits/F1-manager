@@ -188,8 +188,8 @@ export default function LivePage() {
     return (
       <main className="flex-1 w-full pb-28">
         <section className={`app-wrap pt-14 pb-12 app-in`}>
-          <p className="kicker inline-flex items-center gap-2.5 !text-accent-400"><span className="size-1.5 rounded-full bg-accent-400 shadow-[0_0_10px_2px_rgb(99_102_241_/_0.7)]" aria-hidden />Live</p>
-          <h1 className="text-gradient mt-5 text-5xl sm:text-7xl font-semibold tracking-[-0.045em] leading-[1.02]">Pas de session en cours</h1>
+          <p className="kicker">Live</p>
+          <h1 className="text-gradient mt-5 text-[2.5rem] sm:text-[4rem] font-medium tracking-[-0.04em] leading-[1.04]">Pas de session en cours</h1>
           <p className="mt-6 text-zinc-400 max-w-2xl text-base sm:text-lg leading-relaxed">Chronos, carte du circuit, stratégie, télémétrie et radios de la F1 en direct — ou rejouez n’importe quelle session passée avec les données d’OpenF1.</p>
           <div className="mt-9 flex flex-wrap gap-3">
             <button disabled={!lastRace} onClick={() => lastRace && start(lastRace)} className="btn-primary min-h-12 px-7 rounded-full inline-flex items-center gap-2.5 active:scale-[0.98] disabled:opacity-40 text-white text-sm font-semibold">
@@ -241,7 +241,7 @@ export default function LivePage() {
   return (
     <main className="flex-1 w-full pb-28 lg:pb-10">
       <section className={`${wide} py-3 flex flex-wrap items-center gap-x-4 gap-y-2`}>
-        <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${isLive ? 'bg-accent-500 text-white' : 'bg-white/10 text-zinc-200'}`}>
+        <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${isLive ? 'bg-white text-[#0a0a0a]' : 'bg-white/10 text-zinc-200'}`}>
           {isLive && <span className="size-2 rounded-full bg-white animate-pulse" />}{isLive ? 'Live' : 'Rejeu'}
         </span>
         <div className="min-w-0">

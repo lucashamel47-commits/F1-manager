@@ -1,3 +1,4 @@
+import { Brand } from '../components/landing/Sections'
 import AuthCard, { type AuthProps } from '../components/AuthForm'
 
 /** Page dédiée connexion / inscription : logo, formulaire, lien pour passer de l'un à l'autre, retour à l'accueil. */
@@ -11,17 +12,16 @@ export default function AuthPage(props: AuthProps & { showConfetti: boolean }) {
             <div
               key={i}
               className="animate-confetti absolute h-1.5 w-1.5 rounded-full"
-              style={{ left: `${(i * 37 + 11) % 100}%`, background: ['#8b9cff', '#fff', '#b08cff'][i % 3], animationDelay: `${i * 0.03}s` }}
+              style={{ left: `${(i * 37 + 11) % 100}%`, background: ['#f7f8f8', '#939494', '#fff'][i % 3], animationDelay: `${i * 0.03}s` }}
             />
           ))}
         </div>
       )}
-      <header className="mx-auto flex h-16 w-full max-w-[77.5rem] items-center justify-between px-4 sm:px-6">
-        <a href="#/" className="flex items-center gap-2.5" aria-label="F1 Manager, retour à l'accueil">
-          <span className="rounded-md bg-white px-2 py-1 text-sm font-bold leading-none tracking-tight text-black">F1</span>
-          <span className="text-[15px] font-semibold tracking-tight">Manager</span>
+      <header className="mx-auto flex h-16 w-full max-w-[82.5rem] items-center justify-between px-6 lg:px-10">
+        <a href="#/" aria-label="F1 Manager, retour à l'accueil">
+          <Brand />
         </a>
-        <a href="#/" className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm text-zinc-400 transition hover:text-white">
+        <a href="#/" className="inline-flex h-8 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-medium text-[#939494] transition hover:text-white">
           <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
           Retour à l'accueil
         </a>

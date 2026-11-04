@@ -184,7 +184,7 @@ function App() {
         />
         <ChatBot />
         {info && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-4 sm:px-6" onClick={() => setInfo(null)}>
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 px-4 sm:px-6" onClick={() => setInfo(null)}>
             <div className="glass bg-[#0e0f11]/90 rounded-3xl p-6 max-w-sm md:max-w-md w-full max-h-[85dvh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               <h3 className="text-lg font-semibold mb-3">
                 {info === 'hors' ? 'Mode Hors Course' : 'Mode Live Timing'}

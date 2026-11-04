@@ -23,18 +23,18 @@ const eyeOffIcon = <Icon d={<><path d="M3 3l18 18" /><path d="M10.6 5.7A9.6 9.6 
 /** Boutons d'entrée (accueil) : mènent aux pages dédiées. */
 export function AuthCtas() {
   return (
-    <div className="mt-14 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
-      <a href="#/inscription" className="btn-primary inline-flex min-h-14 items-center justify-center rounded-full px-9 text-base font-semibold active:scale-[0.98]">
+    <div className="mt-9 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+      <a href="#/inscription" className="btn-primary inline-flex h-11 items-center justify-center rounded-full px-[22px] text-[15px] active:scale-[0.98]">
         Créer un compte
       </a>
-      <a href="#/connexion" className="btn-ghost inline-flex min-h-14 items-center justify-center rounded-full px-9 text-base font-medium text-zinc-100 active:scale-[0.98]">
+      <a href="#/connexion" className="btn-ghost inline-flex h-11 items-center justify-center rounded-full px-[22px] text-[15px] active:scale-[0.98]">
         Se connecter
       </a>
     </div>
   )
 }
 
-const wrap = 'group relative flex items-center rounded-xl border border-white/[0.12] bg-white/[0.03] transition focus-within:border-white/40'
+const wrap = 'group relative flex items-center rounded-xl border border-[#2b2c2d] bg-[#101112] transition focus-within:border-[#636464]'
 const input = 'peer min-h-12 w-full bg-transparent pl-11 pr-4 text-base outline-none placeholder:text-zinc-600 [&:focus-visible]:outline-none'
 const ico = 'pointer-events-none absolute left-3.5 text-zinc-500 transition group-focus-within:text-zinc-200'
 
@@ -48,9 +48,9 @@ export default function AuthCard({
   const uid = useId()
   const ok = /créé|enregistr|✓/i.test(message)
   return (
-    <form onSubmit={onSubmit} noValidate className="w-full max-w-[26rem] rounded-2xl border border-white/[0.1] bg-[#0d0e10] p-6 sm:p-8">
-      <h1 className="text-2xl font-semibold tracking-tight">{isLogin ? 'Connexion' : 'Créer un compte'}</h1>
-      <p className="mt-1.5 text-sm text-zinc-400">{isLogin ? 'Retrouve tes pilotes, ton écurie et tes rappels.' : 'Choisis tes pilotes et ton écurie, suis ta saison.'}</p>
+    <form onSubmit={onSubmit} noValidate className="w-full max-w-[26rem] rounded-[1.25rem] border border-[#2b2c2d] bg-[#0c0d0e] p-6 sm:p-8">
+      <h1 className="text-[1.75rem] font-medium leading-[1.1] tracking-[-0.035em]">{isLogin ? 'Connexion' : 'Créer un compte'}</h1>
+      <p className="mt-2 text-[15px] text-[#939494]">{isLogin ? 'Retrouve tes pilotes, ton écurie et tes rappels.' : 'Choisis tes pilotes et ton écurie, suis ta saison.'}</p>
 
       <div className="mt-7 space-y-4">
         <div>
@@ -74,13 +74,13 @@ export default function AuthCard({
       </div>
 
       {message && (
-        <p role={ok ? 'status' : 'alert'} className={`mt-5 flex items-start gap-2.5 rounded-xl border px-4 py-3 text-sm leading-snug ${ok ? 'border-emerald-400/25 bg-emerald-400/10 text-emerald-200' : 'border-rose-400/25 bg-rose-400/10 text-rose-200'}`}>
+        <p role={ok ? 'status' : 'alert'} className={`mt-5 flex items-start gap-2.5 rounded-xl border px-4 py-3 text-sm leading-snug ${ok ? 'border-[#2b2c2d] bg-[#101112] text-[#c4c5c5]' : 'border-[#4a2a2a] bg-[#1a1010] text-[#f0b4b4]'}`}>
           <svg viewBox="0 0 24 24" className="mt-0.5 size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>{ok ? <path d="m5 12.5 4.5 4.5L19 7.5" /> : <><circle cx="12" cy="12" r="9" /><path d="M12 7.5v5.5M12 16.5h.01" /></>}</svg>
           <span>{message}</span>
         </p>
       )}
 
-      <button type="submit" disabled={busy} className="mt-6 flex min-h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-white text-base font-semibold text-black transition hover:bg-zinc-200 active:scale-[0.99] disabled:opacity-60">
+      <button type="submit" disabled={busy} className="mt-6 flex h-11 w-full items-center justify-center gap-2.5 rounded-full bg-white text-[15px] font-medium text-[#0a0a0a] transition hover:bg-[#e4e5e5] active:scale-[0.99] disabled:opacity-60">
         {busy && <span className="size-4 animate-spin rounded-full border-2 border-black/30 border-t-black" aria-hidden />}
         {busy ? 'Un instant…' : isLogin ? 'Se connecter' : 'Créer le compte'}
       </button>

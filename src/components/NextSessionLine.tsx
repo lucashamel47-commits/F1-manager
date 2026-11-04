@@ -18,8 +18,8 @@ export default function NextSessionLine() {
   const mins = Math.floor(ms / 60000)
   const txt = ms <= 0 ? 'en cours' : mins < 60 ? `dans ${mins} min` : mins < 2880 ? `dans ${Math.floor(mins / 60)} h ${String(mins % 60).padStart(2, '0')}` : `dans ${Math.floor(mins / 1440)} jours`
   return (
-    <p className="text-center text-xs text-zinc-500 mt-1">
-      Prochaine session : <span className="text-zinc-300">{next.label} · {next.gp}</span> · {txt}
+    <p className="text-left text-[13px] text-[#636464]">
+      Prochaine session : <span className="text-[#c4c5c5]">{next.label} · {next.gp}</span> · {txt}
     </p>
   )
 }
