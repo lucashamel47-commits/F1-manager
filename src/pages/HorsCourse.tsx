@@ -8,7 +8,7 @@ import TrackMap from '../components/TrackMap'
 import { circuits, daysUntil, fmtDay, type Circuit } from '../data/circuits'
 import { getSeasonWinners, season, type RaceWinner } from '../lib/f1api'
 import { useGrid } from '../lib/grid'
-import { DRIVERS, TEAMS, driverPhoto, type GridDriver } from '../data/grid'
+import { DRIVERS, TEAMS, driverPhoto, teamById, teamByName, teamLogo, normTeamId, type GridDriver } from '../data/grid'
 
 const LivePage = lazy(() => import('../live/LivePage'))
 
@@ -20,19 +20,6 @@ interface Props {
   favTeam: string | null
   setFavTeam: (id: string) => void
 }
-
-const teams = [
-  { id: 'rbr', name: 'Red Bull Racing', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/red-bull-racing-logo.png' },
-  { id: 'mcl', name: 'McLaren', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/mclaren-logo.png' },
-  { id: 'fer', name: 'Ferrari', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/ferrari-logo.png' },
-  { id: 'mer', name: 'Mercedes', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/mercedes-logo.png' },
-  { id: 'ast', name: 'Aston Martin', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/aston-martin-logo.png' },
-  { id: 'alp', name: 'Alpine', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/alpine-logo.png' },
-  { id: 'wil', name: 'Williams', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/williams-logo.png' },
-  { id: 'rb', name: 'RB', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/rb-logo.png' },
-  { id: 'haas', name: 'Haas', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/haas-logo.png' },
-  { id: 'sau', name: 'Sauber', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/sauber-logo.png' },
-]
 
 const BASE = import.meta.env.BASE_URL
 
@@ -474,7 +461,6 @@ if (subPage === 'stats-constructors') {
   if (selectedTeamStats) {
     const name = selectedTeamStats.Constructor.name.toLowerCase()
     let carImage = BASE + 'cars/redbull.jpeg'
-    let teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/red-bull-racing-logo.png'
     let fournisseur = 'Red Bull Ford'
     let noteMoteur = 'Premier moteur maison de Red Bull (DM01), développé avec Ford. L’écurie conçoit pour la première fois son propre groupe motopropulseur.'
     let noteAero = 'Red Bull va chercher à maximiser l’efficacité en ligne droite avec les ailes actives, tout en gardant un bon appui dans les virages rapides.'
@@ -482,77 +468,66 @@ if (subPage === 'stats-constructors') {
 
     if (name.includes('ferrari')) {
       carImage = BASE + 'cars/ferrari.jpeg'
-      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/ferrari-logo.png'
       fournisseur = 'Ferrari'
       noteMoteur = 'Moteur entièrement développé à Maranello. Ferrari fournit aussi Haas et Cadillac.'
       noteAero = 'Ferrari devra adapter son concept aéro pour bien gérer le passage entre mode virage et mode ligne droite.'
       officialSite = 'https://www.ferrari.com/en-EN/formula1'
     } else if (name.includes('mercedes')) {
       carImage = BASE + 'cars/mercedes.jpeg'
-      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/mercedes-logo.png'
       fournisseur = 'Mercedes'
       noteMoteur = 'Mercedes fournit McLaren, Williams et Alpine. Référence en gestion de l’énergie et fiabilité.'
       noteAero = 'Mercedes va chercher à tirer le meilleur parti des ailes actives sur les circuits à longues lignes droites.'
       officialSite = 'https://www.mercedesamgf1.com'
     } else if (name.includes('mclaren')) {
       carImage = BASE + 'cars/mclaren.jpeg'
-      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/mclaren-logo.png'
       fournisseur = 'Mercedes'
       noteMoteur = 'Client Mercedes depuis 2021. Partenariat prolongé jusqu’en 2030.'
       noteAero = 'McLaren va chercher à maximiser les zones de freinage et les virages rapides.'
       officialSite = 'https://www.mclaren.com/racing'
     } else if (name.includes('aston')) {
       carImage = BASE + 'cars/aston.jpeg'
-      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/aston-martin-logo.png'
       fournisseur = 'Honda'
       noteMoteur = 'Partenariat exclusif avec Honda à partir de 2026. Honda revient avec un moteur entièrement nouveau.'
       noteAero = 'Aston Martin devra adapter son concept aéro au nouveau moteur Honda.'
       officialSite = 'https://www.astonmartinf1.com'
     } else if (name.includes('williams')) {
       carImage = BASE + 'cars/williams.jpeg'
-      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/williams-logo.png'
       fournisseur = 'Mercedes'
       noteMoteur = 'Client Mercedes. Williams bénéficie de la puissance et de la fiabilité du constructeur allemand.'
       noteAero = 'Williams espère réduire l’écart grâce aux ailes actives sur les longues lignes droites.'
       officialSite = 'https://www.williamsf1.com'
     } else if (name.includes('alpine')) {
       carImage = BASE + 'cars/alpine.jpeg'
-      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/alpine-logo.png'
       fournisseur = 'Mercedes'
       noteMoteur = 'Alpine passe chez Mercedes en 2026. Un changement majeur qui permet de se concentrer sur le châssis.'
       noteAero = 'Le passage à Mercedes va permettre à Alpine de mieux travailler sur les ailes actives.'
       officialSite = 'https://www.alpinecars.com/en/formula-1'
     } else if (name.includes('haas')) {
       carImage = BASE + 'cars/haas.jpeg'
-      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/haas-f1-team-logo.png'
       fournisseur = 'Ferrari'
       noteMoteur = 'Client Ferrari. Haas utilise le même groupe motopropulseur que Ferrari.'
       noteAero = 'Haas va chercher à maximiser les zones de dépassement avec le nouveau règlement.'
       officialSite = 'https://www.haasf1team.com'
     } else if (name.includes('audi')) {
       carImage = BASE + 'cars/audi.jpeg'
-      teamLogo = 'https://upload.wikimedia.org/wikipedia/commons/a/aa/Audi.png'
       fournisseur = 'Audi'
       noteMoteur = 'Audi développe son propre moteur pour sa première saison en Formule 1. Un projet ambitieux pour la marque allemande.'
       noteAero = 'Audi devra rapidement maîtriser les ailes actives et le mode dépassement dès sa première année.'
       officialSite = 'https://www.audi.com'
     } else if (name.includes('sauber') || name.includes('kick')) {
       carImage = BASE + 'cars/sauber.jpeg'
-      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/kick-sauber-logo.png'
       fournisseur = 'Audi'
       noteMoteur = 'Sauber devient Audi. L’équipe prépare la transition vers la marque allemande.'
       noteAero = 'Sauber travaille sur l’adaptation aux nouvelles règles aérodynamiques de 2026.'
       officialSite = 'https://www.sauber-group.com'
     } else if (name.includes('cadillac')) {
       carImage = BASE + 'cars/cadillac.jpeg'
-      teamLogo = 'https://cdn.brandfetch.io/cadillac.com/logo'
       fournisseur = 'Ferrari'
       noteMoteur = 'Cadillac utilise un moteur Ferrari pour ses débuts en Formule 1. L’équipe américaine arrive avec un projet ambitieux.'
       noteAero = 'Cadillac devra rapidement maîtriser les ailes actives pour être compétitive dès sa première saison.'
       officialSite = 'https://www.cadillac.com'
     } else if (name.includes('racing bulls') || name.includes('rb')) {
       carImage = BASE + 'cars/racingbulls.jpeg'
-      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/rb-logo.png'
       fournisseur = 'Red Bull Ford'
       noteMoteur = 'Utilise le même groupe motopropulseur que Red Bull Racing.'
       noteAero = 'Racing Bulls profite des connaissances de Red Bull en aérodynamique.'
@@ -566,7 +541,7 @@ if (subPage === 'stats-constructors') {
         {nav(() => setSelectedTeamStats(null), selectedTeamStats.Constructor.name)}
 
         <div className="app-page flex-1 lg:grid lg:grid-cols-2 lg:gap-x-12 lg:content-start">
-          <div className="lg:col-span-2 flex items-center justify-between gap-4"><SectionTitle h1 kicker="Écurie 2026" title={selectedTeamStats.Constructor.name} /><img src={teamLogo} alt="" className="h-10 sm:h-14 max-w-[30%] object-contain" /></div>
+          <div className="lg:col-span-2 flex items-center justify-between gap-4"><SectionTitle h1 kicker="Écurie 2026" title={selectedTeamStats.Constructor.name} />{(() => { const gt = teamByName(selectedTeamStats.Constructor.constructorId) ?? teamByName(selectedTeamStats.Constructor.name); return gt ? <span className="grid size-16 sm:size-20 shrink-0 place-items-center rounded-2xl border border-white/[0.08] bg-[#141516]"><img src={teamLogo(gt)} alt={gt.name} className="size-10 sm:size-12 object-contain" /></span> : null })()}</div>
 
           <div className="relative rounded-3xl overflow-hidden border border-white/[0.08] bg-black [container-type:size] h-48 sm:h-64 md:h-80 lg:h-full lg:min-h-[28rem] flex items-center justify-start mb-8 lg:mb-0 shadow-[0_30px_80px_-30px_rgb(0_0_0_/_0.9)]">
             <CarStage src={carImage} className="w-[min(86cqw,148.6cqh)] ml-[1%] shrink-0" />
@@ -792,7 +767,7 @@ if (subPage === 'stats-constructors') {
 
     if (subPage === 'favorites') {
       const driver = driverInfo(favDriver)
-      const team = teams.find(t => t.id === favTeam)
+      const team = teamById(favTeam)
       return (
         <div className="min-h-dvh w-full flex flex-col text-white">
           {nav(() => setSubPage('home'), "Tes favoris")}
@@ -811,7 +786,7 @@ if (subPage === 'stats-constructors') {
             {team && (
               <div className="bg-zinc-950 border border-white/[0.08] rounded-3xl p-6">
                 <div className="flex items-center gap-5 mb-8">
-                  <img src={team.logo} alt={team.name} className="w-20 h-20 object-contain" />
+                  <span className="grid size-20 shrink-0 place-items-center rounded-2xl border border-white/[0.08] bg-[#141516]"><img src={teamLogo(team)} alt={team.name} className="size-12 object-contain" /></span>
                   <p className="text-2xl font-semibold tracking-[-0.03em]">{team.name}</p>
                 </div>
                 <a href={`https://en.wikipedia.org/wiki/${encodeURIComponent(team.name.replace(' Racing', ''))}`} target="_blank" rel="noreferrer" className="btn-ghost block w-full py-3 min-h-12 rounded-full text-center text-sm font-medium">Voir les actualités</a>
@@ -959,15 +934,26 @@ if (subPage === 'stats-constructors') {
       </TopBar>
       <div className="app-page flex-1">
         <SectionTitle h1 kicker="Étape 2 sur 2" title="Choisis ton écurie" desc="Une seule, celle de ton cœur." />
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
-          {teams.map((t) => (
-            <button key={t.id} onClick={() => { setFavTeam(t.id); localStorage.setItem(teamKey, t.id); scrollToValidate() }} aria-pressed={favTeam === t.id} className={`flex flex-col items-center gap-4 px-4 py-8 rounded-3xl border transition active:scale-[0.98] hover:-translate-y-0.5 ${favTeam === t.id ? 'border-accent-400/60 bg-accent-500/10' : 'bg-white/[0.02] border-white/[0.08] hover:bg-white/[0.05]'}`}>
-              <img src={t.logo} alt={t.name} className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-contain" />
-              <p className="font-semibold text-sm text-center">{t.name}</p>
-            </button>
-          ))}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+          {TEAMS.map((t) => {
+            const on = normTeamId(favTeam) === t.id
+            return (
+              <button key={t.id} onClick={() => { setFavTeam(t.id); localStorage.setItem(teamKey, t.id); scrollToValidate() }} aria-pressed={on} className={`group relative flex flex-col overflow-hidden rounded-2xl border text-left transition active:scale-[0.98] ${on ? 'border-white bg-[#17181a]' : 'border-white/[0.08] bg-[#101112] hover:border-white/25'}`}>
+                <span className={`absolute right-3 top-3 grid size-5 place-items-center rounded-full border transition ${on ? 'border-white bg-white text-black' : 'border-white/20 text-transparent'}`} aria-hidden>
+                  <svg viewBox="0 0 16 16" className="size-3" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="m3.5 8.5 3 3 6-7" /></svg>
+                </span>
+                <span className="grid aspect-[16/10] place-items-center">
+                  <img src={teamLogo(t)} alt="" className={`size-20 sm:size-24 object-contain transition duration-300 ${on ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'}`} />
+                </span>
+                <span className="flex items-center gap-2 border-t border-white/[0.06] px-4 py-3.5">
+                  <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: t.color }} />
+                  <span className="truncate text-[14px] font-medium">{t.name}</span>
+                </span>
+              </button>
+            )
+          })}
         </div>
-        <button ref={validateRef} disabled={!favTeam} onClick={() => setStep('done')} className="btn-primary mt-14 block w-full sm:max-w-md mx-auto min-h-14 rounded-full font-semibold disabled:opacity-35 disabled:saturate-0 disabled:shadow-none">Valider</button>
+        <button ref={validateRef} disabled={!teamById(favTeam)} onClick={() => setStep('done')} className="btn-primary mt-14 block w-full sm:max-w-md mx-auto min-h-14 rounded-full font-semibold disabled:opacity-35 disabled:saturate-0 disabled:shadow-none">Valider</button>
       </div>
     </div>
   )
