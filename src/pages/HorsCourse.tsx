@@ -22,7 +22,6 @@ interface Props {
   setFavTeam: (id: string) => void
 }
 
-const BASE = import.meta.env.BASE_URL
 
 const calendar = [
   { round: 18, iso: '2026-10-25', name: 'United States', date: '23 – 25 octobre', circuit: 'Austin', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/USA_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/USA.jpg', length: '5,513 km', laps: 56, record: '1:36.169', recordDriver: 'C. Leclerc', history: 'Inauguré en 2012, conçu par Hermann Tilke. Circuit technique avec de longs virages et une grande ligne droite qui favorise les dépassements.', grip: 'Asphalte lisse, bon grip une fois en température. Usure modérée.', creator: 'Hermann Tilke' },
@@ -47,21 +46,6 @@ const findNextRace = () => {
   return i === -1 ? calendar.length - 1 : i
 }
 
-const carImageFor = (teamName: string) => {
-  const n = teamName.toLowerCase()
-  if (n.includes('ferrari')) return BASE + 'cars/ferrari.jpeg'
-  if (n.includes('mercedes')) return BASE + 'cars/mercedes.jpeg'
-  if (n.includes('mclaren')) return BASE + 'cars/mclaren.jpeg'
-  if (n.includes('aston')) return BASE + 'cars/aston.jpeg'
-  if (n.includes('williams')) return BASE + 'cars/williams.jpeg'
-  if (n.includes('alpine')) return BASE + 'cars/alpine.jpeg'
-  if (n.includes('haas')) return BASE + 'cars/haas.jpeg'
-  if (n.includes('audi')) return BASE + 'cars/audi.jpeg'
-  if (n.includes('sauber') || n.includes('kick')) return BASE + 'cars/sauber.jpeg'
-  if (n.includes('cadillac')) return BASE + 'cars/cadillac.jpeg'
-  if (n.includes('racing bulls') || n.includes('rb')) return BASE + 'cars/racingbulls.jpeg'
-  return BASE + 'cars/redbull.jpeg'
-}
 
 export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver, favTeam, setFavTeam }: Props) {
   const driverKey = `f1-fav-drivers-${userEmail}`
@@ -176,12 +160,6 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
     return '#3f3f46'
   }
 
-  const trailColor = (teamName: string) => {
-    const c = getColor(teamName)
-    if (teamName.toLowerCase().includes('audi')) return '#BB0A30'
-    if (teamName.toLowerCase().includes('cadillac')) return '#FFD700'
-    return c === '#3f3f46' ? '#e10600' : c
-  }
 
   const go = (k: NavKey) => {
     setSelectedRace(null)
@@ -493,74 +471,62 @@ if (subPage === 'stats-records') {
 if (subPage === 'stats-constructors') {
   if (selectedTeamStats) {
     const name = selectedTeamStats.Constructor.name.toLowerCase()
-    let carImage = BASE + 'cars/redbull.jpeg'
     let fournisseur = 'Red Bull Ford'
     let noteMoteur = 'Premier moteur maison de Red Bull (DM01), développé avec Ford. L’écurie conçoit pour la première fois son propre groupe motopropulseur.'
     let noteAero = 'Red Bull va chercher à maximiser l’efficacité en ligne droite avec les ailes actives, tout en gardant un bon appui dans les virages rapides.'
     let officialSite = 'https://www.redbullracing.com'
 
     if (name.includes('ferrari')) {
-      carImage = BASE + 'cars/ferrari.jpeg'
       fournisseur = 'Ferrari'
       noteMoteur = 'Moteur entièrement développé à Maranello. Ferrari fournit aussi Haas et Cadillac.'
       noteAero = 'Ferrari devra adapter son concept aéro pour bien gérer le passage entre mode virage et mode ligne droite.'
       officialSite = 'https://www.ferrari.com/en-EN/formula1'
     } else if (name.includes('mercedes')) {
-      carImage = BASE + 'cars/mercedes.jpeg'
       fournisseur = 'Mercedes'
       noteMoteur = 'Mercedes fournit McLaren, Williams et Alpine. Référence en gestion de l’énergie et fiabilité.'
       noteAero = 'Mercedes va chercher à tirer le meilleur parti des ailes actives sur les circuits à longues lignes droites.'
       officialSite = 'https://www.mercedesamgf1.com'
     } else if (name.includes('mclaren')) {
-      carImage = BASE + 'cars/mclaren.jpeg'
       fournisseur = 'Mercedes'
       noteMoteur = 'Client Mercedes depuis 2021. Partenariat prolongé jusqu’en 2030.'
       noteAero = 'McLaren va chercher à maximiser les zones de freinage et les virages rapides.'
       officialSite = 'https://www.mclaren.com/racing'
     } else if (name.includes('aston')) {
-      carImage = BASE + 'cars/aston.jpeg'
       fournisseur = 'Honda'
       noteMoteur = 'Partenariat exclusif avec Honda à partir de 2026. Honda revient avec un moteur entièrement nouveau.'
       noteAero = 'Aston Martin devra adapter son concept aéro au nouveau moteur Honda.'
       officialSite = 'https://www.astonmartinf1.com'
     } else if (name.includes('williams')) {
-      carImage = BASE + 'cars/williams.jpeg'
       fournisseur = 'Mercedes'
       noteMoteur = 'Client Mercedes. Williams bénéficie de la puissance et de la fiabilité du constructeur allemand.'
       noteAero = 'Williams espère réduire l’écart grâce aux ailes actives sur les longues lignes droites.'
       officialSite = 'https://www.williamsf1.com'
     } else if (name.includes('alpine')) {
-      carImage = BASE + 'cars/alpine.jpeg'
       fournisseur = 'Mercedes'
       noteMoteur = 'Alpine passe chez Mercedes en 2026. Un changement majeur qui permet de se concentrer sur le châssis.'
       noteAero = 'Le passage à Mercedes va permettre à Alpine de mieux travailler sur les ailes actives.'
       officialSite = 'https://www.alpinecars.com/en/formula-1'
     } else if (name.includes('haas')) {
-      carImage = BASE + 'cars/haas.jpeg'
       fournisseur = 'Ferrari'
       noteMoteur = 'Client Ferrari. Haas utilise le même groupe motopropulseur que Ferrari.'
       noteAero = 'Haas va chercher à maximiser les zones de dépassement avec le nouveau règlement.'
       officialSite = 'https://www.haasf1team.com'
     } else if (name.includes('audi')) {
-      carImage = BASE + 'cars/audi.jpeg'
       fournisseur = 'Audi'
       noteMoteur = 'Audi développe son propre moteur pour sa première saison en Formule 1. Un projet ambitieux pour la marque allemande.'
       noteAero = 'Audi devra rapidement maîtriser les ailes actives et le mode dépassement dès sa première année.'
       officialSite = 'https://www.audi.com'
     } else if (name.includes('sauber') || name.includes('kick')) {
-      carImage = BASE + 'cars/sauber.jpeg'
       fournisseur = 'Audi'
       noteMoteur = 'Sauber devient Audi. L’équipe prépare la transition vers la marque allemande.'
       noteAero = 'Sauber travaille sur l’adaptation aux nouvelles règles aérodynamiques de 2026.'
       officialSite = 'https://www.sauber-group.com'
     } else if (name.includes('cadillac')) {
-      carImage = BASE + 'cars/cadillac.jpeg'
       fournisseur = 'Ferrari'
       noteMoteur = 'Cadillac utilise un moteur Ferrari pour ses débuts en Formule 1. L’équipe américaine arrive avec un projet ambitieux.'
       noteAero = 'Cadillac devra rapidement maîtriser les ailes actives pour être compétitive dès sa première saison.'
       officialSite = 'https://www.cadillac.com'
     } else if (name.includes('racing bulls') || name.includes('rb')) {
-      carImage = BASE + 'cars/racingbulls.jpeg'
       fournisseur = 'Red Bull Ford'
       noteMoteur = 'Utilise le même groupe motopropulseur que Red Bull Racing.'
       noteAero = 'Racing Bulls profite des connaissances de Red Bull en aérodynamique.'
@@ -576,9 +542,7 @@ if (subPage === 'stats-constructors') {
         <div className="app-page flex-1 lg:grid lg:grid-cols-2 lg:gap-x-12 lg:content-start">
           <div className="lg:col-span-2 flex items-center justify-between gap-4"><SectionTitle h1 kicker="Écurie 2026" title={selectedTeamStats.Constructor.name} />{(() => { const gt = teamByName(selectedTeamStats.Constructor.constructorId) ?? teamByName(selectedTeamStats.Constructor.name); return gt ? <span className="grid size-16 sm:size-20 shrink-0 place-items-center rounded-2xl border border-white/[0.08] bg-[#141516]"><img src={teamLogo(gt)} alt={gt.name} className="size-10 sm:size-12 object-contain" /></span> : null })()}</div>
 
-          <div className="relative rounded-3xl overflow-hidden border border-white/[0.08] bg-black [container-type:size] h-48 sm:h-64 md:h-80 lg:h-full lg:min-h-[28rem] flex items-center justify-start mb-8 lg:mb-0 shadow-[0_30px_80px_-30px_rgb(0_0_0_/_0.9)]">
-            <CarStage src={carImage} className="w-[min(86cqw,148.6cqh)] ml-[1%] shrink-0" />
-          </div>
+          {(() => { const gt = teamOf(selectedTeamStats.Constructor); return gt ? <CarStage team={gt} size="lg" className="rounded-3xl border border-white/[0.08] aspect-[16/9] lg:aspect-auto lg:h-full lg:min-h-[28rem] mb-8 lg:mb-0" /> : null })()}
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-1 items-start">
             <div className="rounded-3xl border border-white/[0.08] bg-zinc-950 p-6 md:col-span-2 lg:col-span-1">
@@ -649,11 +613,11 @@ if (subPage === 'stats-constructors') {
         )}
         {liveConstructors.map((t, i) => (
           <button key={t.Constructor.constructorId} onClick={() => setSelectedTeamStats(t)} className="group text-left bg-zinc-950 border border-white/[0.08] rounded-3xl overflow-hidden transition duration-300 hover:-translate-y-1">
-            <div className="relative aspect-video overflow-hidden bg-black [container-type:size] flex items-center justify-start">
-              <CarStage src={carImageFor(t.Constructor.name)} className="w-[min(86cqw,148.6cqh)] ml-[1%] shrink-0" />
-              <span className="absolute top-3 left-3 chip">P{i + 1}</span>
+            <div className="relative">
+              {teamOf(t.Constructor) ? <CarStage team={teamOf(t.Constructor)!} className="aspect-video" /> : <div className="aspect-video bg-[#0c0d0e]" />}
+              <span className="absolute top-3 right-3 chip">P{i + 1}</span>
             </div>
-            <div className="p-6 flex items-end justify-between gap-3" style={{ borderTop: `3px solid ${trailColor(t.Constructor.name)}` }}>
+            <div className="p-6 flex items-end justify-between gap-3" >
               <h3 className="text-lg font-semibold tracking-tight leading-tight">{t.Constructor.name}</h3>
               <p className="text-sm text-zinc-500 shrink-0"><span className="font-semibold text-2xl text-white tabular-nums">{t.points}</span> pts <span className="ml-1 text-zinc-600 group-hover:text-white transition" aria-hidden>›</span></p>
             </div>
@@ -860,13 +824,13 @@ if (subPage === 'stats-constructors') {
               <SectionTitle kicker="À la une" title="Explorer" />
               <div className="grid gap-6 sm:grid-cols-2">
                 {[
-                  { key: 'standings' as const, tag: 'Classements', title: 'Le championnat pilotes et constructeurs', img: BASE + 'cars/mercedes.jpeg', big: true },
+                  { key: 'standings' as const, tag: 'Classements', title: 'Le championnat pilotes et constructeurs', img: '', car: 'mer', big: true },
                   { key: 'calendar' as const, tag: 'Calendrier', title: 'Toutes les courses de la saison', img: (calendar[nextIdx + 1] ?? nextRace).photo },
-                  { key: 'stats' as const, tag: 'Statistiques', title: 'Chiffres, écarts et écuries', img: BASE + 'cars/ferrari.jpeg' },
-                  { key: 'favorites' as const, tag: 'Favoris', title: 'Ton pilote et ton écurie', img: driverInfo(favDriver)?.photo || BASE + 'cars/mclaren.jpeg' },
+                  { key: 'stats' as const, tag: 'Statistiques', title: 'Chiffres, écarts et écuries', img: '', car: 'fer' },
+                  { key: 'favorites' as const, tag: 'Favoris', title: 'Ton pilote et ton écurie', img: '', car: normTeamId(favTeam) ?? 'mcl' },
                 ].map((t) => (
                   <button key={t.key} onClick={() => setSubPage(t.key)} className={`group relative overflow-hidden rounded-3xl border border-white/[0.09] bg-zinc-950 text-left transition duration-300 hover:-translate-y-1 ${t.big ? 'sm:col-span-2 aspect-[16/9] lg:aspect-[21/9]' : 'aspect-[16/10]'}`}>
-                    <img src={t.img} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-65 group-hover:opacity-100 group-hover:scale-105 transition duration-500" />
+                    {t.car && teamById(t.car) ? <div className="absolute inset-0 transition duration-500 group-hover:scale-[1.03]"><CarStage team={teamById(t.car)!} logo={false} className="h-full" /></div> : <img src={t.img} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-65 group-hover:opacity-100 group-hover:scale-105 transition duration-500" />}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#08090a] via-[#08090a]/40 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
                       <span className="inline-block chip">{t.tag}</span>
