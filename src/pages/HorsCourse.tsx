@@ -213,7 +213,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
     American: 'Américain', Chinese: 'Chinois', Japanese: 'Japonais', Danish: 'Danois'
   }
 
-  const raceDetail = (race: any, kicker: string, back: () => void, crumb: string, pager = false) => {
+  const raceDetail = (race: any, _kicker: string, back: () => void, crumb: string, pager = false) => {
     const idx = fullSeason.findIndex((r) => r.round === race.round)
     const prev = pager ? fullSeason[idx - 1] : undefined
     const nextR = pager ? fullSeason[idx + 1] : undefined
@@ -225,8 +225,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
         {nav(back, crumb)}
         <div className="app-page flex-1 grid content-start gap-8 md:grid-cols-2 md:gap-10 items-start">
           <div className="md:col-span-2 mb-4 app-in">
-            <p className="kicker">{kicker} · Manche {race.round}</p>
-            <h1 className="text-gradient mt-5 text-[2rem] sm:text-[2.75rem] font-medium tracking-[-0.035em] leading-[1.04]"><span className="mr-3" aria-hidden>{race.flag}</span>{race.name}</h1>
+            <h1 className="text-gradient text-[2rem] sm:text-[2.75rem] font-medium tracking-[-0.035em] leading-[1.04]"><span className="mr-3" aria-hidden>{race.flag}</span>{race.name}</h1>
             <p className="text-base text-zinc-400 mt-5">{race.circuit} · {race.country} · {fmtDay(race.iso)} · <span className={d >= 0 ? 'text-white' : ''}>{state}</span></p>
           </div>
           <TrackMap src={race.map} alt={`Plan du circuit de ${race.circuit}`} unavailable={race.circuit} />

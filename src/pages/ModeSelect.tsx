@@ -27,9 +27,9 @@ export default function ModeSelect({ onSelectHors, onSelectLive, onSelectNotif, 
       </header>
 
       <main className="app-wrap pb-24 pt-16 sm:pt-24">
-        <p className="kicker app-in">Formula 1</p>
+        
         <h1 className="app-in mt-6 max-w-[40rem] text-[2.25rem] font-[560] leading-[1.06] tracking-[-0.035em] sm:text-[2.75rem]">Choisis ton mode.</h1>
-        <p className="app-in app-in-2 mt-5 text-base text-[#939494]">Résultats de la saison ou course en direct.</p>
+        
 
         <div className="app-in app-in-3 mt-14 border-b border-[#2b2c2d] sm:mt-20">
           <div className="flex items-center border-t border-[#2b2c2d] hover:bg-[#0c0d0e]">
