@@ -22,7 +22,7 @@ type RightTab = 'rc' | 'overtakes' | 'radio' | 'weather' | 'driver'
 type MobTab = LeftTab | RightTab | 'map'
 
 const LEFT: { key: LeftTab; label: string }[] = [
-  { key: 'tower', label: 'Classement' }, { key: 'chrono', label: 'Chronos' }, { key: 'strategy', label: 'Stratégie' }, { key: 'evolution', label: 'Évolution' },
+  { key: 'tower', label: 'Classement' }, { key: 'chrono', label: 'Vitesses & chronos' }, { key: 'strategy', label: 'Stratégie' }, { key: 'evolution', label: 'Évolution' },
 ]
 const RIGHT: { key: RightTab; label: string }[] = [
   { key: 'rc', label: 'Direction' }, { key: 'overtakes', label: 'Dépassements' }, { key: 'radio', label: 'Radios' }, { key: 'weather', label: 'Météo' },
@@ -176,9 +176,9 @@ export default function LivePage() {
   const track = snap ? TRACK_LABEL[snap.track.kind] : null
   const rightTabs = sel != null ? [...RIGHT, { key: 'driver' as const, label: 'Pilote' }] : RIGHT
   const mobTabs: { key: MobTab; label: string }[] = [
-    { key: 'tower', label: 'Classement' }, { key: 'map', label: 'Carte' }, ...(sel != null ? [{ key: 'driver' as const, label: 'Pilote' }] : []),
+    { key: 'tower', label: 'Classement' }, { key: 'chrono', label: 'Vitesses' }, { key: 'map', label: 'Carte' }, ...(sel != null ? [{ key: 'driver' as const, label: 'Pilote' }] : []),
     { key: 'rc', label: 'Direction' }, { key: 'strategy', label: 'Stratégie' }, { key: 'evolution', label: 'Évolution' },
-    { key: 'chrono', label: 'Chronos' }, { key: 'overtakes', label: 'Dépass.' }, { key: 'radio', label: 'Radios' }, { key: 'weather', label: 'Météo' },
+    { key: 'overtakes', label: 'Dépass.' }, { key: 'radio', label: 'Radios' }, { key: 'weather', label: 'Météo' },
   ]
   const wide = 'w-full px-3 sm:px-5 lg:px-6'
 

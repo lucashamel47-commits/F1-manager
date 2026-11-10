@@ -23,7 +23,7 @@ function Trace({ samples, t }: { samples: { t: number; speed: number; thr: numbe
   if (x1 != null) brakes.push({ x1, x2 })
   return (
     <svg viewBox="0 0 300 104" className="w-full h-24" role="img" aria-label="Télémétrie des 30 dernières secondes">
-      <rect width="300" height="104" fill="#09090b" />
+      <rect width="300" height="104" rx="6" fill="#0c0d0e" />
       {brakes.map((b, i) => <rect key={i} x={b.x1} y={0} width={Math.max(1, b.x2 - b.x1)} height="104" fill="#ef4444" fillOpacity=".25" />)}
       <path d={sp} fill="none" stroke="#e4e4e7" strokeWidth="1.4" />
       <path d={th} fill="none" stroke="#22c55e" strokeWidth="1.2" />
@@ -62,15 +62,15 @@ export default function DriverPanel({ store, snap, car, n, t, onClose, issue }: 
         <button onClick={onClose} aria-label="Fermer la fiche pilote" className="min-h-11 min-w-11 flex items-center justify-center text-zinc-400 active:text-white text-xl">✕</button>
       </div>
 
-      <div className="grid grid-cols-3 gap-px bg-zinc-800 text-center">
+      <div className="grid grid-cols-3 gap-px bg-white/[0.06] text-center">
         {[
           { k: 'Dernier tour', v: fmtLap(r.last), cls: stateClass(r.lastState) },
-          { k: 'Meilleur tour', v: fmtLap(bestLap), cls: r.bestOverall ? 'text-fuchsia-400' : '' },
+          { k: 'Meilleur tour', v: fmtLap(bestLap), cls: r.bestOverall ? 'text-white' : '' },
           { k: 'Pointe', v: r.speedTrap ? `${r.speedTrap} km/h` : '—', cls: '' },
         ].map((c) => (
-          <div key={c.k} className="bg-zinc-950 py-2.5">
+          <div key={c.k} className="bg-[#0c0d0e] py-3.5">
             <p className="text-[10px] uppercase tracking-[0.15em] text-zinc-500">{c.k}</p>
-            <p className={`mt-0.5 text-base font-bold tabular-nums ${c.cls}`}>{c.v}</p>
+            <p className={`mt-1 text-base font-semibold tabular-nums ${c.cls}`}>{c.v}</p>
           </div>
         ))}
       </div>
@@ -82,11 +82,18 @@ export default function DriverPanel({ store, snap, car, n, t, onClose, issue }: 
         </div>
         {cur ? (
           <div className={stale ? 'opacity-50' : ''}>
-            <div className="flex items-end gap-4">
-              <p className="text-5xl font-bold tabular-nums leading-none">{cur.speed}<span className="text-sm text-zinc-500 font-bold ml-1">km/h</span></p>
-              <p className="text-3xl font-bold text-zinc-300 leading-none tabular-nums" aria-label="Rapport">{cur.gear === 0 ? 'N' : cur.gear}</p>
-              <span className={`ml-auto text-xs font-bold px-2 py-1 rounded-sm ${drsState(cur.drs) === 'on' ? 'bg-emerald-500 text-black' : drsState(cur.drs) === 'ready' ? 'bg-emerald-900 text-emerald-300' : 'bg-zinc-900 text-zinc-500'}`}>DRS</span>
+            <div className="flex items-end gap-5">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[#636464]">Vitesse</p>
+                <p className="mt-1 text-5xl font-semibold tabular-nums leading-none tracking-[-0.03em]">{cur.speed}<span className="ml-1.5 text-sm font-normal text-[#636464]">km/h</span></p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[#636464]">Rapport</p>
+                <p className="mt-1 text-3xl font-semibold text-zinc-300 leading-none tabular-nums" aria-label="Rapport">{cur.gear === 0 ? 'N' : cur.gear}</p>
+              </div>
+              <span className={`ml-auto rounded-full px-2.5 py-1 text-[11px] font-semibold ${drsState(cur.drs) === 'on' ? 'bg-white text-black' : drsState(cur.drs) === 'ready' ? 'border border-white/40 text-white' : 'border border-white/10 text-[#636464]'}`}>Aileron ouvert</span>
             </div>
+            <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/[0.06]" aria-hidden><span className="block h-full rounded-full bg-white transition-[width] duration-300" style={{ width: `${Math.min(100, (cur.speed / 360) * 100)}%` }} /></div>
             <div className="mt-3 grid gap-2 text-[10px] uppercase tracking-wider text-zinc-500">
               {[
                 { k: 'Accélérateur', v: cur.thr, max: 100, cls: 'bg-emerald-500', txt: `${cur.thr} %` },
@@ -95,7 +102,7 @@ export default function DriverPanel({ store, snap, car, n, t, onClose, issue }: 
               ].map((b) => (
                 <div key={b.k} className="flex items-center gap-2">
                   <span className="w-24 shrink-0">{b.k}</span>
-                  <span className="flex-1 h-2 bg-zinc-900 rounded-full overflow-hidden"><span className={`block h-full ${b.cls}`} style={{ width: `${Math.min(100, (b.v / b.max) * 100)}%` }} /></span>
+                  <span className="flex-1 h-1.5 bg-white/[0.06] rounded-full overflow-hidden"><span className={`block h-full ${b.cls}`} style={{ width: `${Math.min(100, (b.v / b.max) * 100)}%` }} /></span>
                   <span className="w-12 text-right text-zinc-300 tabular-nums">{b.txt}</span>
                 </div>
               ))}
