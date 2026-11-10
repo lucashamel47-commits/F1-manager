@@ -8,7 +8,8 @@ import TrackMap from '../components/TrackMap'
 import { circuits, daysUntil, fmtDay, type Circuit } from '../data/circuits'
 import { getSeasonWinners, season, type RaceWinner } from '../lib/f1api'
 import { useGrid } from '../lib/grid'
-import { DRIVERS, TEAMS, driverPhoto, teamById, teamByName, teamLogo, normTeamId, type GridDriver } from '../data/grid'
+import { useChampionship, type Title } from '../lib/championship'
+import { DRIVERS, F1_PHOTO_ID, TEAMS, driverPhoto, teamById, teamByName, teamLogo, normTeamId, type GridDriver } from '../data/grid'
 
 const LivePage = lazy(() => import('../live/LivePage'))
 
@@ -67,6 +68,12 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
   const teamKey = `f1-fav-team-${userEmail}`
   const validateRef = useRef<HTMLButtonElement>(null)
   const { grid } = useGrid()
+  const teamOf = (c?: { constructorId?: string; name?: string }) => teamByName(c?.constructorId) ?? teamByName(c?.name)
+  /** Portrait officiel d'un pilote du classement (repli : silhouette du CDN). */
+  const standingPhoto = (d: any, w = 160) => {
+    const t = teamOf(d.Constructors?.at(-1))
+    return driverPhoto(t?.slug ?? 'fallback', F1_PHOTO_ID[d.Driver.code ?? ''], w)
+  }
   /** Fiche d'un pilote favori : grille en cours, sinon grille de référence. */
   const driverInfo = (id: string | null) => {
     const d = grid.find((x) => x.id === id) ?? DRIVERS.find((x) => x.id === id)
@@ -82,35 +89,18 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
   const [nextIdx] = useState(findNextRace)
   const nextRace = calendar[nextIdx]
   const [subPage, setSubPage] = useState<'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'live' | 'circuit' | 'stats-constructors' | 'stats-records'>('home')
-  const [liveStandings, setLiveStandings] = useState<any[]>([])
-  const [liveConstructors, setLiveConstructors] = useState<any[]>([])
+  const champ = useChampionship()
+  const liveStandings: any[] = champ.data?.drivers ?? []
+  const liveConstructors: any[] = champ.data?.constructors ?? []
   const [standingsTab, setStandingsTab] = useState<'drivers' | 'constructors'>('drivers')
   const [selectedDriver, setSelectedDriver] = useState<any | null>(null)
   const [selectedConstructor, setSelectedConstructor] = useState<any | null>(null)
   const [selectedRace, setSelectedRace] = useState<any | null>(null)
   const [selectedTeamStats, setSelectedTeamStats] = useState<any | null>(null)
   const [raceFrom, setRaceFrom] = useState<'calendar' | 'stats'>('calendar')
-  const [dataState, setDataState] = useState<'loading' | 'ok' | 'error'>('loading')
-  const [reload, setReload] = useState(0)
+  const dataState = champ.data ? 'ok' : champ.state
   const [winners, setWinners] = useState<Record<number, RaceWinner>>({})
   const [winnersState, setWinnersState] = useState<'loading' | 'ok' | 'error'>('loading')
-
-  useEffect(() => {
-    let alive = true
-    const j = (u: string) => fetch(u).then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json() })
-    Promise.all([
-      j('https://api.jolpi.ca/ergast/f1/2026/driverStandings.json'),
-      j('https://api.jolpi.ca/ergast/f1/2026/constructorStandings.json'),
-    ])
-      .then(([d, c]) => {
-        if (!alive) return
-        setLiveStandings(d.MRData.StandingsTable.StandingsLists[0]?.DriverStandings || [])
-        setLiveConstructors(c.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings || [])
-        setDataState('ok')
-      })
-      .catch(() => alive && setDataState('error'))
-    return () => { alive = false }
-  }, [reload])
 
   useEffect(() => {
     let alive = true
@@ -356,9 +346,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
             {nav(() => setSelectedDriver(null), "Pilote")}
             <div className="app-page flex-1 grid content-start gap-8 lg:grid-cols-3 lg:gap-10 items-start">
               <div className="text-center lg:row-span-2 lg:self-center">
-                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full mx-auto mb-8 flex items-center justify-center text-5xl font-bold text-white" style={{ backgroundColor: getColor(teamName), boxShadow: `0 0 0 6px ${getColor(teamName)}22, 0 20px 60px -12px ${getColor(teamName)}88` }}>
-                  {selectedDriver.Driver.familyName.charAt(0)}
-                </div>
+                <img src={standingPhoto(selectedDriver, 320)} alt="" className="w-28 h-28 sm:w-32 sm:h-32 rounded-full mx-auto mb-8 bg-[#17181a] border border-white/10 object-cover object-top" />
                 <h1 className="text-gradient text-4xl sm:text-5xl font-medium tracking-[-0.035em] leading-[1.05]">{selectedDriver.Driver.givenName} {selectedDriver.Driver.familyName}</h1>
                 <p className="text-base text-zinc-500 mt-3">{teamName}</p>
               </div>
@@ -394,55 +382,100 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
         )
       }
 
+      const title: Title | null = standingsTab === 'drivers' ? champ.data?.driverTitle ?? null : champ.data?.constructorTitle ?? null
+      const updated = champ.data ? new Date(champ.data.updatedAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : null
+      const list = standingsTab === 'drivers' ? liveStandings : liveConstructors
+      const max = Number(list[0]?.points) || 1
       return (
         <div className="min-h-dvh w-full flex flex-col text-white">
           {nav(() => setSubPage('home'), "Classements")}
           <div className="app-page flex-1">
-            <SectionTitle h1 kicker="Championnat 2026" title="Classements" className="" />
-            <div className="seg mb-10" role="tablist" aria-label="Type de classement">
-              <button role="tab" aria-selected={standingsTab === 'drivers'} onClick={() => setStandingsTab('drivers')} className="seg-item">Pilotes</button>
-              <button role="tab" aria-selected={standingsTab === 'constructors'} onClick={() => setStandingsTab('constructors')} className="seg-item">Constructeurs</button>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {standingsTab === 'drivers' ? (
-                liveStandings.length === 0 ? <p className="text-center text-zinc-500 text-sm">Chargement...</p> :
-                liveStandings.map((d, i) => {
-                  const teamName = d.Constructors[0]?.name || ''
-                  return (
-                    <button key={d.Driver.driverId} onClick={() => setSelectedDriver(d)} className="w-full flex items-center justify-between gap-3 bg-zinc-950 border border-white/[0.08] rounded-2xl px-5 sm:px-6 py-5 min-h-16 text-left transition hover:-translate-y-0.5">
-                      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                        <span className="text-sm font-medium text-zinc-600 w-6 tabular-nums">{i + 1}</span>
-                        <div className="w-11 h-11 shrink-0 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: getColor(teamName) }}>
-                          {d.Driver.familyName.charAt(0)}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium truncate">{d.Driver.givenName} {d.Driver.familyName}</p>
-                          <p className="text-xs text-zinc-500">{teamName}</p>
-                        </div>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <span className="text-lg font-semibold tabular-nums">{d.points}</span>
-                        <p className="text-[11px] text-zinc-500">{d.wins} win{Number(d.wins) !== 1 ? 's' : ''}</p>
-                      </div>
-                    </button>
-                  )
-                })
-              ) : (
-                liveConstructors.length === 0 ? <p className="text-center text-zinc-500 text-sm">Chargement...</p> :
-                liveConstructors.map((t, i) => (
-                  <button key={t.Constructor.constructorId} onClick={() => setSelectedConstructor(t)} className="w-full flex items-center justify-between gap-3 bg-zinc-950 border border-white/[0.08] rounded-2xl px-5 sm:px-6 py-5 min-h-16 text-left transition hover:-translate-y-0.5">
-                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                      <span className="text-sm font-medium text-zinc-600 w-6">{i + 1}</span>
-                      <p className="text-sm font-medium">{t.Constructor.name}</p>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <span className="text-lg font-semibold tabular-nums">{t.points}</span>
-                      <p className="text-[11px] text-zinc-500">{t.wins} win{Number(t.wins) !== 1 ? 's' : ''}</p>
-                    </div>
-                  </button>
-                ))
+            <SectionTitle h1 kicker={`Championnat ${champ.data?.season ?? ''}`} title="Classements" className="" />
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-10">
+              <div className="seg" role="tablist" aria-label="Type de classement">
+                <button role="tab" aria-selected={standingsTab === 'drivers'} onClick={() => setStandingsTab('drivers')} className="seg-item">Pilotes</button>
+                <button role="tab" aria-selected={standingsTab === 'constructors'} onClick={() => setStandingsTab('constructors')} className="seg-item">Constructeurs</button>
+              </div>
+              {champ.data && (
+                <p className="flex items-center gap-2 text-[13px] text-[#939494]">
+                  <span className="relative flex size-2"><span className="absolute inline-flex size-full animate-ping rounded-full bg-white/40" /><span className="relative inline-flex size-2 rounded-full bg-white" /></span>
+                  En direct · après la manche {champ.data.round}/{champ.data.totalRounds}{champ.data.lastRaceName ? ` (${champ.data.lastRaceName.replace('Grand Prix', 'GP')})` : ''} · mis à jour à {updated}
+                </p>
               )}
             </div>
+
+            {title && (
+              title.decided ? (
+                <div className="mb-10 overflow-hidden rounded-3xl border border-white/[0.1] bg-[#101112]">
+                  <div className="flex flex-col gap-8 p-7 sm:flex-row sm:items-center sm:p-10">
+                    {standingsTab === 'drivers' && liveStandings[0] ? (
+                      <img src={standingPhoto(liveStandings[0], 320)} alt="" className="size-28 shrink-0 rounded-full border border-white/10 bg-[#17181a] object-cover object-top sm:size-32" />
+                    ) : liveConstructors[0] && teamOf(liveConstructors[0].Constructor) ? (
+                      <span className="grid size-28 shrink-0 place-items-center rounded-full border border-white/10 bg-[#17181a] sm:size-32"><img src={teamLogo(teamOf(liveConstructors[0].Constructor)!)} alt="" className="size-16" /></span>
+                    ) : null}
+                    <div className="min-w-0">
+                      <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#0a0a0a]">
+                        <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0zM17 5h3v2a3 3 0 01-3 3M7 5H4v2a3 3 0 003 3" /></svg>
+                        {standingsTab === 'drivers' ? 'Champion du monde' : 'Champion constructeurs'} {champ.data?.season}
+                      </span>
+                      <p className="mt-5 text-[2rem] font-medium leading-[1.05] tracking-[-0.035em] sm:text-[2.75rem]">{title.leaderName}</p>
+                      <p className="mt-3 text-[15px] leading-relaxed text-[#939494]">
+                        {title.seasonOver
+                          ? `Saison terminée${standingsTab === 'drivers' ? ` · ${title.leaderTeam}` : ''} · ${title.lead} points d'avance.`
+                          : `Titre mathématiquement assuré${standingsTab === 'drivers' ? ` avec ${title.leaderTeam}` : ''} : ${title.lead} points d'avance, ${title.remaining} encore en jeu sur ${title.racesLeft} course${title.racesLeft > 1 ? 's' : ''}.`}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="mb-10 flex flex-wrap items-baseline justify-between gap-3 rounded-2xl border border-white/[0.08] px-6 py-5">
+                  <p className="text-[15px]"><span className="text-[#939494]">Course au titre · </span>{title.leaderName} mène de <span className="font-semibold tabular-nums">{title.lead} pts</span></p>
+                  <p className="text-[13px] text-[#939494] tabular-nums">{title.remaining} pts encore en jeu · {title.racesLeft} course{title.racesLeft > 1 ? 's' : ''}{title.sprintsLeft ? ` + ${title.sprintsLeft} sprint${title.sprintsLeft > 1 ? 's' : ''}` : ''}</p>
+                </div>
+              )
+            )}
+
+            {list.length === 0 ? (
+              champ.state === 'error'
+                ? <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/[0.08] px-5 py-4" role="alert"><p className="text-sm text-zinc-300">Impossible de charger les classements.</p><button onClick={champ.reload} className="btn-primary min-h-11 px-5 rounded-full text-sm font-semibold">Réessayer</button></div>
+                : <div className="space-y-2" aria-busy="true">{Array.from({ length: 8 }, (_, i) => <div key={i} className="h-16 rounded-2xl bg-white/[0.03] animate-pulse" />)}</div>
+            ) : (
+              <ol className="overflow-hidden rounded-3xl border border-white/[0.08] divide-y divide-white/[0.06]">
+                {standingsTab === 'drivers' ? liveStandings.map((d, i) => {
+                  const t = teamOf(d.Constructors.at(-1))
+                  const champion = i === 0 && title?.decided
+                  return (
+                    <li key={d.Driver.driverId}>
+                      <button onClick={() => setSelectedDriver(d)} className="grid w-full grid-cols-[2rem_2.75rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-left transition hover:bg-white/[0.03] sm:grid-cols-[2.5rem_3rem_minmax(0,1fr)_10rem_auto] sm:gap-4 sm:px-6">
+                        <span className="text-sm tabular-nums text-[#636464]">{d.position}</span>
+                        <img src={standingPhoto(d, 160)} alt="" loading="lazy" className="size-11 rounded-full bg-[#17181a] object-cover object-top sm:size-12" />
+                        <span className="min-w-0">
+                          <span className="flex items-center gap-2"><span className="truncate text-[15px] font-medium">{d.Driver.givenName} {d.Driver.familyName}</span>{champion && <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black">Champion</span>}</span>
+                          <span className="mt-0.5 flex items-center gap-1.5 text-xs text-[#636464]"><span className="size-1.5 rounded-full" style={{ backgroundColor: t?.color ?? '#636464' }} />{d.Constructors.at(-1)?.name}</span>
+                        </span>
+                        <span className="hidden h-1 rounded-full bg-white/[0.06] sm:block"><span className="block h-full rounded-full bg-white/70" style={{ width: `${(Number(d.points) / max) * 100}%` }} /></span>
+                        <span className="text-right"><span className="block text-[17px] font-semibold tabular-nums">{d.points}</span><span className="block text-[11px] text-[#636464]">{d.wins} victoire{Number(d.wins) > 1 ? 's' : ''}</span></span>
+                      </button>
+                    </li>
+                  )
+                }) : liveConstructors.map((c, i) => {
+                  const t = teamOf(c.Constructor)
+                  const champion = i === 0 && title?.decided
+                  return (
+                    <li key={c.Constructor.constructorId}>
+                      <button onClick={() => setSelectedConstructor(c)} className="grid w-full grid-cols-[2rem_2.75rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-left transition hover:bg-white/[0.03] sm:grid-cols-[2.5rem_3rem_minmax(0,1fr)_10rem_auto] sm:gap-4 sm:px-6">
+                        <span className="text-sm tabular-nums text-[#636464]">{c.position}</span>
+                        <span className="grid size-11 place-items-center rounded-full border border-white/[0.08] bg-[#141516] sm:size-12">{t && <img src={teamLogo(t)} alt="" className="size-7" />}</span>
+                        <span className="min-w-0 flex items-center gap-2"><span className="truncate text-[15px] font-medium">{c.Constructor.name}</span>{champion && <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black">Champion</span>}</span>
+                        <span className="hidden h-1 rounded-full bg-white/[0.06] sm:block"><span className="block h-full rounded-full" style={{ width: `${(Number(c.points) / max) * 100}%`, backgroundColor: t?.color ?? '#fff' }} /></span>
+                        <span className="text-right"><span className="block text-[17px] font-semibold tabular-nums">{c.points}</span><span className="block text-[11px] text-[#636464]">{c.wins} victoire{Number(c.wins) > 1 ? 's' : ''}</span></span>
+                      </button>
+                    </li>
+                  )
+                })}
+              </ol>
+            )}
+            <p className="mt-6 text-xs text-[#636464]">Source : Jolpica-F1, actualisé automatiquement toutes les 5 minutes. Barème 2026 : 25 points par course, 8 par sprint.</p>
           </div>
         </div>
       )
@@ -611,7 +644,7 @@ if (subPage === 'stats-constructors') {
         {liveConstructors.length === 0 && dataState === 'error' && (
           <div className="col-span-full flex flex-wrap items-center justify-between gap-3 border border-white/[0.08] bg-zinc-950 rounded-2xl px-5 py-4" role="alert">
             <p className="text-sm text-zinc-300">Impossible de charger les écuries.</p>
-            <button onClick={() => { setDataState('loading'); setReload((n) => n + 1) }} className="btn-primary min-h-11 px-5 rounded-full text-sm font-semibold">Réessayer</button>
+            <button onClick={champ.reload} className="btn-primary min-h-11 px-5 rounded-full text-sm font-semibold">Réessayer</button>
           </div>
         )}
         {liveConstructors.map((t, i) => (
@@ -668,7 +701,7 @@ if (subPage === 'stats-constructors') {
             {failed && (
               <div className="col-span-full flex flex-wrap items-center justify-between gap-3 border border-white/[0.08] bg-zinc-950 rounded-2xl px-5 py-4" role="alert">
                 <p className="text-sm text-zinc-300">Impossible de charger les classements. Vérifiez votre connexion.</p>
-                <button onClick={() => { setDataState('loading'); setReload((n) => n + 1) }} className="btn-primary min-h-11 px-5 rounded-full text-sm font-semibold">Réessayer</button>
+                <button onClick={champ.reload} className="btn-primary min-h-11 px-5 rounded-full text-sm font-semibold">Réessayer</button>
               </div>
             )}
 
@@ -684,7 +717,7 @@ if (subPage === 'stats-constructors') {
                     <div className="bar-fill" style={{ width: `${(Number(leader.points) / (Number(leader.points) + Number(second.points))) * 100}%` }} />
                     <div className="bg-white/10 flex-1 rounded-full" />
                   </div>
-                  <p className="text-xs text-zinc-500 text-center">Écart : {gap} points</p>
+                  <p className="text-xs text-zinc-500 text-center">{champ.data?.driverTitle?.decided ? `${leader.Driver.familyName} est champion du monde · ${gap} points d'avance` : `Écart : ${gap} points`}</p>
                 </button>
               ) : loading ? skeleton(1, 'h-40') : <p className="text-sm text-zinc-500">Aucune donnée pour le moment.</p>}
             </div>
@@ -856,6 +889,7 @@ if (subPage === 'stats-constructors') {
                       <span className="w-6 text-lg font-semibold text-accent-400 tabular-nums">{i + 1}</span>
                       <span className="w-1 h-7 shrink-0 rounded-full" style={{ backgroundColor: getColor(d.Constructors[0]?.name || '') }} />
                       <span className="truncate text-base font-semibold">{d.Driver.givenName} {d.Driver.familyName}</span>
+                      {i === 0 && champ.data?.driverTitle?.decided && <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black">Champion</span>}
                     </span>
                     <span className="text-lg font-semibold tabular-nums">{d.points}</span>
                   </button>
