@@ -6,7 +6,9 @@ import { colorFor } from '../lib/teamColors'
 import CircuitCarousel from '../components/CircuitCarousel'
 import TrackMap from '../components/TrackMap'
 import { circuits, daysUntil, fmtDay, type Circuit } from '../data/circuits'
-import { getSeasonWinners, type RaceWinner } from '../lib/f1api'
+import { getSeasonWinners, season, type RaceWinner } from '../lib/f1api'
+import { useGrid } from '../lib/grid'
+import { DRIVERS, TEAMS, driverPhoto, type GridDriver } from '../data/grid'
 
 const LivePage = lazy(() => import('../live/LivePage'))
 
@@ -18,21 +20,6 @@ interface Props {
   favTeam: string | null
   setFavTeam: (id: string) => void
 }
-
-const drivers = [
-  { id: 'ver', name: 'Max Verstappen', team: 'Red Bull', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/M/MAXVER01_Max_Verstappen/maxver01.png.transform/2col/image.png' },
-  { id: 'nor', name: 'Lando Norris', team: 'McLaren', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LANNOR01_Lando_Norris/lannor01.png.transform/2col/image.png' },
-  { id: 'lec', name: 'Charles Leclerc', team: 'Ferrari', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/C/CHALEC01_Charles_Leclerc/chalec01.png.transform/2col/image.png' },
-  { id: 'pia', name: 'Oscar Piastri', team: 'McLaren', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/O/OSCPIA01_Oscar_Piastri/oscpia01.png.transform/2col/image.png' },
-  { id: 'sai', name: 'Carlos Sainz', team: 'Ferrari', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/C/CARSAI01_Carlos_Sainz/carsai01.png.transform/2col/image.png' },
-  { id: 'ham', name: 'Lewis Hamilton', team: 'Ferrari', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LEWHAM01_Lewis_Hamilton/lewham01.png.transform/2col/image.png' },
-  { id: 'rus', name: 'George Russell', team: 'Mercedes', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/G/GEORUS01_George_Russell/georus01.png.transform/2col/image.png' },
-  { id: 'alo', name: 'Fernando Alonso', team: 'Aston Martin', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/F/FERALO01_Fernando_Alonso/feralo01.png.transform/2col/image.png' },
-  { id: 'str', name: 'Lance Stroll', team: 'Aston Martin', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LANSTR01_Lance_Stroll/lanstr01.png.transform/2col/image.png' },
-  { id: 'gas', name: 'Pierre Gasly', team: 'Alpine', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/P/PIEGAS01_Pierre_Gasly/piegas01.png.transform/2col/image.png' },
-  { id: 'oco', name: 'Esteban Ocon', team: 'Alpine', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/E/ESTOCO01_Esteban_Ocon/estoco01.png.transform/2col/image.png' },
-  { id: 'alb', name: 'Alexander Albon', team: 'Williams', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/A/ALEALB01_Alexander_Albon/alealb01.png.transform/2col/image.png' },
-]
 
 const teams = [
   { id: 'rbr', name: 'Red Bull Racing', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/red-bull-racing-logo.png' },
@@ -92,6 +79,14 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
   const driverKey = `f1-fav-drivers-${userEmail}`
   const teamKey = `f1-fav-team-${userEmail}`
   const validateRef = useRef<HTMLButtonElement>(null)
+  const { grid } = useGrid()
+  /** Fiche d'un pilote favori : grille en cours, sinon grille de référence. */
+  const driverInfo = (id: string | null) => {
+    const d = grid.find((x) => x.id === id) ?? DRIVERS.find((x) => x.id === id)
+    if (!d) return null
+    const t = TEAMS.find((x) => x.id === d.teamId)
+    return { ...d, name: `${d.givenName} ${d.familyName}`, team: t?.name ?? '', color: t?.color ?? '#a1a1aa', photo: driverPhoto(t?.slug ?? 'fallback', d.f1, 320) }
+  }
 
   const [step, setStep] = useState<'driver' | 'team' | 'done'>('driver')
   const [selectedDrivers, setSelectedDrivers] = useState<string[]>([])
@@ -796,7 +791,7 @@ if (subPage === 'stats-constructors') {
     }
 
     if (subPage === 'favorites') {
-      const driver = drivers.find(d => d.id === favDriver)
+      const driver = driverInfo(favDriver)
       const team = teams.find(t => t.id === favTeam)
       return (
         <div className="min-h-dvh w-full flex flex-col text-white">
@@ -806,10 +801,10 @@ if (subPage === 'stats-constructors') {
             {driver && (
               <div className="bg-zinc-950 border border-white/[0.08] rounded-3xl p-6">
                 <div className="flex items-center gap-5 mb-8">
-                  <img src={driver.photo} alt={driver.name} className="w-20 h-20 shrink-0 rounded-full object-cover object-top ring-2 ring-accent-500/60" />
+                  <img src={driver.photo} alt={driver.name} className="w-20 h-20 shrink-0 rounded-full bg-[#141516] object-cover object-top ring-1 ring-white/10" />
                   <div><p className="text-2xl font-semibold tracking-[-0.03em]">{driver.name}</p><p className="text-sm text-zinc-500 mt-1">{driver.team}</p></div>
                 </div>
-                <a href={`https://www.formula1.com/en/drivers/${driver.name.toLowerCase().replace(/ /g, '-')}.html`} target="_blank" rel="noreferrer" className="btn-ghost block w-full py-3 min-h-12 rounded-full text-center text-sm font-medium">Voir les actualités</a>
+                <a href={`https://www.formula1.com/en/drivers/${driver.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/ /g, '-')}`} target="_blank" rel="noreferrer" className="btn-ghost block w-full py-3 min-h-12 rounded-full text-center text-sm font-medium">Voir les actualités</a>
                 <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(driver.name + ' F1')}`} target="_blank" rel="noreferrer" className="btn-ghost block w-full py-3 min-h-12 mt-3 rounded-full text-center text-sm font-medium">Vidéos récentes</a>
               </div>
             )}
@@ -860,7 +855,7 @@ if (subPage === 'stats-constructors') {
                   { key: 'standings' as const, tag: 'Classements', title: 'Le championnat pilotes et constructeurs', img: BASE + 'cars/mercedes.jpeg', big: true },
                   { key: 'calendar' as const, tag: 'Calendrier', title: 'Toutes les courses de la saison', img: (calendar[nextIdx + 1] ?? nextRace).photo },
                   { key: 'stats' as const, tag: 'Statistiques', title: 'Chiffres, écarts et écuries', img: BASE + 'cars/ferrari.jpeg' },
-                  { key: 'favorites' as const, tag: 'Favoris', title: 'Ton pilote et ton écurie', img: drivers.find(d => d.id === favDriver)?.photo || BASE + 'cars/mclaren.jpeg' },
+                  { key: 'favorites' as const, tag: 'Favoris', title: 'Ton pilote et ton écurie', img: driverInfo(favDriver)?.photo || BASE + 'cars/mclaren.jpeg' },
                 ].map((t) => (
                   <button key={t.key} onClick={() => setSubPage(t.key)} className={`group relative overflow-hidden rounded-3xl border border-white/[0.09] bg-zinc-950 text-left transition duration-300 hover:-translate-y-1 ${t.big ? 'sm:col-span-2 aspect-[16/9] lg:aspect-[21/9]' : 'aspect-[16/10]'}`}>
                     <img src={t.img} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-65 group-hover:opacity-100 group-hover:scale-105 transition duration-500" />
@@ -924,15 +919,25 @@ if (subPage === 'stats-constructors') {
           </div>
         </TopBar>
         <div className="app-page flex-1">
-          <SectionTitle h1 kicker="Étape 1 sur 2" title="Choisis tes pilotes" desc="Touche ceux que tu veux suivre." />
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
-            {drivers.map((d) => {
+          <SectionTitle h1 kicker="Étape 1 sur 2" title="Choisis tes pilotes" desc={`Les ${grid.length} pilotes de la grille ${season}. Touche ceux que tu veux suivre.`} />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+            {grid.map((d: GridDriver) => {
               const on = selectedDrivers.includes(d.id)
+              const t = TEAMS.find((x) => x.id === d.teamId)
               return (
-                <button key={d.id} onClick={() => toggleDriver(d.id)} aria-pressed={on} className={`flex flex-col items-center rounded-3xl px-3 py-6 border transition active:scale-[0.98] hover:-translate-y-0.5 ${on ? 'border-accent-400/60 bg-accent-500/10' : 'border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.05]'}`}>
-                  <img src={d.photo} alt={d.name} className={`w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover object-top transition ${on ? 'ring-4 ring-accent-500' : 'ring-1 ring-white/10'}`} />
-                  <p className="mt-4 font-semibold text-sm text-center">{d.name}</p>
-                  <p className="text-xs text-zinc-500 mt-0.5">{d.team}</p>
+                <button key={d.id} onClick={() => toggleDriver(d.id)} aria-pressed={on} aria-label={`${d.givenName} ${d.familyName}, ${t?.name ?? ''}`} className={`group relative overflow-hidden rounded-2xl border text-left transition active:scale-[0.98] ${on ? 'border-white bg-[#17181a]' : 'border-white/[0.08] bg-[#101112] hover:border-white/25'}`}>
+                  <span className="absolute left-3 top-3 z-10 text-[11px] font-medium tabular-nums text-[#636464]">{d.number}</span>
+                  <span className={`absolute right-3 top-3 z-10 grid size-5 place-items-center rounded-full border transition ${on ? 'border-white bg-white text-black' : 'border-white/20 text-transparent'}`} aria-hidden>
+                    <svg viewBox="0 0 16 16" className="size-3" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="m3.5 8.5 3 3 6-7" /></svg>
+                  </span>
+                  <span className="block aspect-[4/5] overflow-hidden">
+                    <img src={driverPhoto(t?.slug ?? 'fallback', d.f1, 320)} alt="" loading="lazy" className={`size-full object-cover object-top transition duration-500 ${on ? '' : 'grayscale-[35%] group-hover:grayscale-0'}`} />
+                  </span>
+                  <span className="block border-t border-white/[0.06] px-3.5 py-3">
+                    <span className="block truncate text-[13px] text-[#939494]">{d.givenName}</span>
+                    <span className="block truncate text-[15px] font-medium tracking-[-0.01em]">{d.familyName}</span>
+                    <span className="mt-1.5 flex items-center gap-1.5 text-[11px] text-[#636464]"><span className="size-1.5 rounded-full" style={{ backgroundColor: t?.color }} />{t?.name}</span>
+                  </span>
                 </button>
               )
             })}
