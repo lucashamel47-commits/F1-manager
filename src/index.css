@@ -420,3 +420,8 @@ button.bg-zinc-950:not(:disabled):hover, a.bg-zinc-950:hover { border-color: #3d
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
   button.rounded-full:active, a.rounded-full:active, .seg-item:active { scale: none; }
 }
+
+/* Barre latérale (façon Novex) */
+.app-side { transition: width 260ms cubic-bezier(0.32, 0.72, 0, 1); overflow: hidden; }
+.app-side-content { transition: padding-left 260ms cubic-bezier(0.32, 0.72, 0, 1); }
+@media (prefers-reduced-motion: reduce) { .app-side, .app-side-content { transition-duration: 1ms; } }

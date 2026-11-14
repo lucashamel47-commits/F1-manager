@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { Brand } from '../components/landing/Sections'
 import { getCalendar } from '../lib/f1api'
 import { allSessions, countdown, formatWhen, type Session } from '../lib/sessions'
 import { useChampionship } from '../lib/championship'
@@ -12,7 +11,6 @@ interface Props {
   onOpenSeason: (page: HorsPage) => void
   onOpenLive: () => void
   onOpenReminders: () => void
-  onLogout: () => void
 }
 
 const Arrow = ({ className = 'size-4' }: { className?: string }) => (
@@ -38,7 +36,7 @@ const card = 'rounded-[1.75rem] border border-[#232425] bg-[#0c0d0e]'
  * Accueil de l'app, structure Novex : l'essentiel en haut (prochaine session + compte à rebours, état du direct,
  * ton pilote et ton écurie), puis trois grandes entrées. Les outils secondaires sont à un geste, pas tous affichés.
  */
-export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenReminders, onLogout }: Props) {
+export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenReminders }: Props) {
   const now = useTick(1000)
   const sessions = useSessions()
   const champ = useChampionship()
@@ -60,19 +58,8 @@ export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenRem
 
   return (
     <div className="min-h-dvh text-white">
-      <header className="sticky top-0 z-30 border-b border-[#1d1e1f] bg-[#08090a]/95 backdrop-blur-sm">
-        <div className="app-wrap flex h-16 items-center gap-6">
-          <Brand />
-          <nav className="hidden items-center gap-1 md:flex" aria-label="Sections">
-            <button onClick={onOpenLive} className="h-9 rounded-full px-3.5 text-[14px] text-[#939494] hover:text-white">Live</button>
-            <button onClick={() => onOpenSeason('home')} className="h-9 rounded-full px-3.5 text-[14px] text-[#939494] hover:text-white">Saison</button>
-            <button onClick={onOpenReminders} className="h-9 rounded-full px-3.5 text-[14px] text-[#939494] hover:text-white">Rappels</button>
-          </nav>
-          <button onClick={onLogout} className="ml-auto inline-flex h-9 items-center rounded-full border border-[#2b2c2d] px-4 text-[13px] font-medium text-[#c4c5c5] hover:bg-[#161718] hover:text-white">Changer de compte</button>
-        </div>
-      </header>
 
-      <main className="app-wrap pb-28 pt-14 sm:pt-20">
+      <main className="app-wrap pb-28 pt-10 sm:pt-16">
         <h1 className="app-in max-w-[40rem] text-[2.25rem] font-[560] leading-[1.06] tracking-[-0.035em] sm:text-[3rem]">
           {live ? 'C’est en direct.' : `Salut ${first}.`}
         </h1>
@@ -134,7 +121,7 @@ export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenRem
           </div>
 
           <div className="grid gap-4">
-            <button onClick={() => onOpenSeason(drv ? 'favorites' : 'home')} className={`${card} group flex items-center gap-5 p-6 text-left transition hover:border-[#3a3b3c]`} data-home="driver">
+            <button onClick={() => onOpenSeason(drv ? 'favorites' : 'onboarding')} className={`${card} group flex items-center gap-5 p-6 text-left transition hover:border-[#3a3b3c]`} data-home="driver">
               {drv ? (
                 <>
                   <img src={driverPhoto(drvTeam?.slug ?? 'fallback', drv.f1, 240)} alt="" className="size-20 shrink-0 rounded-full border border-white/10 bg-[#17181a] object-cover object-top" />
@@ -149,7 +136,7 @@ export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenRem
                 <span className="flex-1"><span className="block text-[12px] text-[#636464]">Ton pilote</span><span className="mt-1 block text-[17px] font-medium">Choisis tes favoris</span></span>
               )}
             </button>
-            <button onClick={() => onOpenSeason(team ? 'favorites' : 'home')} className={`${card} group flex items-center gap-5 p-6 text-left transition hover:border-[#3a3b3c]`} data-home="team">
+            <button onClick={() => onOpenSeason(team ? 'favorites' : 'onboarding')} className={`${card} group flex items-center gap-5 p-6 text-left transition hover:border-[#3a3b3c]`} data-home="team">
               {team ? (
                 <>
                   <span className="grid size-20 shrink-0 place-items-center rounded-full border border-white/10 bg-[#141516]"><img src={teamLogo(team)} alt="" className="size-11 object-contain" /></span>
@@ -185,9 +172,9 @@ export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenRem
               tools={[['Classement en direct', onOpenLive], ['Suivre une voiture', onOpenLive], ['Vue pilote', onOpenLive]]}
             />
             <Entry
-              title="Saison" onOpen={() => onOpenSeason('home')}
+              title="Saison" onOpen={() => onOpenSeason('standings')}
               icon={<path d="M6 20V10M12 20V4M18 20v-7" />}
-              tools={[['Classements', () => onOpenSeason('standings')], ['Calendrier', () => onOpenSeason('calendar')], ['Statistiques', () => onOpenSeason('stats')], ['Duel & positions', () => onOpenSeason('stats-duel')]]}
+              tools={[['Classements', () => onOpenSeason('standings')], ['Calendrier', () => onOpenSeason('calendar')], ['Statistiques', () => onOpenSeason('stats')], ['Duel', () => onOpenSeason('stats-duel')], ['Positions', () => onOpenSeason('stats-positions')]]}
             />
             <Entry
               title="Rappels" onOpen={onOpenReminders}

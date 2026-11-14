@@ -9,10 +9,10 @@ import Reminders from './pages/Reminders'
 import NewPassword from './components/NewPassword'
 import { supabase, supabaseEnabled, APP_URL } from './lib/supabase'
 import type { Session } from '@supabase/supabase-js'
-import ChatBot from './components/ChatBot'
 import Legal from './pages/Legal'
 import { usePageFade } from './lib/motion'
 import { isPendingDeletion } from './lib/account'
+import AppMenu, { type MenuKey } from './components/AppMenu'
 
 interface User {
   id: string
@@ -51,6 +51,9 @@ function App() {
   const [favDriver, setFavDriver] = useState<string | null>(null)
   const [favTeam, setFavTeam] = useState<string | null>(null)
   const [deleted, setDeleted] = useState(false)
+  // Page « Saison » affichée (suivie pour surligner la bonne entrée du menu) et compteur pour rouvrir une page depuis le menu.
+  const [seasonPage, setSeasonPage] = useState<string>('standings')
+  const [seasonNav, setSeasonNav] = useState(0)
   const loggedIn = user !== null
 
   // Changer de page (connexion ↔ inscription ↔ accueil) efface l'ancien message d'erreur ; on revient en haut de page.
@@ -172,49 +175,61 @@ function App() {
 
   if (route === 'mentions') return <Legal />
 
-  if (loggedIn && mode === 'notif') {
-    return <Reminders onBack={() => setMode('select')} user={supabaseEnabled ? user : null} onDeleted={accountDeleted} />
-  }
-
-  if (loggedIn && mode === 'live') {
-    return (
-      <>
-        <LiveMode onBack={() => setMode('select')} />
-        <ChatBot />
-      </>
-    )
-  }
-
-  if (loggedIn && mode === 'hors') {
-    return (
-      <>
-        <HorsCourse
-          key={horsPage ?? 'home'}
-          initialPage={horsPage}
-          onBack={() => setMode('select')}
-          userEmail={user?.email ?? ''}
-          favDriver={favDriver}
-          setFavDriver={setFavDriver}
-          favTeam={favTeam}
-          setFavTeam={setFavTeam}
-        />
-        <ChatBot />
-      </>
-    )
-  }
-
   if (loggedIn) {
+    const active: MenuKey =
+      mode === 'live' ? 'live'
+        : mode === 'notif' ? 'reminders'
+          : mode === 'hors'
+            ? (seasonPage === 'calendar' ? 'calendar'
+              : seasonPage === 'stats-duel' ? 'duel'
+                : seasonPage === 'stats-positions' ? 'positions'
+                : seasonPage.startsWith('stats') ? 'stats'
+                  : seasonPage === 'favorites' ? 'favorites'
+                    : seasonPage === 'standings' ? 'standings' : 'home')
+            : 'home'
+    const openSeason = (p: HorsPage) => { setHorsPage(p); setSeasonNav((n) => n + 1); setMode('hors') }
+    const navigate = (k: MenuKey) => {
+      if (k === 'home') setMode('select')
+      else if (k === 'live') setMode('live')
+      else if (k === 'reminders') setMode('notif')
+      else openSeason(k === 'duel' ? 'stats-duel' : k === 'positions' ? 'stats-positions' : k)
+      window.scrollTo(0, 0)
+    }
+    let screen
+    if (mode === 'notif') screen = <Reminders onBack={() => setMode('select')} user={supabaseEnabled ? user : null} onDeleted={accountDeleted} />
+    else if (mode === 'live') screen = <LiveMode onBack={() => setMode('select')} />
+    else if (mode === 'hors') {
+      screen = (
+        <>
+          <HorsCourse
+            key={`${horsPage ?? 'home'}-${seasonNav}`}
+            initialPage={horsPage}
+            onBack={() => setMode('select')}
+            onPageChange={setSeasonPage}
+            userEmail={user?.email ?? ''}
+            favDriver={favDriver}
+            setFavDriver={setFavDriver}
+            favTeam={favTeam}
+            setFavTeam={setFavTeam}
+          />
+        </>
+      )
+    } else {
+      screen = (
+        <>
+          <AppHome
+            userEmail={user?.email ?? ''}
+            onOpenSeason={openSeason}
+            onOpenLive={() => setMode('live')}
+            onOpenReminders={() => setMode('notif')}
+          />
+        </>
+      )
+    }
     return (
-      <>
-        <AppHome
-          userEmail={user?.email ?? ''}
-          onOpenSeason={(p) => { setHorsPage(p); setMode('hors') }}
-          onOpenLive={() => setMode('live')}
-          onOpenReminders={() => setMode('notif')}
-          onLogout={logout}
-        />
-        <ChatBot />
-      </>
+      <AppMenu active={active} email={user?.email ?? ''} onNavigate={navigate} onLogout={logout}>
+        {screen}
+      </AppMenu>
     )
   }
 
