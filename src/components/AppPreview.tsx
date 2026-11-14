@@ -13,15 +13,16 @@ type TabKey = 'standings' | 'calendar' | 'live' | 'stats'
 
 interface Drv { id: string; acr: string; name: string; team: string; color: string; pts: number; wins: number; podiums: number; form: number[] }
 
+// Démo : top 8 du championnat 2026 (Jolpica, après le GP du Brésil), couleurs officielles 2026.
 const D: Drv[] = [
-  { id: 'ant', acr: 'ANT', name: 'Kimi Antonelli', team: 'Mercedes', color: '#27F4D2', pts: 365, wins: 9, podiums: 12, form: [18, 25, 15, 25, 18, 25, 12, 25] },
-  { id: 'rus', acr: 'RUS', name: 'George Russell', team: 'Mercedes', color: '#27F4D2', pts: 242, wins: 3, podiums: 8, form: [15, 18, 18, 15, 12, 18, 25, 12] },
-  { id: 'ham', acr: 'HAM', name: 'Lewis Hamilton', team: 'Ferrari', color: '#E8002D', pts: 241, wins: 1, podiums: 6, form: [6, 8, 8, 15, 8, 10, 8, 12] },
-  { id: 'ver', acr: 'VER', name: 'Max Verstappen', team: 'Red Bull', color: '#3671C6', pts: 236, wins: 2, podiums: 7, form: [25, 12, 25, 18, 25, 10, 18, 18] },
-  { id: 'lec', acr: 'LEC', name: 'Charles Leclerc', team: 'Ferrari', color: '#E8002D', pts: 233, wins: 1, podiums: 6, form: [10, 10, 12, 12, 18, 12, 10, 15] },
-  { id: 'nor', acr: 'NOR', name: 'Lando Norris', team: 'McLaren', color: '#FF8000', pts: 211, wins: 2, podiums: 6, form: [12, 15, 10, 18, 15, 15, 15, 18] },
-  { id: 'pia', acr: 'PIA', name: 'Oscar Piastri', team: 'McLaren', color: '#FF8000', pts: 144, wins: 0, podiums: 4, form: [8, 12, 15, 10, 10, 18, 12, 10] },
-  { id: 'had', acr: 'HAD', name: 'Isack Hadjar', team: 'Red Bull', color: '#3671C6', pts: 105, wins: 0, podiums: 1, form: [4, 6, 6, 4, 8, 6, 10, 6] },
+  { id: 'ant', acr: 'ANT', name: 'Kimi Antonelli', team: 'Mercedes', color: '#00D7B6', pts: 390, wins: 9, podiums: 14, form: [18, 25, 15, 25, 18, 25, 12, 25] },
+  { id: 'ver', acr: 'VER', name: 'Max Verstappen', team: 'Red Bull Racing', color: '#4781D7', pts: 279, wins: 3, podiums: 9, form: [25, 12, 25, 18, 25, 10, 18, 18] },
+  { id: 'rus', acr: 'RUS', name: 'George Russell', team: 'Mercedes', color: '#00D7B6', pts: 262, wins: 3, podiums: 9, form: [15, 18, 18, 15, 12, 18, 25, 12] },
+  { id: 'ham', acr: 'HAM', name: 'Lewis Hamilton', team: 'Ferrari', color: '#ED1131', pts: 261, wins: 1, podiums: 7, form: [6, 8, 8, 15, 8, 10, 8, 12] },
+  { id: 'lec', acr: 'LEC', name: 'Charles Leclerc', team: 'Ferrari', color: '#ED1131', pts: 249, wins: 1, podiums: 7, form: [10, 10, 12, 12, 18, 12, 10, 15] },
+  { id: 'nor', acr: 'NOR', name: 'Lando Norris', team: 'McLaren', color: '#F47600', pts: 246, wins: 3, podiums: 8, form: [12, 15, 10, 18, 15, 15, 15, 18] },
+  { id: 'pia', acr: 'PIA', name: 'Oscar Piastri', team: 'McLaren', color: '#F47600', pts: 152, wins: 0, podiums: 4, form: [8, 12, 15, 10, 10, 18, 12, 10] },
+  { id: 'had', acr: 'HAD', name: 'Isack Hadjar', team: 'Red Bull Racing', color: '#4781D7', pts: 122, wins: 0, podiums: 1, form: [4, 6, 6, 4, 8, 6, 10, 6] },
 ]
 const TEAMS = Object.values(
   D.reduce<Record<string, { name: string; color: string; pts: number }>>((a, d) => {
@@ -208,7 +209,7 @@ function Live() {
     <div className="grid lg:grid-cols-[1fr_17rem] gap-4 h-full">
       <div className="min-w-0">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-semibold tracking-tight flex items-center gap-2"><span className="size-1.5 rounded-full bg-red-500 animate-pulse" aria-hidden />Course · Tour {lap}/56</p>
+          <p className="text-sm font-semibold tracking-tight flex items-center gap-2"><span className="size-1.5 rounded-full bg-white animate-pulse" aria-hidden />Course · Tour {lap}/56</p>
           <span className="rounded-full bg-emerald-500/15 text-emerald-300 px-2.5 py-0.5 text-[10px] font-medium">Drapeau vert</span>
         </div>
         <div className="grid grid-cols-[1.5rem_1fr_3.5rem_2rem] items-center gap-2 px-3 pb-1 text-[10px] uppercase tracking-wider text-zinc-600"><span>P</span><span>Pilote</span><span className="text-right">Écart</span><span className="text-center">Pn</span></div>
@@ -246,7 +247,7 @@ function Live() {
 /* ───────── Statistiques ───────── */
 function Stats() {
   const four = D.slice(0, 4)
-  const [on, setOn] = useState<string[]>(['ant', 'rus', 'ver'])
+  const [on, setOn] = useState<string[]>(['ant', 'ver', 'rus'])
   const [hover, setHover] = useState<number | null>(null)
   const series = useMemo(() => Object.fromEntries(four.map((d) => [d.id, d.form.reduce<number[]>((a, v) => [...a, (a[a.length - 1] ?? 0) + v], [])])), [four])
   const W = 480, H = 170
@@ -326,7 +327,7 @@ export default function AppPreview() {
               {TABS.map((t) => (
                 <button key={t.key} role="tab" aria-selected={tab === t.key} onClick={() => choose(t.key)} className={`flex items-center gap-2.5 rounded-xl px-3 min-h-10 text-[13px] text-left transition ${tab === t.key ? 'bg-[#222324] text-white' : 'text-zinc-400 hover:bg-white/[0.05] hover:text-white'}`}>
                   <Icon k={t.key} />{t.label}
-                  {t.key === 'live' && <span className="ml-auto size-1.5 rounded-full bg-red-500 animate-pulse" aria-hidden />}
+                  {t.key === 'live' && <span className="ml-auto size-1.5 rounded-full bg-white animate-pulse" aria-hidden />}
                 </button>
               ))}
               <div className="mt-auto rounded-xl border border-white/[0.07] bg-white/[0.03] p-3 text-[11px] leading-snug text-zinc-500">Données de démonstration. Crée ton compte pour suivre la vraie saison.</div>

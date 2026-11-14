@@ -153,7 +153,7 @@ function nearestProgress(o: Outline, x: number, y: number): number {
   }
   return o.cum[bi] / o.total
 }
-function pointAt(o: Outline, p: number): [number, number] {
+export function pointAt(o: Outline, p: number): [number, number] {
   const target = ((p % 1) + 1) % 1 * o.total
   let lo = 0, hi = o.cum.length - 1
   while (lo < hi - 1) { const mid = (lo + hi) >> 1; if (o.cum[mid] <= target) lo = mid; else hi = mid }

@@ -1,3 +1,4 @@
+import { gpFr, countryFr, statusFr } from './i18n'
 // Moteur de réponses du chatbot : reconnaissance d'intentions simple (mots-clés) exécutée dans le navigateur.
 import {
   getCalendar,
@@ -43,7 +44,7 @@ const daysUntil = (r: Race) => {
   return Math.round((rd.getTime() - today.getTime()) / 86400000)
 }
 const dayLabel = (n: number) => (n <= 0 ? 'aujourd’hui' : n === 1 ? 'demain' : `dans ${n} jours`)
-const gpName = (r: Race) => r.raceName.replace('Grand Prix', 'GP')
+const gpName = (r: Race) => gpFr(r.raceName)
 const fullName = (d: { givenName: string; familyName: string }) => `${d.givenName} ${d.familyName}`
 const age = (iso?: string) => {
   if (!iso) return null
@@ -155,7 +156,7 @@ async function answerRace(r: Race, q: string, cal: Race[]): Promise<BotReply> {
   const askPole = any(q, ['pole', 'qualif'])
   if (!done) {
     return {
-      text: `**${r.raceName}** (manche ${r.round}) n’a pas encore eu lieu.\n📅 ${fmtDate(r.date, r.time)}\n📍 ${place}\nC’est ${dayLabel(daysUntil(r))}.`,
+      text: `**${gpFr(r.raceName)}** (manche ${r.round}) n’a pas encore eu lieu.\n📅 ${fmtDate(r.date, r.time)}\n📍 ${place}\nC’est ${dayLabel(daysUntil(r))}.`,
       chips: ['Prochain GP', 'Calendrier', 'Classement pilotes'],
     }
   }
@@ -164,7 +165,7 @@ async function answerRace(r: Race, q: string, cal: Race[]): Promise<BotReply> {
     const top = qual?.QualifyingResults?.slice(0, 3)
     if (!top?.length) return { text: `Je n’ai pas les qualifications du ${gpName(r)}.`, chips: MAIN_CHIPS }
     return {
-      text: `Qualifications du **${r.raceName}** :\n${top.map((x) => `${medal(x.position)} **${fullName(x.Driver)}** (${x.Constructor.name})${x.position === '1' && x.Q3 ? ` — ${x.Q3}` : ''}`).join('\n')}`,
+      text: `Qualifications · **${gpFr(r.raceName)}** :\n${top.map((x) => `${medal(x.position)} **${fullName(x.Driver)}** (${x.Constructor.name})${x.position === '1' && x.Q3 ? ` — ${x.Q3}` : ''}`).join('\n')}`,
       chips: ['Dernière course', 'Prochain GP'],
     }
   }
@@ -175,7 +176,7 @@ async function answerRace(r: Race, q: string, cal: Race[]): Promise<BotReply> {
   const podium = any(q, ['podium'])
   const n = winnerOnly ? 1 : podium ? 3 : 10
   const w = list[0]
-  const head = `**${r.raceName}** — manche ${r.round}, ${fmtDate(r.date)}`
+  const head = `**${gpFr(r.raceName)}** — manche ${r.round}, ${fmtDate(r.date)}`
   const body = winnerOnly
     ? `🏆 Victoire de **${fullName(w.Driver)}** (${w.Constructor.name})${w.Time ? ` en ${w.Time.time}` : ''}, parti ${w.grid === '0' ? 'des stands' : `${ord(w.grid)} sur la grille`}.`
     : list.slice(0, n).map((x) => `${medal(x.position)} **${fullName(x.Driver)}** (${x.Constructor.name})${x.position === '1' && x.Time ? ` — ${x.Time.time}` : ''}`).join('\n')
@@ -230,7 +231,7 @@ export async function answer(raw: string): Promise<BotReply> {
       const x = res?.Results?.find((r) => r.Driver.driverId === d.Driver.driverId)
       if (cur && x) {
         return {
-          text: `**${fullName(d.Driver)}** au ${gpName(cur)} : **${ord(x.position)}** (parti ${x.grid === '0' ? 'des stands' : ord(x.grid)}), ${pts(x.points)} marqué${Number(x.points) > 1 ? 's' : ''}${x.status !== 'Finished' && !x.status.startsWith('+') ? ` — ${x.status}` : ''}.`,
+          text: `**${fullName(d.Driver)}** au ${gpName(cur)} : **${ord(x.position)}** (parti ${x.grid === '0' ? 'des stands' : ord(x.grid)}), ${pts(x.points)} marqué${Number(x.points) > 1 ? 's' : ''}${x.status !== 'Finished' && !x.status.startsWith('+') ? ` — ${statusFr(x.status)}` : ''}.`,
           chips: [`Fiche ${d.Driver.familyName}`, 'Classement pilotes'],
         }
       }
@@ -261,7 +262,7 @@ export async function answer(raw: string): Promise<BotReply> {
     const n = daysUntil(r)
     const after = upcoming[1]
     return {
-      text: `**Prochain GP : ${r.raceName}** (manche ${r.round}/${cal.length})\n📅 ${fmtDate(r.date, r.time)}\n📍 ${r.Circuit.circuitName}, ${r.Circuit.Location.locality} (${r.Circuit.Location.country})\n⏱️ Course ${dayLabel(n)}.${after ? `\nEnsuite : ${gpName(after)}.` : ''}`,
+      text: `**Prochain GP : ${gpFr(r.raceName)}** (manche ${r.round}/${cal.length})\n📅 ${fmtDate(r.date, r.time)}\n📍 ${r.Circuit.circuitName}, ${r.Circuit.Location.locality} (${countryFr(r.Circuit.Location.country)})\n⏱️ Course ${dayLabel(n)}.${after ? `\nEnsuite : ${gpName(after)}.` : ''}`,
       chips: ['Calendrier', 'Classement pilotes', 'Dernière course'],
     }
   }

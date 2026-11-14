@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef, lazy, Suspense, type ReactNode } from 'react'
+import { gpFr } from '../lib/i18n'
 import MotorNav, { SectionTitle, TopBar, LogoButton, type NavKey } from '../components/MotorNav'
 import StatsRecords from '../components/StatsRecords'
 import { colorFor } from '../lib/teamColors'
 import CircuitCarousel from '../components/CircuitCarousel'
 import TrackMap from '../components/TrackMap'
 import { circuits, daysUntil, fmtDay, type Circuit } from '../data/circuits'
-import { getSeasonWinners, season, type RaceWinner } from '../lib/f1api'
+import { getSeasonWinners, type RaceWinner } from '../lib/f1api'
 import { useGrid } from '../lib/grid'
 import { useChampionship, type Title } from '../lib/championship'
 import { DRIVERS, F1_PHOTO_ID, TEAMS, driverPhoto, teamById, teamByName, teamLogo, normTeamId, type GridDriver } from '../data/grid'
@@ -19,7 +20,10 @@ interface Props {
   setFavDriver: (id: string) => void
   favTeam: string | null
   setFavTeam: (id: string) => void
+  /** page ouverte directement depuis l'accueil de l'app (sans l'écran de bienvenue) */
+  initialPage?: HorsPage
 }
+export type HorsPage = 'home' | 'standings' | 'calendar' | 'stats' | 'favorites'
 
 
 const extras: Record<number, { history?: string; grip?: string; creator?: string }> = {
@@ -46,7 +50,7 @@ const findNextRace = () => {
 }
 
 
-export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver, favTeam, setFavTeam }: Props) {
+export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver, favTeam, setFavTeam, initialPage }: Props) {
   const driverKey = `f1-fav-drivers-${userEmail}`
   const teamKey = `f1-fav-team-${userEmail}`
   const validateRef = useRef<HTMLButtonElement>(null)
@@ -71,7 +75,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
   const [welcomeDone, setWelcomeDone] = useState(false)
   const [nextIdx] = useState(findNextRace)
   const nextRace = fullSeason[nextIdx]
-  const [subPage, setSubPage] = useState<'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'live' | 'circuit' | 'stats-constructors' | 'stats-records'>('home')
+  const [subPage, setSubPage] = useState<'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'live' | 'circuit' | 'stats-constructors' | 'stats-records'>(initialPage ?? 'home')
   const [hidePast, setHidePast] = useState(() => localStorage.getItem('f1-hide-past') === '1')
   const toggleHidePast = () => setHidePast((v) => { localStorage.setItem('f1-hide-past', v ? '0' : '1'); return !v })
   const champ = useChampionship()
@@ -108,6 +112,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
     const onboarded = localStorage.getItem(driverKey + '-onboarded') === '1'
     if ((savedDrivers && savedTeam) || onboarded) {
       setStep('done')
+      if (initialPage) { setWelcomeDone(true); return }
       setShowWelcome(true)
       setTimeout(() => {
         setShowWelcome(false)
@@ -394,7 +399,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
               {champ.data && (
                 <p className="flex items-center gap-2 text-[13px] text-[#939494]">
                   <span className="relative flex size-2"><span className="absolute inline-flex size-full animate-ping rounded-full bg-white/40" /><span className="relative inline-flex size-2 rounded-full bg-white" /></span>
-                  En direct · après la manche {champ.data.round}/{champ.data.totalRounds}{champ.data.lastRaceName ? ` (${champ.data.lastRaceName.replace('Grand Prix', 'GP')})` : ''} · mis à jour à {updated}
+                  En direct · après la manche {champ.data.round}/{champ.data.totalRounds}{champ.data.lastRaceName ? ` (${gpFr(champ.data.lastRaceName)})` : ''} · mis à jour à {updated}
                 </p>
               )}
             </div>
@@ -694,7 +699,7 @@ if (subPage === 'stats-constructors') {
             )}
 
             <div className="min-w-0">
-              {head('Title fight', 'Classement', () => setSubPage('standings'))}
+              {head('Course au titre', 'Classement', () => setSubPage('standings'))}
               {leader && second ? (
                 <button onClick={() => setSubPage('standings')} className="group w-full text-left bg-zinc-950 border border-zinc-800 hover:border-zinc-600 active:bg-zinc-900 rounded-2xl p-5 transition">
                   <div className="flex justify-between items-end mb-8">
@@ -835,7 +840,7 @@ if (subPage === 'stats-constructors') {
               <img src={nextRace.photo} alt="" className="absolute inset-0 w-full h-full object-cover opacity-55 group-hover:scale-105 transition duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#08090a] via-[#08090a]/55 to-[#08090a]/10" />
               <div className="relative min-h-[24rem] sm:min-h-[30rem] lg:min-h-[34rem] flex flex-col justify-end p-6 sm:p-12 lg:p-16 pt-24">
-                <span className="self-start chip">Prochain GP • Round {nextRace.round}</span>
+                <span className="self-start chip">Prochain GP • Manche {nextRace.round}</span>
                 <h1 className="text-gradient mt-6 font-medium leading-[1.04] tracking-[-0.04em] text-[2.5rem] sm:text-[4rem] lg:text-[4.5rem]">{nextRace.name}</h1>
                 <p className="mt-6 text-zinc-300 text-base sm:text-lg">{nextRace.date} • {nextRace.circuit} • <span className="text-white font-semibold">{getDaysUntilRace()}</span></p>
                 <span className="btn-primary mt-8 self-start inline-flex items-center min-h-12 rounded-full text-white font-semibold text-sm px-7">Voir le circuit →</span>
@@ -956,7 +961,13 @@ if (subPage === 'stats-constructors') {
           </div>
         </TopBar>
         <div className="app-page flex-1">
-          <SectionTitle h1 kicker="Étape 1 sur 2" title="Choisis tes pilotes" desc={`Les ${grid.length} pilotes de la grille ${season}. Touche ceux que tu veux suivre.`} />
+          <div className="mb-12 sm:mb-16 app-in">
+            <div className="flex items-center gap-3">
+              <span className="text-[13px] font-medium text-[#939494]">Étape 1 sur 2</span>
+              <span className="flex gap-1.5" aria-hidden><span className="h-1 w-8 rounded-full bg-white" /><span className="h-1 w-8 rounded-full bg-white/15" /></span>
+            </div>
+            <h1 className="mt-4 font-medium tracking-[-0.035em] text-[2rem] leading-[1.06] sm:text-[2.75rem]">Choisis tes pilotes</h1>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
             {grid.map((d: GridDriver) => {
               const on = selectedDrivers.includes(d.id)
@@ -995,7 +1006,13 @@ if (subPage === 'stats-constructors') {
         </div>
       </TopBar>
       <div className="app-page flex-1">
-        <SectionTitle h1 kicker="Étape 2 sur 2" title="Choisis ton écurie" desc="Une seule, celle de ton cœur." />
+        <div className="mb-12 sm:mb-16 app-in">
+            <div className="flex items-center gap-3">
+              <span className="text-[13px] font-medium text-[#939494]">Étape 2 sur 2</span>
+              <span className="flex gap-1.5" aria-hidden><span className="h-1 w-8 rounded-full bg-white" /><span className="h-1 w-8 rounded-full bg-white" /></span>
+            </div>
+            <h1 className="mt-4 font-medium tracking-[-0.035em] text-[2rem] leading-[1.06] sm:text-[2.75rem]">Choisis ton écurie</h1>
+          </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
           {TEAMS.map((t) => {
             const on = normTeamId(favTeam) === t.id

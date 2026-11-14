@@ -2,9 +2,9 @@ import type { SectorState, TrackKind } from '../model'
 
 export const COMPOUND: Record<string, { color: string; letter: string; label: string }> = {
   SOFT: { color: '#ef4444', letter: 'S', label: 'Tendre' },
-  MEDIUM: { color: '#facc15', letter: 'M', label: 'Medium' },
+  MEDIUM: { color: '#facc15', letter: 'M', label: 'Médium' },
   HARD: { color: '#f4f4f5', letter: 'H', label: 'Dur' },
-  INTERMEDIATE: { color: '#22c55e', letter: 'I', label: 'Inter' },
+  INTERMEDIATE: { color: '#22c55e', letter: 'I', label: 'Intermédiaire' },
   WET: { color: '#3b82f6', letter: 'W', label: 'Pluie' },
   UNKNOWN: { color: '#71717a', letter: '?', label: 'Inconnu' },
 }

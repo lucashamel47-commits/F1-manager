@@ -5,6 +5,10 @@ import type { Row } from '../model'
 /** Mini-carte : tracé du circuit (un tour de référence) + une pastille par voiture, mise à jour en continu. */
 export default function LiveMap({ loc, now, rows, selected, onSelect, version }: { loc: LocationStore | null; now: () => number; rows: Row[]; selected: number | null; onSelect: (n: number) => void; version: number }) {
   const gRefs = useRef(new Map<number, SVGGElement>())
+  const lRefs = useRef(new Map<number, SVGGElement>())
+  const lnRefs = useRef(new Map<number, SVGLineElement>())
+  const selRef = useRef(selected)
+  useEffect(() => { selRef.current = selected })
   const rowsRef = useRef(rows)
   useEffect(() => { rowsRef.current = rows })
   const o = loc?.outline ?? null
@@ -49,14 +53,20 @@ export default function LiveMap({ loc, now, rows, selected, onSelect, version }:
       if (ts - last < 16) return
       last = ts
       const t = now()
+      const R = geo.span * 0.016
+      const cars: { r: Row; x: number; y: number }[] = []
       for (const r of rowsRef.current) {
         const g = gRefs.current.get(r.n)
         if (!g) continue
         const p = loc.at(r.n, t)
         if (!p) { g.setAttribute('visibility', 'hidden'); continue }
+        const x = geo.px(p[0]), y = geo.py(p[1])
         g.setAttribute('visibility', 'visible')
-        g.setAttribute('transform', `translate(${geo.px(p[0]).toFixed(1)} ${geo.py(p[1]).toFixed(1)})`)
+        g.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)})`)
+        cars.push({ r, x, y })
       }
+      placeLabels(cars, R, selRef.current, lRefs.current, lnRefs.current)
+      for (const r of rowsRef.current) if (!cars.some((c) => c.r.n === r.n)) { lRefs.current.get(r.n)?.setAttribute('visibility', 'hidden'); lnRefs.current.get(r.n)?.setAttribute('visibility', 'hidden') }
     }
     raf = requestAnimationFrame(loop)
     return () => cancelAnimationFrame(raf)
@@ -97,13 +107,63 @@ export default function LiveMap({ loc, now, rows, selected, onSelect, version }:
             <circle r={R * 2.6} fill="transparent" />
             {on && <circle r={R * 2} fill="none" stroke="#fff" strokeOpacity={0.5} strokeWidth={R * 0.14} />}
             <circle r={R * k} fill={r.color} stroke="#0a0a0a" strokeWidth={R * 0.28} />
-            <g transform={`translate(${R * 1.7 * k} ${-R * 1.7 * k})`}>
-              <rect x={0} y={-R * 0.95 * k} width={R * 3.5 * k} height={R * 1.9 * k} rx={R * 0.95 * k} fill={on ? '#fff' : 'rgb(10 10 10 / 0.82)'} stroke="rgb(255 255 255 / 0.12)" strokeWidth={R * 0.08} />
-              <text x={R * 1.75 * k} y={R * 0.42 * k} textAnchor="middle" fontSize={R * 1.15 * k} fontWeight={600} fill={on ? '#0a0a0a' : '#fff'} style={{ fontFamily: 'inherit' }}>{r.acr}</text>
-            </g>
+          </g>
+        )
+      })}
+      {/* étiquettes au-dessus des pastilles, placées sans chevauchement à chaque image */}
+      {ordered.map((r) => (
+        <line key={'l' + r.n} ref={(el) => { if (el) lnRefs.current.set(r.n, el); else lnRefs.current.delete(r.n) }} visibility="hidden" stroke={r.n === selected ? '#fff' : r.color} strokeOpacity={0.55} strokeWidth={R * 0.12} pointerEvents="none" />
+      ))}
+      {ordered.map((r) => {
+        const on = r.n === selected
+        const k = on ? 1.2 : 1
+        const w = labelW(R, on), h = R * 1.9 * k
+        return (
+          <g key={'t' + r.n} data-label={r.acr} ref={(el) => { if (el) lRefs.current.set(r.n, el); else lRefs.current.delete(r.n) }} visibility="hidden" onClick={() => onSelect(r.n)} style={{ cursor: 'pointer' }} opacity={r.out ? 0.35 : selected != null && !on ? 0.55 : 1}>
+            <rect x={-w / 2} y={-h / 2} width={w} height={h} rx={h / 2} fill={on ? '#fff' : 'rgb(10 10 10 / 0.86)'} stroke="rgb(255 255 255 / 0.14)" strokeWidth={R * 0.08} />
+            <text x={0} y={R * 0.42 * k} textAnchor="middle" fontSize={R * 1.15 * k} fontWeight={600} fill={on ? '#0a0a0a' : '#fff'} style={{ fontFamily: 'inherit' }}>{on ? `P${r.pos} ${r.acr}` : r.acr}</text>
           </g>
         )
       })}
     </svg>
   )
+}
+
+const labelW = (R: number, on: boolean) => R * (on ? 5.6 : 3.5)
+
+/**
+ * Placement glouton des étiquettes : voiture sélectionnée d'abord, puis ordre de course.
+ * Chaque étiquette essaie 8 positions proches, puis 6 plus éloignées reliées par un trait ;
+ * si rien ne tient, elle est masquée (sauf pour la voiture sélectionnée).
+ */
+function placeLabels(cars: { r: Row; x: number; y: number }[], R: number, selected: number | null, labels: Map<number, SVGGElement>, lines: Map<number, SVGLineElement>) {
+  const boxes: [number, number, number, number][] = cars.map((c) => [c.x - R * 1.15, c.y - R * 1.15, c.x + R * 1.15, c.y + R * 1.15])
+  const order = [...cars].sort((a, b) => Number(b.r.n === selected) - Number(a.r.n === selected) || a.r.pos - b.r.pos)
+  for (const c of order) {
+    const on = c.r.n === selected
+    const w = labelW(R, on), h = R * 1.9 * (on ? 1.2 : 1)
+    const g = R * (on ? 2.2 : 1.6), f = g * 2.3
+    const cands: [number, number][] = [
+      [g + w / 2, -g], [-g - w / 2, -g], [g + w / 2, g], [-g - w / 2, g], [0, -g - h / 2], [0, g + h / 2], [g + w / 2, 0], [-g - w / 2, 0],
+      [f + w / 2, -f], [-f - w / 2, -f], [f + w / 2, f], [-f - w / 2, f], [0, -f - h / 2], [0, f + h / 2],
+    ]
+    const box = ([dx, dy]: [number, number]): [number, number, number, number] => [c.x + dx - w / 2, c.y + dy - h / 2, c.x + dx + w / 2, c.y + dy + h / 2]
+    const free = (b: [number, number, number, number]) => boxes.every(([a, b2, c2, d]) => b[0] >= c2 || b[2] <= a || b[1] >= d || b[3] <= b2)
+    const i = cands.findIndex((q) => free(box(q)))
+    const pick = i >= 0 ? i : on ? 0 : -1
+    const el = labels.get(c.r.n), ln = lines.get(c.r.n)
+    if (pick < 0) { el?.setAttribute('visibility', 'hidden'); ln?.setAttribute('visibility', 'hidden'); continue }
+    const [dx, dy] = cands[pick]
+    const b = box([dx, dy])
+    boxes.push([b[0] - R * 0.2, b[1] - R * 0.2, b[2] + R * 0.2, b[3] + R * 0.2])
+    el?.setAttribute('visibility', 'visible')
+    el?.setAttribute('transform', `translate(${(c.x + dx).toFixed(1)} ${(c.y + dy).toFixed(1)})`)
+    if (ln) {
+      if (pick >= 8) {
+        const lx = Math.max(b[0], Math.min(b[2], c.x)), ly = Math.max(b[1], Math.min(b[3], c.y))
+        ln.setAttribute('x1', c.x.toFixed(1)); ln.setAttribute('y1', c.y.toFixed(1)); ln.setAttribute('x2', lx.toFixed(1)); ln.setAttribute('y2', ly.toFixed(1))
+        ln.setAttribute('visibility', 'visible')
+      } else ln.setAttribute('visibility', 'hidden')
+    }
+  }
 }

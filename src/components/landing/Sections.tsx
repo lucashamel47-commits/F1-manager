@@ -145,7 +145,7 @@ function MiniReminder() {
         </span>
         <span className="min-w-0 flex-1">
           <span className="block truncate text-[13px] font-medium">Qualifications dans 1 h</span>
-          <span className="block truncate text-xs text-[#636464]">GP Mexico City · Autódromo Hermanos Rodríguez</span>
+          <span className="block truncate text-xs text-[#636464]">GP de Mexico · Autódromo Hermanos Rodríguez</span>
         </span>
       </div>
       <div className="flex items-center justify-between rounded-2xl border border-[#2b2c2d] px-4 py-3">

@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import Home from './pages/Home'
 import AuthPage from './pages/AuthPage'
 import { useRoute, replaceRoute, clearRoute } from './lib/route'
-import ModeSelect from './pages/ModeSelect'
-import HorsCourse from './pages/HorsCourse'
+import AppHome from './pages/AppHome'
+import HorsCourse, { type HorsPage } from './pages/HorsCourse'
 import LiveMode from './pages/LiveMode'
 import Reminders from './pages/Reminders'
 import NewPassword from './components/NewPassword'
@@ -43,8 +43,8 @@ function App() {
   const [user, setUser] = useState<User | null>(() => (supabase ? null : localUser()))
   const [ready, setReady] = useState(!supabase)
   const [recovery, setRecovery] = useState(false)
-  const [info, setInfo] = useState<string | null>(null)
   const [mode, setMode] = useState<'select' | 'hors' | 'live' | 'notif'>('select')
+  const [horsPage, setHorsPage] = useState<HorsPage | undefined>(undefined)
   const [favDriver, setFavDriver] = useState<string | null>(null)
   const [favTeam, setFavTeam] = useState<string | null>(null)
   const loggedIn = user !== null
@@ -160,6 +160,8 @@ function App() {
     return (
       <>
         <HorsCourse
+          key={horsPage ?? 'home'}
+          initialPage={horsPage}
           onBack={() => setMode('select')}
           userEmail={user?.email ?? ''}
           favDriver={favDriver}
@@ -175,31 +177,14 @@ function App() {
   if (loggedIn) {
     return (
       <>
-        <ModeSelect
-          onSelectHors={() => setMode('hors')}
-          onSelectLive={() => setMode('live')}
-          onSelectNotif={() => setMode('notif')}
+        <AppHome
+          userEmail={user?.email ?? ''}
+          onOpenSeason={(p) => { setHorsPage(p); setMode('hors') }}
+          onOpenLive={() => setMode('live')}
+          onOpenReminders={() => setMode('notif')}
           onLogout={logout}
-          onInfo={setInfo}
         />
         <ChatBot />
-        {info && (
-          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 px-4 sm:px-6" onClick={() => setInfo(null)}>
-            <div className="glass bg-[#0e0f11]/90 rounded-3xl p-6 max-w-sm md:max-w-md w-full max-h-[85dvh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-              <h3 className="text-lg font-semibold mb-3">
-                {info === 'hors' ? 'Mode Hors Course' : 'Mode Live Timing'}
-              </h3>
-              <p className="text-sm text-zinc-400 leading-relaxed">
-                {info === 'hors'
-                  ? 'Classements, statistiques, suivi de ton pilote préféré, de ton écurie, calendrier des courses et données hors week-end.'
-                  : 'Classement en direct, carte du circuit avec les voitures, pneus et stratégie, chronos par secteur, télémétrie de chaque pilote, direction de course, radios et météo pendant les sessions. Hors week-end : compte à rebours de la prochaine session et rejeu des courses passées (×1, ×10, ×50).'}
-              </p>
-              <button onClick={() => setInfo(null)} className="btn-ghost mt-5 w-full min-h-12 rounded-full text-sm font-medium">
-                Fermer
-              </button>
-            </div>
-          </div>
-        )}
       </>
     )
   }

@@ -2,7 +2,7 @@
 
 const BASE = 'https://api.openf1.org/v1'
 
-export type OFErrorKind = 'auth' | 'rate' | 'network' | 'http' | 'abort'
+export type OFErrorKind = 'auth' | 'rate' | 'network' | 'http' | 'abort' | 'feed'
 
 export class OpenF1Error extends Error {
   kind: OFErrorKind
