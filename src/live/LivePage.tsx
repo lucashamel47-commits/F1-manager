@@ -174,9 +174,9 @@ export default function LivePage() {
 
   const isLive = active?.mode === 'live'
   const track = snap ? TRACK_LABEL[snap.track.kind] : null
-  const rightTabs = sel != null ? [...RIGHT, { key: 'driver' as const, label: 'Pilote' }] : RIGHT
+  const rightTabs = sel != null ? [...RIGHT, { key: 'driver' as const, label: 'Vue pilote' }] : RIGHT
   const mobTabs: { key: MobTab; label: string }[] = [
-    { key: 'tower', label: 'Classement' }, { key: 'chrono', label: 'Vitesses' }, { key: 'map', label: 'Carte' }, ...(sel != null ? [{ key: 'driver' as const, label: 'Pilote' }] : []),
+    { key: 'tower', label: 'Classement' }, { key: 'chrono', label: 'Vitesses' }, { key: 'map', label: 'Carte' }, ...(sel != null ? [{ key: 'driver' as const, label: 'Vue pilote' }] : []),
     { key: 'rc', label: 'Direction' }, { key: 'strategy', label: 'Stratégie' }, { key: 'evolution', label: 'Évolution' },
     { key: 'overtakes', label: 'Dépass.' }, { key: 'radio', label: 'Radios' }, { key: 'weather', label: 'Météo' },
   ]

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { answer } from '../lib/chatEngine'
+import { LogoGlyph } from './Logo'
 
 interface Msg {
   from: 'bot' | 'user'
@@ -100,7 +101,7 @@ export default function ChatBot() {
           className="fixed z-50 inset-0 sm:inset-auto sm:right-6 sm:bottom-6 sm:w-[420px] sm:h-[620px] sm:max-h-[calc(100dvh-3rem)] flex flex-col bg-[#0b0c0d] text-white sm:rounded-3xl overflow-hidden sm:border sm:border-white/10"
         >
           <header className="shrink-0 flex items-center gap-3 px-4 h-14 border-b border-white/[0.08] bg-white/[0.03]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-            <span className="grid h-7 place-items-center rounded-lg bg-white text-[#0a0a0a] px-2 text-[13px] font-bold leading-none">F1</span>
+            <span className="grid size-7 place-items-center"><LogoGlyph className="h-[16px] w-auto text-white" /></span>
             <div className="leading-tight">
               <p className="font-semibold tracking-tight">Assistant</p>
               <p className="text-[11px] text-zinc-500 flex items-center gap-1.5">

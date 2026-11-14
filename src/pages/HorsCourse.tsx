@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, lazy, Suspense, type ReactNode } from 'react'
-import MotorNav, { SectionTitle, TopBar, LogoMark, type NavKey } from '../components/MotorNav'
+import MotorNav, { SectionTitle, TopBar, LogoButton, type NavKey } from '../components/MotorNav'
 import StatsRecords from '../components/StatsRecords'
 import { colorFor } from '../lib/teamColors'
 import CircuitCarousel from '../components/CircuitCarousel'
@@ -35,9 +35,12 @@ const extras: Record<number, { history?: string; grip?: string; creator?: string
 const fullSeason: any[] = circuits.map((c) => ({ ...extras[c.round], ...c, date: fmtDay(c.iso) }))
 
 /** Index du prochain GP : première course dont le jour de course (iso) n'est pas encore passé. */
-const findNextRace = () => {
+const todayISO = () => {
   const n = new Date()
-  const today = `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`
+  return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`
+}
+const findNextRace = () => {
+  const today = todayISO()
   const i = fullSeason.findIndex((r) => r.iso >= today)
   return i === -1 ? fullSeason.length - 1 : i
 }
@@ -69,6 +72,8 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
   const [nextIdx] = useState(findNextRace)
   const nextRace = fullSeason[nextIdx]
   const [subPage, setSubPage] = useState<'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'live' | 'circuit' | 'stats-constructors' | 'stats-records'>('home')
+  const [hidePast, setHidePast] = useState(() => localStorage.getItem('f1-hide-past') === '1')
+  const toggleHidePast = () => setHidePast((v) => { localStorage.setItem('f1-hide-past', v ? '0' : '1'); return !v })
   const champ = useChampionship()
   const liveStandings: any[] = champ.data?.drivers ?? []
   const liveConstructors: any[] = champ.data?.constructors ?? []
@@ -297,8 +302,19 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
         <div className="min-h-dvh w-full flex flex-col text-white">
           {nav(() => setSubPage('home'), "Calendrier")}
           <div className="app-page flex-1 grid content-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <SectionTitle h1 kicker="Saison 2026" title="Calendrier" className="col-span-full" />
-            {fullSeason.map((race) => (
+            <div className="col-span-full flex flex-wrap items-end justify-between gap-4 mb-2 sm:mb-4">
+              <SectionTitle h1 kicker="Saison 2026" title="Calendrier" className="!mb-0" />
+              <button onClick={toggleHidePast} aria-pressed={hidePast} className={`inline-flex min-h-10 items-center gap-2.5 rounded-full border px-4 text-sm font-medium transition ${hidePast ? 'border-white bg-white text-[#0a0a0a]' : 'border-[#3d3e3f] bg-[#161718] text-[#d6d7d7] hover:bg-[#222324] hover:text-white'}`}>
+                <span className={`relative inline-block h-4 w-7 rounded-full transition ${hidePast ? 'bg-[#0a0a0a]' : 'bg-[#3d3e3f]'}`} aria-hidden>
+                  <span className={`absolute top-0.5 size-3 rounded-full bg-white transition-all ${hidePast ? 'left-[0.875rem]' : 'left-0.5'}`} />
+                </span>
+                Masquer les courses passées
+              </button>
+            </div>
+            {hidePast && fullSeason.every((r) => r.iso < todayISO()) && (
+              <p className="col-span-full text-sm text-zinc-500">La saison est terminée : toutes les courses sont passées.</p>
+            )}
+            {fullSeason.filter((r) => !hidePast || r.iso >= todayISO()).map((race) => (
               <button key={race.round} onClick={() => { setRaceFrom('calendar'); setSelectedRace(race) }} className="group text-left bg-zinc-950 border border-white/[0.08] rounded-3xl overflow-hidden transition duration-300 hover:-translate-y-1">
                 <div className="relative aspect-video overflow-hidden bg-[#0c0d0e]">
                   <img src={race.photo} alt={`Le circuit de ${race.circuit}`} loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition duration-500" />
@@ -935,7 +951,7 @@ if (subPage === 'stats-constructors') {
         <TopBar>
           <div className="app-wrap flex items-center justify-between gap-2 h-16">
             <button onClick={onBack} className="text-sm text-zinc-400 hover:text-white min-h-11 min-w-16 text-left">← Retour</button>
-            <LogoMark />
+            <LogoButton onClick={onBack} />
             <button onClick={() => setStep('team')} className="text-sm text-zinc-400 hover:text-white min-h-11 min-w-16 text-right">Passer</button>
           </div>
         </TopBar>
@@ -974,7 +990,7 @@ if (subPage === 'stats-constructors') {
       <TopBar>
         <div className="app-wrap flex items-center justify-between gap-2 h-16">
           <button onClick={() => setStep('driver')} className="text-sm text-zinc-400 hover:text-white min-h-11 min-w-16 text-left">← Retour</button>
-          <LogoMark />
+          <LogoButton onClick={onBack} />
           <button onClick={() => setStep('done')} className="text-sm text-zinc-400 hover:text-white min-h-11 min-w-16 text-right">Passer</button>
         </div>
       </TopBar>
