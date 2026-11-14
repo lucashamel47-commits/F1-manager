@@ -23,27 +23,24 @@ interface Props {
 }
 
 
-const calendar = [
-  { round: 18, iso: '2026-10-25', name: 'United States', date: '23 – 25 octobre', circuit: 'Austin', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/USA_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/USA.jpg', length: '5,513 km', laps: 56, record: '1:36.169', recordDriver: 'C. Leclerc', history: 'Inauguré en 2012, conçu par Hermann Tilke. Circuit technique avec de longs virages et une grande ligne droite qui favorise les dépassements.', grip: 'Asphalte lisse, bon grip une fois en température. Usure modérée.', creator: 'Hermann Tilke' },
-  { round: 19, iso: '2026-11-01', name: 'Mexico City', date: '30 oct – 1 nov', circuit: 'Mexico', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Mexico_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Mexico.jpg', length: '4,304 km', laps: 71, record: '1:17.774', recordDriver: 'V. Bottas', history: 'Autódromo Hermanos Rodríguez, rénové en 2015. L’altitude élevée (2200 m) réduit la puissance des moteurs et augmente l’usure des freins.', grip: 'Grip correct mais usure pneus importante à cause de l’air moins dense.', creator: 'Oscar Fernández' },
-  { round: 20, iso: '2026-11-08', name: 'São Paulo', date: '6 – 8 novembre', circuit: 'Interlagos', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Brazil_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Brazil.jpg', length: '4,309 km', laps: 71, record: '1:10.540', recordDriver: 'V. Bottas', history: 'Circuit historique depuis 1940, plusieurs fois rénové. Connu pour ses dépassements et l’ambiance unique du public brésilien.', grip: 'Asphalte abrasif, grip moyen, forte usure des pneus.', creator: 'Hermann Tilke (rénovation)' },
-  { round: 21, iso: '2026-11-22', name: 'Las Vegas', date: '19 – 21 novembre', circuit: 'Las Vegas', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Las_Vegas_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/USA.jpg', length: '6,201 km', laps: 50, record: '1:34.119', recordDriver: 'O. Piastri', history: 'Circuit urbain inauguré en 2023. Très long avec une grande ligne droite sur le Strip. Course de nuit spectaculaire.', grip: 'Asphalte neuf, grip qui évolue fortement pendant le week-end.', creator: 'Hermann Tilke' },
-  { round: 22, iso: '2026-11-29', name: 'Qatar', date: '27 – 29 novembre', circuit: 'Lusail', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Qatar_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Qatar.jpg', length: '5,419 km', laps: 57, record: '1:22.384', recordDriver: 'M. Verstappen', history: 'Circuit moderne inauguré en 2004, utilisé en F1 depuis 2021. Très exigeant physiquement avec de nombreux virages rapides.', grip: 'Asphalte abrasif, grip élevé mais usure importante.', creator: 'Hermann Tilke' },
-  { round: 23, iso: '2026-12-06', name: 'Abu Dhabi', date: '4 – 6 décembre', circuit: 'Yas Marina', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Abu_Dhabi_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Abu_Dhabi.jpg', length: '5,281 km', laps: 58, record: '1:26.103', recordDriver: 'M. Verstappen', history: 'Circuit inauguré en 2009, rénové en 2021. Course de nuit sous les lumières, dernier Grand Prix de la saison.', grip: 'Asphalte lisse, grip stable tout le week-end.', creator: 'Hermann Tilke' },
-]
+const extras: Record<number, { history?: string; grip?: string; creator?: string }> = {
+  18: { history: 'Inauguré en 2012, conçu par Hermann Tilke. Circuit technique avec de longs virages et une grande ligne droite qui favorise les dépassements.', grip: 'Asphalte lisse, bon grip une fois en température. Usure modérée.', creator: 'Hermann Tilke' },
+  19: { history: 'Autódromo Hermanos Rodríguez, rénové en 2015. L’altitude élevée (2200 m) réduit la puissance des moteurs et augmente l’usure des freins.', grip: 'Grip correct mais usure pneus importante à cause de l’air moins dense.', creator: 'Oscar Fernández' },
+  20: { history: 'Circuit historique depuis 1940, plusieurs fois rénové. Connu pour ses dépassements et l’ambiance unique du public brésilien.', grip: 'Asphalte abrasif, grip moyen, forte usure des pneus.', creator: 'Hermann Tilke (rénovation)' },
+  21: { history: 'Circuit urbain inauguré en 2023. Très long avec une grande ligne droite sur le Strip. Course de nuit spectaculaire.', grip: 'Asphalte neuf, grip qui évolue fortement pendant le week-end.', creator: 'Hermann Tilke' },
+  22: { history: 'Circuit moderne inauguré en 2004, utilisé en F1 depuis 2021. Très exigeant physiquement avec de nombreux virages rapides.', grip: 'Asphalte abrasif, grip élevé mais usure importante.', creator: 'Hermann Tilke' },
+  23: { history: 'Circuit inauguré en 2009, rénové en 2021. Course de nuit sous les lumières, dernier Grand Prix de la saison.', grip: 'Asphalte lisse, grip stable tout le week-end.', creator: 'Hermann Tilke' },
+}
 
-/** Les 23 courses (données de base) enrichies par la fiche détaillée des courses de fin de saison. */
-const fullSeason: any[] = circuits.map((c) => {
-  const legacy = calendar.find((r) => r.round === c.round)
-  return { ...legacy, ...c, date: fmtDay(c.iso) }
-})
+/** Les 23 courses, avec date lisible et fiches détaillées quand elles existent. */
+const fullSeason: any[] = circuits.map((c) => ({ ...extras[c.round], ...c, date: fmtDay(c.iso) }))
 
 /** Index du prochain GP : première course dont le jour de course (iso) n'est pas encore passé. */
 const findNextRace = () => {
   const n = new Date()
   const today = `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`
-  const i = calendar.findIndex((r) => r.iso >= today)
-  return i === -1 ? calendar.length - 1 : i
+  const i = fullSeason.findIndex((r) => r.iso >= today)
+  return i === -1 ? fullSeason.length - 1 : i
 }
 
 
@@ -71,7 +68,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
   const [showWelcome, setShowWelcome] = useState(false)
   const [welcomeDone, setWelcomeDone] = useState(false)
   const [nextIdx] = useState(findNextRace)
-  const nextRace = calendar[nextIdx]
+  const nextRace = fullSeason[nextIdx]
   const [subPage, setSubPage] = useState<'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'live' | 'circuit' | 'stats-constructors' | 'stats-records'>('home')
   const champ = useChampionship()
   const liveStandings: any[] = champ.data?.drivers ?? []
@@ -119,6 +116,12 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
   useEffect(() => {
     if (step === 'done') localStorage.setItem(driverKey + '-onboarded', '1')
   }, [step, driverKey])
+
+  useEffect(() => {
+    if (subPage === 'circuit' || (subPage === 'calendar' && selectedRace)) {
+      window.scrollTo(0, 0)
+    }
+  }, [subPage, selectedRace])
 
   const toggleDriver = (id: string) => {
     setSelectedDrivers(prev => {
@@ -225,12 +228,12 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
         {nav(back, crumb)}
         <div className="app-page flex-1 grid content-start gap-8 md:grid-cols-2 md:gap-10 items-start">
           <div className="md:col-span-2 mb-4 app-in">
-            <h1 className="text-gradient text-[2rem] sm:text-[2.75rem] font-medium tracking-[-0.035em] leading-[1.04]"><span className="mr-3" aria-hidden>{race.flag}</span>{race.name}</h1>
+            <h1 className="text-[2rem] sm:text-[2.75rem] font-medium tracking-[-0.035em] leading-[1.04] text-white"><span className="mr-3" aria-hidden>{race.flag}</span>{race.name}</h1>
             <p className="text-base text-zinc-400 mt-5">{race.circuit} · {race.country} · {fmtDay(race.iso)} · <span className={d >= 0 ? 'text-white' : ''}>{state}</span></p>
           </div>
           <TrackMap src={race.map} alt={`Plan du circuit de ${race.circuit}`} unavailable={race.circuit} />
           <div className="space-y-6 min-w-0">
-            {race.photo && <img src={race.photo} alt="" className="w-full h-auto rounded-3xl border border-white/[0.08]" />}
+            {race.photo && <img src={race.photo} alt={`Le circuit de ${race.circuit}`} className="w-full h-auto rounded-3xl border border-white/[0.08]" />}
             <dl className="grid grid-cols-3 gap-4">
               <div className="bg-zinc-950 border border-white/[0.08] rounded-3xl p-6"><dt className="text-xs text-zinc-500">Longueur</dt><dd className="font-semibold mt-1">{race.length}</dd></div>
               <div className="bg-zinc-950 border border-white/[0.08] rounded-3xl p-6"><dt className="text-xs text-zinc-500">Tours</dt><dd className="font-semibold mt-1">{race.laps ?? '—'}</dd></div>
@@ -296,16 +299,16 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
           {nav(() => setSubPage('home'), "Calendrier")}
           <div className="app-page flex-1 grid content-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <SectionTitle h1 kicker="Saison 2026" title="Calendrier" className="col-span-full" />
-            {calendar.map((race) => (
-              <button key={race.round} onClick={() => { setRaceFrom('calendar'); setSelectedRace(fullSeason.find((r) => r.round === race.round) ?? race) }} className="group text-left bg-zinc-950 border border-white/[0.08] rounded-3xl overflow-hidden transition duration-300 hover:-translate-y-1">
-                <div className="relative aspect-video overflow-hidden bg-zinc-900">
-                  <img src={race.photo} alt="" loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition duration-500" />
+            {fullSeason.map((race) => (
+              <button key={race.round} onClick={() => { setRaceFrom('calendar'); setSelectedRace(race) }} className="group text-left bg-zinc-950 border border-white/[0.08] rounded-3xl overflow-hidden transition duration-300 hover:-translate-y-1">
+                <div className="relative aspect-video overflow-hidden bg-[#0c0d0e]">
+                  <img src={race.photo} alt={`Le circuit de ${race.circuit}`} loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#08090a]/80 to-transparent" />
-                  <span className="absolute top-3 left-3 chip">Round {race.round}</span>
+                  <span className="absolute top-3 left-3 chip">Manche {race.round}</span>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold tracking-[-0.02em]">{race.name}</h3>
-                  <p className="text-sm text-zinc-500 mt-1.5">{race.circuit} • {race.date}</p>
+                  <h3 className="text-xl font-semibold tracking-[-0.02em]">{race.flag} {race.name}</h3>
+                  <p className="text-sm text-zinc-500 mt-1.5">{race.circuit} • {race.country} • {race.date}</p>
                 </div>
               </button>
             ))}
@@ -824,7 +827,7 @@ if (subPage === 'stats-constructors') {
               <div className="grid gap-6 sm:grid-cols-2">
                 {[
                   { key: 'standings' as const, tag: 'Classements', title: 'Le championnat pilotes et constructeurs', img: '', car: 'mer', big: true },
-                  { key: 'calendar' as const, tag: 'Calendrier', title: 'Toutes les courses de la saison', img: (calendar[nextIdx + 1] ?? nextRace).photo },
+                  { key: 'calendar' as const, tag: 'Calendrier', title: 'Toutes les courses de la saison', img: (fullSeason[nextIdx + 1] ?? nextRace).photo },
                   { key: 'stats' as const, tag: 'Statistiques', title: 'Chiffres, écarts et écuries', img: '', car: 'fer' },
                   { key: 'favorites' as const, tag: 'Favoris', title: 'Ton pilote et ton écurie', img: '', car: normTeamId(favTeam) ?? 'mcl' },
                 ].map((t) => (
@@ -862,12 +865,12 @@ if (subPage === 'stats-constructors') {
             <section>
               <SectionTitle kicker="À suivre" title="Prochaines courses" />
               <div className="rounded-3xl overflow-hidden border border-white/[0.09] bg-zinc-950 divide-y divide-white/[0.06]">
-                {calendar.slice(nextIdx + 1, nextIdx + 5).length === 0 && <p className="p-6 text-sm text-zinc-500">Dernière course de la saison.</p>}
-                {calendar.slice(nextIdx + 1, nextIdx + 5).map((race) => (
+                {fullSeason.slice(nextIdx + 1, nextIdx + 5).length === 0 && <p className="p-6 text-sm text-zinc-500">Dernière course de la saison.</p>}
+                {fullSeason.slice(nextIdx + 1, nextIdx + 5).map((race) => (
                   <button key={race.round} onClick={() => { setRaceFrom('calendar'); setSelectedRace(fullSeason.find((r) => r.round === race.round) ?? race); setSubPage('calendar') }} className="w-full flex items-center justify-between gap-3 px-6 min-h-[4.5rem] text-left hover:bg-white/[0.04] transition">
                     <span className="min-w-0">
                       <span className="block text-base font-semibold truncate">{race.name}</span>
-                      <span className="block text-sm text-zinc-500">{race.circuit}</span>
+                      <span className="block text-sm text-zinc-500">{race.circuit} · {race.country}</span>
                     </span>
                     <span className="text-sm text-zinc-400 text-right shrink-0">{race.date}</span>
                   </button>
