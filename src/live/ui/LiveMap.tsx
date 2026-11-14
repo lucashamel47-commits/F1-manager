@@ -46,7 +46,7 @@ export default function LiveMap({ loc, now, rows, selected, onSelect, version }:
     let last = 0
     const loop = (ts: number) => {
       raf = requestAnimationFrame(loop)
-      if (ts - last < 45) return
+      if (ts - last < 16) return
       last = ts
       const t = now()
       for (const r of rowsRef.current) {
@@ -69,32 +69,41 @@ export default function LiveMap({ loc, now, rows, selected, onSelect, version }:
       </div>
     )
   }
-  const R = geo.span * 0.021
+  const R = geo.span * 0.016
   const ordered = [...rows].sort((a, b) => Number(a.n === selected) - Number(b.n === selected))
-  const leader = rows.find((r) => r.pos === 1)?.n
   return (
-    <svg viewBox={geo.vb} className="w-full aspect-[4/3] max-h-[52dvh] lg:max-h-[36dvh] select-none" role="img" aria-label="Carte du circuit avec la position des voitures">
+    <svg data-livemap viewBox={geo.vb} className="w-full aspect-[4/3] max-h-[52dvh] lg:max-h-[36dvh] select-none [touch-action:manipulation]" role="img" aria-label="Carte du circuit avec la position des voitures">
       {geo.d && (
         <>
-          <path d={geo.d} fill="none" stroke="#27272a" strokeWidth={R * 1.9} strokeLinejoin="round" strokeLinecap="round" />
-          <path d={geo.d} fill="none" stroke="#52525b" strokeWidth={R * 0.28} strokeLinejoin="round" strokeLinecap="round" />
+          <path d={geo.d} fill="none" stroke="rgb(255 255 255 / 0.06)" strokeWidth={R * 2.2} strokeLinejoin="round" strokeLinecap="round" />
+          <path d={geo.d} fill="none" stroke="rgb(255 255 255 / 0.32)" strokeWidth={R * 0.22} strokeLinejoin="round" strokeLinecap="round" />
         </>
       )}
-      {geo.sf && <line x1={geo.sf.x - geo.sf.dy * R * 1.2} y1={geo.sf.y + geo.sf.dx * R * 1.2} x2={geo.sf.x + geo.sf.dy * R * 1.2} y2={geo.sf.y - geo.sf.dx * R * 1.2} stroke="#fff" strokeWidth={R * 0.3} />}
-      {ordered.map((r) => (
-        <g
-          key={r.n}
-          ref={(el) => { if (el) gRefs.current.set(r.n, el); else gRefs.current.delete(r.n) }}
-          visibility="hidden"
-          onClick={() => onSelect(r.n)}
-          style={{ cursor: 'pointer' }}
-          opacity={r.out ? 0.35 : 1}
-        >
-          <circle r={R * 1.9} fill="transparent" />
-          <circle r={R} fill={r.color} stroke={r.n === selected ? '#fff' : r.n === leader ? '#facc15' : '#000'} strokeWidth={r.n === selected || r.n === leader ? R * 0.34 : R * 0.2} />
-          <text y={-R * 1.35} textAnchor="middle" fontSize={R * 1.25} fontWeight={800} fill="#fff" stroke="#000" strokeWidth={R * 0.3} paintOrder="stroke" style={{ fontFamily: 'inherit' }}>{r.acr}</text>
-        </g>
-      ))}
+      {geo.sf && <line x1={geo.sf.x - geo.sf.dy * R * 1.4} y1={geo.sf.y + geo.sf.dx * R * 1.4} x2={geo.sf.x + geo.sf.dy * R * 1.4} y2={geo.sf.y - geo.sf.dx * R * 1.4} stroke="#fff" strokeWidth={R * 0.22} strokeLinecap="round" />}
+      {ordered.map((r) => {
+        const on = r.n === selected
+        const dim = selected != null && !on
+        const k = on ? 1.35 : 1
+        return (
+          <g
+            key={r.n}
+            data-car={r.pos}
+            ref={(el) => { if (el) gRefs.current.set(r.n, el); else gRefs.current.delete(r.n) }}
+            visibility="hidden"
+            onClick={() => onSelect(r.n)}
+            style={{ cursor: 'pointer', transition: 'opacity .3s' }}
+            opacity={r.out ? 0.3 : dim ? 0.4 : 1}
+          >
+            <circle r={R * 2.6} fill="transparent" />
+            {on && <circle r={R * 2} fill="none" stroke="#fff" strokeOpacity={0.5} strokeWidth={R * 0.14} />}
+            <circle r={R * k} fill={r.color} stroke="#0a0a0a" strokeWidth={R * 0.28} />
+            <g transform={`translate(${R * 1.7 * k} ${-R * 1.7 * k})`}>
+              <rect x={0} y={-R * 0.95 * k} width={R * 3.5 * k} height={R * 1.9 * k} rx={R * 0.95 * k} fill={on ? '#fff' : 'rgb(10 10 10 / 0.82)'} stroke="rgb(255 255 255 / 0.12)" strokeWidth={R * 0.08} />
+              <text x={R * 1.75 * k} y={R * 0.42 * k} textAnchor="middle" fontSize={R * 1.15 * k} fontWeight={600} fill={on ? '#0a0a0a' : '#fff'} style={{ fontFamily: 'inherit' }}>{r.acr}</text>
+            </g>
+          </g>
+        )
+      })}
     </svg>
   )
 }

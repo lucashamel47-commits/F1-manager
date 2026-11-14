@@ -98,16 +98,12 @@ export default function MotorNav({ active, onNavigate, onExit, onBack, crumb, ex
   )
 }
 
-export function SectionTitle({ kicker, title, className = '', h1 = false, desc }: { kicker: string; title: string; className?: string; h1?: boolean; desc?: string }) {
+// Titres épurés : plus de sur-titre ni de sous-titre (kicker / desc gardés dans la signature pour compatibilité).
+export function SectionTitle({ title, className = '', h1 = false }: { kicker?: string; title: string; className?: string; h1?: boolean; desc?: string }) {
   const Tag = h1 ? 'h1' : 'h2'
   return (
     <div className={`${h1 ? 'mb-12 sm:mb-16 app-in' : 'mb-8 sm:mb-10'} ${className}`}>
-      <p className="kicker">
-        
-        {kicker}
-      </p>
-      <Tag className={`text-gradient mt-5 font-medium tracking-[-0.035em] ${h1 ? 'text-[2rem] leading-[1.06] sm:text-[2.75rem]' : 'text-[1.75rem] leading-[1.1] sm:text-[2.625rem]'}`}>{title}</Tag>
-      {desc && <p className="mt-5 max-w-xl text-base leading-relaxed text-zinc-400 sm:text-lg">{desc}</p>}
+      <Tag className={`text-gradient font-medium tracking-[-0.035em] ${h1 ? 'text-[2rem] leading-[1.06] sm:text-[2.75rem]' : 'text-[1.75rem] leading-[1.1] sm:text-[2.625rem]'}`}>{title}</Tag>
     </div>
   )
 }

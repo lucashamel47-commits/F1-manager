@@ -6,7 +6,10 @@ import { colorFor } from '../lib/teamColors'
 import CircuitCarousel from '../components/CircuitCarousel'
 import TrackMap from '../components/TrackMap'
 import { circuits, daysUntil, fmtDay, type Circuit } from '../data/circuits'
-import { getSeasonWinners, type RaceWinner } from '../lib/f1api'
+import { getSeasonWinners, season, type RaceWinner } from '../lib/f1api'
+import { useGrid } from '../lib/grid'
+import { useChampionship, type Title } from '../lib/championship'
+import { DRIVERS, F1_PHOTO_ID, TEAMS, driverPhoto, teamById, teamByName, teamLogo, normTeamId, type GridDriver } from '../data/grid'
 
 const LivePage = lazy(() => import('../live/LivePage'))
 
@@ -19,116 +22,66 @@ interface Props {
   setFavTeam: (id: string) => void
 }
 
-const drivers = [
-  { id: 'ver', name: 'Max Verstappen', team: 'Red Bull', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/M/MAXVER01_Max_Verstappen/maxver01.png.transform/2col/image.png' },
-  { id: 'nor', name: 'Lando Norris', team: 'McLaren', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LANNOR01_Lando_Norris/lannor01.png.transform/2col/image.png' },
-  { id: 'lec', name: 'Charles Leclerc', team: 'Ferrari', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/C/CHALEC01_Charles_Leclerc/chalec01.png.transform/2col/image.png' },
-  { id: 'pia', name: 'Oscar Piastri', team: 'McLaren', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/O/OSCPIA01_Oscar_Piastri/oscpia01.png.transform/2col/image.png' },
-  { id: 'sai', name: 'Carlos Sainz', team: 'Ferrari', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/C/CARSAI01_Carlos_Sainz/carsai01.png.transform/2col/image.png' },
-  { id: 'ham', name: 'Lewis Hamilton', team: 'Ferrari', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LEWHAM01_Lewis_Hamilton/lewham01.png.transform/2col/image.png' },
-  { id: 'rus', name: 'George Russell', team: 'Mercedes', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/G/GEORUS01_George_Russell/georus01.png.transform/2col/image.png' },
-  { id: 'alo', name: 'Fernando Alonso', team: 'Aston Martin', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/F/FERALO01_Fernando_Alonso/feralo01.png.transform/2col/image.png' },
-  { id: 'str', name: 'Lance Stroll', team: 'Aston Martin', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LANSTR01_Lance_Stroll/lanstr01.png.transform/2col/image.png' },
-  { id: 'gas', name: 'Pierre Gasly', team: 'Alpine', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/P/PIEGAS01_Pierre_Gasly/piegas01.png.transform/2col/image.png' },
-  { id: 'oco', name: 'Esteban Ocon', team: 'Alpine', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/E/ESTOCO01_Esteban_Ocon/estoco01.png.transform/2col/image.png' },
-  { id: 'alb', name: 'Alexander Albon', team: 'Williams', photo: 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/A/ALEALB01_Alexander_Albon/alealb01.png.transform/2col/image.png' },
-]
 
-const teams = [
-  { id: 'rbr', name: 'Red Bull Racing', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/red-bull-racing-logo.png' },
-  { id: 'mcl', name: 'McLaren', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/mclaren-logo.png' },
-  { id: 'fer', name: 'Ferrari', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/ferrari-logo.png' },
-  { id: 'mer', name: 'Mercedes', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/mercedes-logo.png' },
-  { id: 'ast', name: 'Aston Martin', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/aston-martin-logo.png' },
-  { id: 'alp', name: 'Alpine', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/alpine-logo.png' },
-  { id: 'wil', name: 'Williams', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/williams-logo.png' },
-  { id: 'rb', name: 'RB', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/rb-logo.png' },
-  { id: 'haas', name: 'Haas', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/haas-logo.png' },
-  { id: 'sau', name: 'Sauber', logo: 'https://www.formula1.com/content/dam/fom-website/teams/2024/sauber-logo.png' },
-]
+const extras: Record<number, { history?: string; grip?: string; creator?: string }> = {
+  18: { history: 'Inauguré en 2012, conçu par Hermann Tilke. Circuit technique avec de longs virages et une grande ligne droite qui favorise les dépassements.', grip: 'Asphalte lisse, bon grip une fois en température. Usure modérée.', creator: 'Hermann Tilke' },
+  19: { history: 'Autódromo Hermanos Rodríguez, rénové en 2015. L’altitude élevée (2200 m) réduit la puissance des moteurs et augmente l’usure des freins.', grip: 'Grip correct mais usure pneus importante à cause de l’air moins dense.', creator: 'Oscar Fernández' },
+  20: { history: 'Circuit historique depuis 1940, plusieurs fois rénové. Connu pour ses dépassements et l’ambiance unique du public brésilien.', grip: 'Asphalte abrasif, grip moyen, forte usure des pneus.', creator: 'Hermann Tilke (rénovation)' },
+  21: { history: 'Circuit urbain inauguré en 2023. Très long avec une grande ligne droite sur le Strip. Course de nuit spectaculaire.', grip: 'Asphalte neuf, grip qui évolue fortement pendant le week-end.', creator: 'Hermann Tilke' },
+  22: { history: 'Circuit moderne inauguré en 2004, utilisé en F1 depuis 2021. Très exigeant physiquement avec de nombreux virages rapides.', grip: 'Asphalte abrasif, grip élevé mais usure importante.', creator: 'Hermann Tilke' },
+  23: { history: 'Circuit inauguré en 2009, rénové en 2021. Course de nuit sous les lumières, dernier Grand Prix de la saison.', grip: 'Asphalte lisse, grip stable tout le week-end.', creator: 'Hermann Tilke' },
+}
 
-const BASE = import.meta.env.BASE_URL
-
-const calendar = [
-  { round: 18, iso: '2026-10-25', name: 'United States', date: '23 – 25 octobre', circuit: 'Austin', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/USA_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/USA.jpg', length: '5,513 km', laps: 56, record: '1:36.169', recordDriver: 'C. Leclerc', history: 'Inauguré en 2012, conçu par Hermann Tilke. Circuit technique avec de longs virages et une grande ligne droite qui favorise les dépassements.', grip: 'Asphalte lisse, bon grip une fois en température. Usure modérée.', creator: 'Hermann Tilke' },
-  { round: 19, iso: '2026-11-01', name: 'Mexico City', date: '30 oct – 1 nov', circuit: 'Mexico', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Mexico_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Mexico.jpg', length: '4,304 km', laps: 71, record: '1:17.774', recordDriver: 'V. Bottas', history: 'Autódromo Hermanos Rodríguez, rénové en 2015. L’altitude élevée (2200 m) réduit la puissance des moteurs et augmente l’usure des freins.', grip: 'Grip correct mais usure pneus importante à cause de l’air moins dense.', creator: 'Oscar Fernández' },
-  { round: 20, iso: '2026-11-08', name: 'São Paulo', date: '6 – 8 novembre', circuit: 'Interlagos', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Brazil_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Brazil.jpg', length: '4,309 km', laps: 71, record: '1:10.540', recordDriver: 'V. Bottas', history: 'Circuit historique depuis 1940, plusieurs fois rénové. Connu pour ses dépassements et l’ambiance unique du public brésilien.', grip: 'Asphalte abrasif, grip moyen, forte usure des pneus.', creator: 'Hermann Tilke (rénovation)' },
-  { round: 21, iso: '2026-11-22', name: 'Las Vegas', date: '19 – 21 novembre', circuit: 'Las Vegas', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Las_Vegas_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/USA.jpg', length: '6,201 km', laps: 50, record: '1:34.119', recordDriver: 'O. Piastri', history: 'Circuit urbain inauguré en 2023. Très long avec une grande ligne droite sur le Strip. Course de nuit spectaculaire.', grip: 'Asphalte neuf, grip qui évolue fortement pendant le week-end.', creator: 'Hermann Tilke' },
-  { round: 22, iso: '2026-11-29', name: 'Qatar', date: '27 – 29 novembre', circuit: 'Lusail', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Qatar_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Qatar.jpg', length: '5,419 km', laps: 57, record: '1:22.384', recordDriver: 'M. Verstappen', history: 'Circuit moderne inauguré en 2004, utilisé en F1 depuis 2021. Très exigeant physiquement avec de nombreux virages rapides.', grip: 'Asphalte abrasif, grip élevé mais usure importante.', creator: 'Hermann Tilke' },
-  { round: 23, iso: '2026-12-06', name: 'Abu Dhabi', date: '4 – 6 décembre', circuit: 'Yas Marina', map: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Abu_Dhabi_Circuit.png', photo: 'https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Racehub%20header%20images%2016x9/Abu_Dhabi.jpg', length: '5,281 km', laps: 58, record: '1:26.103', recordDriver: 'M. Verstappen', history: 'Circuit inauguré en 2009, rénové en 2021. Course de nuit sous les lumières, dernier Grand Prix de la saison.', grip: 'Asphalte lisse, grip stable tout le week-end.', creator: 'Hermann Tilke' },
-]
-
-/** Les 23 courses (données de base) enrichies par la fiche détaillée des courses de fin de saison. */
-const fullSeason: any[] = circuits.map((c) => {
-  const legacy = calendar.find((r) => r.round === c.round)
-  return { ...legacy, ...c, date: fmtDay(c.iso) }
-})
+/** Les 23 courses, avec date lisible et fiches détaillées quand elles existent. */
+const fullSeason: any[] = circuits.map((c) => ({ ...extras[c.round], ...c, date: fmtDay(c.iso) }))
 
 /** Index du prochain GP : première course dont le jour de course (iso) n'est pas encore passé. */
 const findNextRace = () => {
   const n = new Date()
   const today = `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`
-  const i = calendar.findIndex((r) => r.iso >= today)
-  return i === -1 ? calendar.length - 1 : i
+  const i = fullSeason.findIndex((r) => r.iso >= today)
+  return i === -1 ? fullSeason.length - 1 : i
 }
 
-const carImageFor = (teamName: string) => {
-  const n = teamName.toLowerCase()
-  if (n.includes('ferrari')) return BASE + 'cars/ferrari.jpeg'
-  if (n.includes('mercedes')) return BASE + 'cars/mercedes.jpeg'
-  if (n.includes('mclaren')) return BASE + 'cars/mclaren.jpeg'
-  if (n.includes('aston')) return BASE + 'cars/aston.jpeg'
-  if (n.includes('williams')) return BASE + 'cars/williams.jpeg'
-  if (n.includes('alpine')) return BASE + 'cars/alpine.jpeg'
-  if (n.includes('haas')) return BASE + 'cars/haas.jpeg'
-  if (n.includes('audi')) return BASE + 'cars/audi.jpeg'
-  if (n.includes('sauber') || n.includes('kick')) return BASE + 'cars/sauber.jpeg'
-  if (n.includes('cadillac')) return BASE + 'cars/cadillac.jpeg'
-  if (n.includes('racing bulls') || n.includes('rb')) return BASE + 'cars/racingbulls.jpeg'
-  return BASE + 'cars/redbull.jpeg'
-}
 
 export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver, favTeam, setFavTeam }: Props) {
   const driverKey = `f1-fav-drivers-${userEmail}`
   const teamKey = `f1-fav-team-${userEmail}`
   const validateRef = useRef<HTMLButtonElement>(null)
+  const { grid } = useGrid()
+  const teamOf = (c?: { constructorId?: string; name?: string }) => teamByName(c?.constructorId) ?? teamByName(c?.name)
+  /** Portrait officiel d'un pilote du classement (repli : silhouette du CDN). */
+  const standingPhoto = (d: any, w = 160) => {
+    const t = teamOf(d.Constructors?.at(-1))
+    return driverPhoto(t?.slug ?? 'fallback', F1_PHOTO_ID[d.Driver.code ?? ''], w)
+  }
+  /** Fiche d'un pilote favori : grille en cours, sinon grille de référence. */
+  const driverInfo = (id: string | null) => {
+    const d = grid.find((x) => x.id === id) ?? DRIVERS.find((x) => x.id === id)
+    if (!d) return null
+    const t = TEAMS.find((x) => x.id === d.teamId)
+    return { ...d, name: `${d.givenName} ${d.familyName}`, team: t?.name ?? '', color: t?.color ?? '#a1a1aa', photo: driverPhoto(t?.slug ?? 'fallback', d.f1, 320) }
+  }
 
   const [step, setStep] = useState<'driver' | 'team' | 'done'>('driver')
   const [selectedDrivers, setSelectedDrivers] = useState<string[]>([])
   const [showWelcome, setShowWelcome] = useState(false)
   const [welcomeDone, setWelcomeDone] = useState(false)
   const [nextIdx] = useState(findNextRace)
-  const nextRace = calendar[nextIdx]
+  const nextRace = fullSeason[nextIdx]
   const [subPage, setSubPage] = useState<'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'live' | 'circuit' | 'stats-constructors' | 'stats-records'>('home')
-  const [liveStandings, setLiveStandings] = useState<any[]>([])
-  const [liveConstructors, setLiveConstructors] = useState<any[]>([])
+  const champ = useChampionship()
+  const liveStandings: any[] = champ.data?.drivers ?? []
+  const liveConstructors: any[] = champ.data?.constructors ?? []
   const [standingsTab, setStandingsTab] = useState<'drivers' | 'constructors'>('drivers')
   const [selectedDriver, setSelectedDriver] = useState<any | null>(null)
   const [selectedConstructor, setSelectedConstructor] = useState<any | null>(null)
   const [selectedRace, setSelectedRace] = useState<any | null>(null)
   const [selectedTeamStats, setSelectedTeamStats] = useState<any | null>(null)
   const [raceFrom, setRaceFrom] = useState<'calendar' | 'stats'>('calendar')
-  const [dataState, setDataState] = useState<'loading' | 'ok' | 'error'>('loading')
-  const [reload, setReload] = useState(0)
+  const dataState = champ.data ? 'ok' : champ.state
   const [winners, setWinners] = useState<Record<number, RaceWinner>>({})
   const [winnersState, setWinnersState] = useState<'loading' | 'ok' | 'error'>('loading')
-
-  useEffect(() => {
-    let alive = true
-    const j = (u: string) => fetch(u).then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json() })
-    Promise.all([
-      j('https://api.jolpi.ca/ergast/f1/2026/driverStandings.json'),
-      j('https://api.jolpi.ca/ergast/f1/2026/constructorStandings.json'),
-    ])
-      .then(([d, c]) => {
-        if (!alive) return
-        setLiveStandings(d.MRData.StandingsTable.StandingsLists[0]?.DriverStandings || [])
-        setLiveConstructors(c.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings || [])
-        setDataState('ok')
-      })
-      .catch(() => alive && setDataState('error'))
-    return () => { alive = false }
-  }, [reload])
 
   useEffect(() => {
     let alive = true
@@ -163,6 +116,12 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
   useEffect(() => {
     if (step === 'done') localStorage.setItem(driverKey + '-onboarded', '1')
   }, [step, driverKey])
+
+  useEffect(() => {
+    if (subPage === 'circuit' || (subPage === 'calendar' && selectedRace)) {
+      window.scrollTo(0, 0)
+    }
+  }, [subPage, selectedRace])
 
   const toggleDriver = (id: string) => {
     setSelectedDrivers(prev => {
@@ -204,12 +163,6 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
     return '#3f3f46'
   }
 
-  const trailColor = (teamName: string) => {
-    const c = getColor(teamName)
-    if (teamName.toLowerCase().includes('audi')) return '#BB0A30'
-    if (teamName.toLowerCase().includes('cadillac')) return '#FFD700'
-    return c === '#3f3f46' ? '#e10600' : c
-  }
 
   const go = (k: NavKey) => {
     setSelectedRace(null)
@@ -263,7 +216,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
     American: 'Américain', Chinese: 'Chinois', Japanese: 'Japonais', Danish: 'Danois'
   }
 
-  const raceDetail = (race: any, kicker: string, back: () => void, crumb: string, pager = false) => {
+  const raceDetail = (race: any, _kicker: string, back: () => void, crumb: string, pager = false) => {
     const idx = fullSeason.findIndex((r) => r.round === race.round)
     const prev = pager ? fullSeason[idx - 1] : undefined
     const nextR = pager ? fullSeason[idx + 1] : undefined
@@ -275,13 +228,12 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
         {nav(back, crumb)}
         <div className="app-page flex-1 grid content-start gap-8 md:grid-cols-2 md:gap-10 items-start">
           <div className="md:col-span-2 mb-4 app-in">
-            <p className="kicker">{kicker} · Manche {race.round}</p>
-            <h1 className="text-gradient mt-5 text-[2rem] sm:text-[2.75rem] font-medium tracking-[-0.035em] leading-[1.04]"><span className="mr-3" aria-hidden>{race.flag}</span>{race.name}</h1>
+            <h1 className="text-[2rem] sm:text-[2.75rem] font-medium tracking-[-0.035em] leading-[1.04] text-white"><span className="mr-3" aria-hidden>{race.flag}</span>{race.name}</h1>
             <p className="text-base text-zinc-400 mt-5">{race.circuit} · {race.country} · {fmtDay(race.iso)} · <span className={d >= 0 ? 'text-white' : ''}>{state}</span></p>
           </div>
           <TrackMap src={race.map} alt={`Plan du circuit de ${race.circuit}`} unavailable={race.circuit} />
           <div className="space-y-6 min-w-0">
-            {race.photo && <img src={race.photo} alt="" className="w-full h-auto rounded-3xl border border-white/[0.08]" />}
+            {race.photo && <img src={race.photo} alt={`Le circuit de ${race.circuit}`} className="w-full h-auto rounded-3xl border border-white/[0.08]" />}
             <dl className="grid grid-cols-3 gap-4">
               <div className="bg-zinc-950 border border-white/[0.08] rounded-3xl p-6"><dt className="text-xs text-zinc-500">Longueur</dt><dd className="font-semibold mt-1">{race.length}</dd></div>
               <div className="bg-zinc-950 border border-white/[0.08] rounded-3xl p-6"><dt className="text-xs text-zinc-500">Tours</dt><dd className="font-semibold mt-1">{race.laps ?? '—'}</dd></div>
@@ -347,16 +299,16 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
           {nav(() => setSubPage('home'), "Calendrier")}
           <div className="app-page flex-1 grid content-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <SectionTitle h1 kicker="Saison 2026" title="Calendrier" className="col-span-full" />
-            {calendar.map((race) => (
-              <button key={race.round} onClick={() => { setRaceFrom('calendar'); setSelectedRace(fullSeason.find((r) => r.round === race.round) ?? race) }} className="group text-left bg-zinc-950 border border-white/[0.08] rounded-3xl overflow-hidden transition duration-300 hover:-translate-y-1">
-                <div className="relative aspect-video overflow-hidden bg-zinc-900">
-                  <img src={race.photo} alt="" loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition duration-500" />
+            {fullSeason.map((race) => (
+              <button key={race.round} onClick={() => { setRaceFrom('calendar'); setSelectedRace(race) }} className="group text-left bg-zinc-950 border border-white/[0.08] rounded-3xl overflow-hidden transition duration-300 hover:-translate-y-1">
+                <div className="relative aspect-video overflow-hidden bg-[#0c0d0e]">
+                  <img src={race.photo} alt={`Le circuit de ${race.circuit}`} loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#08090a]/80 to-transparent" />
-                  <span className="absolute top-3 left-3 chip">Round {race.round}</span>
+                  <span className="absolute top-3 left-3 chip">Manche {race.round}</span>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold tracking-[-0.02em]">{race.name}</h3>
-                  <p className="text-sm text-zinc-500 mt-1.5">{race.circuit} • {race.date}</p>
+                  <h3 className="text-xl font-semibold tracking-[-0.02em]">{race.flag} {race.name}</h3>
+                  <p className="text-sm text-zinc-500 mt-1.5">{race.circuit} • {race.country} • {race.date}</p>
                 </div>
               </button>
             ))}
@@ -374,9 +326,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
             {nav(() => setSelectedDriver(null), "Pilote")}
             <div className="app-page flex-1 grid content-start gap-8 lg:grid-cols-3 lg:gap-10 items-start">
               <div className="text-center lg:row-span-2 lg:self-center">
-                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full mx-auto mb-8 flex items-center justify-center text-5xl font-bold text-white" style={{ backgroundColor: getColor(teamName), boxShadow: `0 0 0 6px ${getColor(teamName)}22, 0 20px 60px -12px ${getColor(teamName)}88` }}>
-                  {selectedDriver.Driver.familyName.charAt(0)}
-                </div>
+                <img src={standingPhoto(selectedDriver, 320)} alt="" className="w-28 h-28 sm:w-32 sm:h-32 rounded-full mx-auto mb-8 bg-[#17181a] border border-white/10 object-cover object-top" />
                 <h1 className="text-gradient text-4xl sm:text-5xl font-medium tracking-[-0.035em] leading-[1.05]">{selectedDriver.Driver.givenName} {selectedDriver.Driver.familyName}</h1>
                 <p className="text-base text-zinc-500 mt-3">{teamName}</p>
               </div>
@@ -412,55 +362,100 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
         )
       }
 
+      const title: Title | null = standingsTab === 'drivers' ? champ.data?.driverTitle ?? null : champ.data?.constructorTitle ?? null
+      const updated = champ.data ? new Date(champ.data.updatedAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : null
+      const list = standingsTab === 'drivers' ? liveStandings : liveConstructors
+      const max = Number(list[0]?.points) || 1
       return (
         <div className="min-h-dvh w-full flex flex-col text-white">
           {nav(() => setSubPage('home'), "Classements")}
           <div className="app-page flex-1">
-            <SectionTitle h1 kicker="Championnat 2026" title="Classements" className="" />
-            <div className="seg mb-10" role="tablist" aria-label="Type de classement">
-              <button role="tab" aria-selected={standingsTab === 'drivers'} onClick={() => setStandingsTab('drivers')} className="seg-item">Pilotes</button>
-              <button role="tab" aria-selected={standingsTab === 'constructors'} onClick={() => setStandingsTab('constructors')} className="seg-item">Constructeurs</button>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {standingsTab === 'drivers' ? (
-                liveStandings.length === 0 ? <p className="text-center text-zinc-500 text-sm">Chargement...</p> :
-                liveStandings.map((d, i) => {
-                  const teamName = d.Constructors[0]?.name || ''
-                  return (
-                    <button key={d.Driver.driverId} onClick={() => setSelectedDriver(d)} className="w-full flex items-center justify-between gap-3 bg-zinc-950 border border-white/[0.08] rounded-2xl px-5 sm:px-6 py-5 min-h-16 text-left transition hover:-translate-y-0.5">
-                      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                        <span className="text-sm font-medium text-zinc-600 w-6 tabular-nums">{i + 1}</span>
-                        <div className="w-11 h-11 shrink-0 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: getColor(teamName) }}>
-                          {d.Driver.familyName.charAt(0)}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium truncate">{d.Driver.givenName} {d.Driver.familyName}</p>
-                          <p className="text-xs text-zinc-500">{teamName}</p>
-                        </div>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <span className="text-lg font-semibold tabular-nums">{d.points}</span>
-                        <p className="text-[11px] text-zinc-500">{d.wins} win{Number(d.wins) !== 1 ? 's' : ''}</p>
-                      </div>
-                    </button>
-                  )
-                })
-              ) : (
-                liveConstructors.length === 0 ? <p className="text-center text-zinc-500 text-sm">Chargement...</p> :
-                liveConstructors.map((t, i) => (
-                  <button key={t.Constructor.constructorId} onClick={() => setSelectedConstructor(t)} className="w-full flex items-center justify-between gap-3 bg-zinc-950 border border-white/[0.08] rounded-2xl px-5 sm:px-6 py-5 min-h-16 text-left transition hover:-translate-y-0.5">
-                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                      <span className="text-sm font-medium text-zinc-600 w-6">{i + 1}</span>
-                      <p className="text-sm font-medium">{t.Constructor.name}</p>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <span className="text-lg font-semibold tabular-nums">{t.points}</span>
-                      <p className="text-[11px] text-zinc-500">{t.wins} win{Number(t.wins) !== 1 ? 's' : ''}</p>
-                    </div>
-                  </button>
-                ))
+            <SectionTitle h1 kicker={`Championnat ${champ.data?.season ?? ''}`} title="Classements" className="" />
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-10">
+              <div className="seg" role="tablist" aria-label="Type de classement">
+                <button role="tab" aria-selected={standingsTab === 'drivers'} onClick={() => setStandingsTab('drivers')} className="seg-item">Pilotes</button>
+                <button role="tab" aria-selected={standingsTab === 'constructors'} onClick={() => setStandingsTab('constructors')} className="seg-item">Constructeurs</button>
+              </div>
+              {champ.data && (
+                <p className="flex items-center gap-2 text-[13px] text-[#939494]">
+                  <span className="relative flex size-2"><span className="absolute inline-flex size-full animate-ping rounded-full bg-white/40" /><span className="relative inline-flex size-2 rounded-full bg-white" /></span>
+                  En direct · après la manche {champ.data.round}/{champ.data.totalRounds}{champ.data.lastRaceName ? ` (${champ.data.lastRaceName.replace('Grand Prix', 'GP')})` : ''} · mis à jour à {updated}
+                </p>
               )}
             </div>
+
+            {title && (
+              title.decided ? (
+                <div className="mb-10 overflow-hidden rounded-3xl border border-white/[0.1] bg-[#101112]">
+                  <div className="flex flex-col gap-8 p-7 sm:flex-row sm:items-center sm:p-10">
+                    {standingsTab === 'drivers' && liveStandings[0] ? (
+                      <img src={standingPhoto(liveStandings[0], 320)} alt="" className="size-28 shrink-0 rounded-full border border-white/10 bg-[#17181a] object-cover object-top sm:size-32" />
+                    ) : liveConstructors[0] && teamOf(liveConstructors[0].Constructor) ? (
+                      <span className="grid size-28 shrink-0 place-items-center rounded-full border border-white/10 bg-[#17181a] sm:size-32"><img src={teamLogo(teamOf(liveConstructors[0].Constructor)!)} alt="" className="size-16" /></span>
+                    ) : null}
+                    <div className="min-w-0">
+                      <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#0a0a0a]">
+                        <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0zM17 5h3v2a3 3 0 01-3 3M7 5H4v2a3 3 0 003 3" /></svg>
+                        {standingsTab === 'drivers' ? 'Champion du monde' : 'Champion constructeurs'} {champ.data?.season}
+                      </span>
+                      <p className="mt-5 text-[2rem] font-medium leading-[1.05] tracking-[-0.035em] sm:text-[2.75rem]">{title.leaderName}</p>
+                      <p className="mt-3 text-[15px] leading-relaxed text-[#939494]">
+                        {title.seasonOver
+                          ? `Saison terminée${standingsTab === 'drivers' ? ` · ${title.leaderTeam}` : ''} · ${title.lead} points d'avance.`
+                          : `Titre mathématiquement assuré${standingsTab === 'drivers' ? ` avec ${title.leaderTeam}` : ''} : ${title.lead} points d'avance, ${title.remaining} encore en jeu sur ${title.racesLeft} course${title.racesLeft > 1 ? 's' : ''}.`}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="mb-10 flex flex-wrap items-baseline justify-between gap-3 rounded-2xl border border-white/[0.08] px-6 py-5">
+                  <p className="text-[15px]"><span className="text-[#939494]">Course au titre · </span>{title.leaderName} mène de <span className="font-semibold tabular-nums">{title.lead} pts</span></p>
+                  <p className="text-[13px] text-[#939494] tabular-nums">{title.remaining} pts encore en jeu · {title.racesLeft} course{title.racesLeft > 1 ? 's' : ''}{title.sprintsLeft ? ` + ${title.sprintsLeft} sprint${title.sprintsLeft > 1 ? 's' : ''}` : ''}</p>
+                </div>
+              )
+            )}
+
+            {list.length === 0 ? (
+              champ.state === 'error'
+                ? <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/[0.08] px-5 py-4" role="alert"><p className="text-sm text-zinc-300">Impossible de charger les classements.</p><button onClick={champ.reload} className="btn-primary min-h-11 px-5 rounded-full text-sm font-semibold">Réessayer</button></div>
+                : <div className="space-y-2" aria-busy="true">{Array.from({ length: 8 }, (_, i) => <div key={i} className="h-16 rounded-2xl bg-white/[0.03] animate-pulse" />)}</div>
+            ) : (
+              <ol className="overflow-hidden rounded-3xl border border-white/[0.08] divide-y divide-white/[0.06]">
+                {standingsTab === 'drivers' ? liveStandings.map((d, i) => {
+                  const t = teamOf(d.Constructors.at(-1))
+                  const champion = i === 0 && title?.decided
+                  return (
+                    <li key={d.Driver.driverId}>
+                      <button onClick={() => setSelectedDriver(d)} className="grid w-full grid-cols-[2rem_2.75rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-left transition hover:bg-white/[0.03] sm:grid-cols-[2.5rem_3rem_minmax(0,1fr)_10rem_auto] sm:gap-4 sm:px-6">
+                        <span className="text-sm tabular-nums text-[#636464]">{d.position}</span>
+                        <img src={standingPhoto(d, 160)} alt="" loading="lazy" className="size-11 rounded-full bg-[#17181a] object-cover object-top sm:size-12" />
+                        <span className="min-w-0">
+                          <span className="flex items-center gap-2"><span className="truncate text-[15px] font-medium">{d.Driver.givenName} {d.Driver.familyName}</span>{champion && <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black">Champion</span>}</span>
+                          <span className="mt-0.5 flex items-center gap-1.5 text-xs text-[#636464]"><span className="size-1.5 rounded-full" style={{ backgroundColor: t?.color ?? '#636464' }} />{d.Constructors.at(-1)?.name}</span>
+                        </span>
+                        <span className="hidden h-1 rounded-full bg-white/[0.06] sm:block"><span className="block h-full rounded-full bg-white/70" style={{ width: `${(Number(d.points) / max) * 100}%` }} /></span>
+                        <span className="text-right"><span className="block text-[17px] font-semibold tabular-nums">{d.points}</span><span className="block text-[11px] text-[#636464]">{d.wins} victoire{Number(d.wins) > 1 ? 's' : ''}</span></span>
+                      </button>
+                    </li>
+                  )
+                }) : liveConstructors.map((c, i) => {
+                  const t = teamOf(c.Constructor)
+                  const champion = i === 0 && title?.decided
+                  return (
+                    <li key={c.Constructor.constructorId}>
+                      <button onClick={() => setSelectedConstructor(c)} className="grid w-full grid-cols-[2rem_2.75rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-left transition hover:bg-white/[0.03] sm:grid-cols-[2.5rem_3rem_minmax(0,1fr)_10rem_auto] sm:gap-4 sm:px-6">
+                        <span className="text-sm tabular-nums text-[#636464]">{c.position}</span>
+                        <span className="grid size-11 place-items-center rounded-full border border-white/[0.08] bg-[#141516] sm:size-12">{t && <img src={teamLogo(t)} alt="" className="size-7" />}</span>
+                        <span className="min-w-0 flex items-center gap-2"><span className="truncate text-[15px] font-medium">{c.Constructor.name}</span>{champion && <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black">Champion</span>}</span>
+                        <span className="hidden h-1 rounded-full bg-white/[0.06] sm:block"><span className="block h-full rounded-full" style={{ width: `${(Number(c.points) / max) * 100}%`, backgroundColor: t?.color ?? '#fff' }} /></span>
+                        <span className="text-right"><span className="block text-[17px] font-semibold tabular-nums">{c.points}</span><span className="block text-[11px] text-[#636464]">{c.wins} victoire{Number(c.wins) > 1 ? 's' : ''}</span></span>
+                      </button>
+                    </li>
+                  )
+                })}
+              </ol>
+            )}
+            <p className="mt-6 text-xs text-[#636464]">Source : Jolpica-F1, actualisé automatiquement toutes les 5 minutes. Barème 2026 : 25 points par course, 8 par sprint.</p>
           </div>
         </div>
       )
@@ -478,86 +473,62 @@ if (subPage === 'stats-records') {
 if (subPage === 'stats-constructors') {
   if (selectedTeamStats) {
     const name = selectedTeamStats.Constructor.name.toLowerCase()
-    let carImage = BASE + 'cars/redbull.jpeg'
-    let teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/red-bull-racing-logo.png'
     let fournisseur = 'Red Bull Ford'
     let noteMoteur = 'Premier moteur maison de Red Bull (DM01), développé avec Ford. L’écurie conçoit pour la première fois son propre groupe motopropulseur.'
     let noteAero = 'Red Bull va chercher à maximiser l’efficacité en ligne droite avec les ailes actives, tout en gardant un bon appui dans les virages rapides.'
     let officialSite = 'https://www.redbullracing.com'
 
     if (name.includes('ferrari')) {
-      carImage = BASE + 'cars/ferrari.jpeg'
-      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/ferrari-logo.png'
       fournisseur = 'Ferrari'
       noteMoteur = 'Moteur entièrement développé à Maranello. Ferrari fournit aussi Haas et Cadillac.'
       noteAero = 'Ferrari devra adapter son concept aéro pour bien gérer le passage entre mode virage et mode ligne droite.'
       officialSite = 'https://www.ferrari.com/en-EN/formula1'
     } else if (name.includes('mercedes')) {
-      carImage = BASE + 'cars/mercedes.jpeg'
-      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/mercedes-logo.png'
       fournisseur = 'Mercedes'
       noteMoteur = 'Mercedes fournit McLaren, Williams et Alpine. Référence en gestion de l’énergie et fiabilité.'
       noteAero = 'Mercedes va chercher à tirer le meilleur parti des ailes actives sur les circuits à longues lignes droites.'
       officialSite = 'https://www.mercedesamgf1.com'
     } else if (name.includes('mclaren')) {
-      carImage = BASE + 'cars/mclaren.jpeg'
-      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/mclaren-logo.png'
       fournisseur = 'Mercedes'
       noteMoteur = 'Client Mercedes depuis 2021. Partenariat prolongé jusqu’en 2030.'
       noteAero = 'McLaren va chercher à maximiser les zones de freinage et les virages rapides.'
       officialSite = 'https://www.mclaren.com/racing'
     } else if (name.includes('aston')) {
-      carImage = BASE + 'cars/aston.jpeg'
-      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/aston-martin-logo.png'
       fournisseur = 'Honda'
       noteMoteur = 'Partenariat exclusif avec Honda à partir de 2026. Honda revient avec un moteur entièrement nouveau.'
       noteAero = 'Aston Martin devra adapter son concept aéro au nouveau moteur Honda.'
       officialSite = 'https://www.astonmartinf1.com'
     } else if (name.includes('williams')) {
-      carImage = BASE + 'cars/williams.jpeg'
-      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/williams-logo.png'
       fournisseur = 'Mercedes'
       noteMoteur = 'Client Mercedes. Williams bénéficie de la puissance et de la fiabilité du constructeur allemand.'
       noteAero = 'Williams espère réduire l’écart grâce aux ailes actives sur les longues lignes droites.'
       officialSite = 'https://www.williamsf1.com'
     } else if (name.includes('alpine')) {
-      carImage = BASE + 'cars/alpine.jpeg'
-      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/alpine-logo.png'
       fournisseur = 'Mercedes'
       noteMoteur = 'Alpine passe chez Mercedes en 2026. Un changement majeur qui permet de se concentrer sur le châssis.'
       noteAero = 'Le passage à Mercedes va permettre à Alpine de mieux travailler sur les ailes actives.'
       officialSite = 'https://www.alpinecars.com/en/formula-1'
     } else if (name.includes('haas')) {
-      carImage = BASE + 'cars/haas.jpeg'
-      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/haas-f1-team-logo.png'
       fournisseur = 'Ferrari'
       noteMoteur = 'Client Ferrari. Haas utilise le même groupe motopropulseur que Ferrari.'
       noteAero = 'Haas va chercher à maximiser les zones de dépassement avec le nouveau règlement.'
       officialSite = 'https://www.haasf1team.com'
     } else if (name.includes('audi')) {
-      carImage = BASE + 'cars/audi.jpeg'
-      teamLogo = 'https://upload.wikimedia.org/wikipedia/commons/a/aa/Audi.png'
       fournisseur = 'Audi'
       noteMoteur = 'Audi développe son propre moteur pour sa première saison en Formule 1. Un projet ambitieux pour la marque allemande.'
       noteAero = 'Audi devra rapidement maîtriser les ailes actives et le mode dépassement dès sa première année.'
       officialSite = 'https://www.audi.com'
     } else if (name.includes('sauber') || name.includes('kick')) {
-      carImage = BASE + 'cars/sauber.jpeg'
-      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/kick-sauber-logo.png'
       fournisseur = 'Audi'
       noteMoteur = 'Sauber devient Audi. L’équipe prépare la transition vers la marque allemande.'
       noteAero = 'Sauber travaille sur l’adaptation aux nouvelles règles aérodynamiques de 2026.'
       officialSite = 'https://www.sauber-group.com'
     } else if (name.includes('cadillac')) {
-      carImage = BASE + 'cars/cadillac.jpeg'
-      teamLogo = 'https://cdn.brandfetch.io/cadillac.com/logo'
       fournisseur = 'Ferrari'
       noteMoteur = 'Cadillac utilise un moteur Ferrari pour ses débuts en Formule 1. L’équipe américaine arrive avec un projet ambitieux.'
       noteAero = 'Cadillac devra rapidement maîtriser les ailes actives pour être compétitive dès sa première saison.'
       officialSite = 'https://www.cadillac.com'
     } else if (name.includes('racing bulls') || name.includes('rb')) {
-      carImage = BASE + 'cars/racingbulls.jpeg'
-      teamLogo = 'https://media.formula1.com/content/dam/fom-website/teams/2024/rb-logo.png'
       fournisseur = 'Red Bull Ford'
       noteMoteur = 'Utilise le même groupe motopropulseur que Red Bull Racing.'
       noteAero = 'Racing Bulls profite des connaissances de Red Bull en aérodynamique.'
@@ -571,11 +542,9 @@ if (subPage === 'stats-constructors') {
         {nav(() => setSelectedTeamStats(null), selectedTeamStats.Constructor.name)}
 
         <div className="app-page flex-1 lg:grid lg:grid-cols-2 lg:gap-x-12 lg:content-start">
-          <div className="lg:col-span-2 flex items-center justify-between gap-4"><SectionTitle h1 kicker="Écurie 2026" title={selectedTeamStats.Constructor.name} /><img src={teamLogo} alt="" className="h-10 sm:h-14 max-w-[30%] object-contain" /></div>
+          <div className="lg:col-span-2 flex items-center justify-between gap-4"><SectionTitle h1 kicker="Écurie 2026" title={selectedTeamStats.Constructor.name} />{(() => { const gt = teamByName(selectedTeamStats.Constructor.constructorId) ?? teamByName(selectedTeamStats.Constructor.name); return gt ? <span className="grid size-16 sm:size-20 shrink-0 place-items-center rounded-2xl border border-white/[0.08] bg-[#141516]"><img src={teamLogo(gt)} alt={gt.name} className="size-10 sm:size-12 object-contain" /></span> : null })()}</div>
 
-          <div className="relative rounded-3xl overflow-hidden border border-white/[0.08] bg-black [container-type:size] h-48 sm:h-64 md:h-80 lg:h-full lg:min-h-[28rem] flex items-center justify-start mb-8 lg:mb-0 shadow-[0_30px_80px_-30px_rgb(0_0_0_/_0.9)]">
-            <CarStage src={carImage} className="w-[min(86cqw,148.6cqh)] ml-[1%] shrink-0" />
-          </div>
+          {(() => { const gt = teamOf(selectedTeamStats.Constructor); return gt ? <CarStage team={gt} size="lg" className="rounded-3xl border border-white/[0.08] aspect-[16/9] lg:aspect-auto lg:h-full lg:min-h-[28rem] mb-8 lg:mb-0" /> : null })()}
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-1 items-start">
             <div className="rounded-3xl border border-white/[0.08] bg-zinc-950 p-6 md:col-span-2 lg:col-span-1">
@@ -641,16 +610,16 @@ if (subPage === 'stats-constructors') {
         {liveConstructors.length === 0 && dataState === 'error' && (
           <div className="col-span-full flex flex-wrap items-center justify-between gap-3 border border-white/[0.08] bg-zinc-950 rounded-2xl px-5 py-4" role="alert">
             <p className="text-sm text-zinc-300">Impossible de charger les écuries.</p>
-            <button onClick={() => { setDataState('loading'); setReload((n) => n + 1) }} className="btn-primary min-h-11 px-5 rounded-full text-sm font-semibold">Réessayer</button>
+            <button onClick={champ.reload} className="btn-primary min-h-11 px-5 rounded-full text-sm font-semibold">Réessayer</button>
           </div>
         )}
         {liveConstructors.map((t, i) => (
           <button key={t.Constructor.constructorId} onClick={() => setSelectedTeamStats(t)} className="group text-left bg-zinc-950 border border-white/[0.08] rounded-3xl overflow-hidden transition duration-300 hover:-translate-y-1">
-            <div className="relative aspect-video overflow-hidden bg-black [container-type:size] flex items-center justify-start">
-              <CarStage src={carImageFor(t.Constructor.name)} className="w-[min(86cqw,148.6cqh)] ml-[1%] shrink-0" />
-              <span className="absolute top-3 left-3 chip">P{i + 1}</span>
+            <div className="relative">
+              {teamOf(t.Constructor) ? <CarStage team={teamOf(t.Constructor)!} className="aspect-video" /> : <div className="aspect-video bg-[#0c0d0e]" />}
+              <span className="absolute top-3 right-3 chip">P{i + 1}</span>
             </div>
-            <div className="p-6 flex items-end justify-between gap-3" style={{ borderTop: `3px solid ${trailColor(t.Constructor.name)}` }}>
+            <div className="p-6 flex items-end justify-between gap-3" >
               <h3 className="text-lg font-semibold tracking-tight leading-tight">{t.Constructor.name}</h3>
               <p className="text-sm text-zinc-500 shrink-0"><span className="font-semibold text-2xl text-white tabular-nums">{t.points}</span> pts <span className="ml-1 text-zinc-600 group-hover:text-white transition" aria-hidden>›</span></p>
             </div>
@@ -698,7 +667,7 @@ if (subPage === 'stats-constructors') {
             {failed && (
               <div className="col-span-full flex flex-wrap items-center justify-between gap-3 border border-white/[0.08] bg-zinc-950 rounded-2xl px-5 py-4" role="alert">
                 <p className="text-sm text-zinc-300">Impossible de charger les classements. Vérifiez votre connexion.</p>
-                <button onClick={() => { setDataState('loading'); setReload((n) => n + 1) }} className="btn-primary min-h-11 px-5 rounded-full text-sm font-semibold">Réessayer</button>
+                <button onClick={champ.reload} className="btn-primary min-h-11 px-5 rounded-full text-sm font-semibold">Réessayer</button>
               </div>
             )}
 
@@ -714,7 +683,7 @@ if (subPage === 'stats-constructors') {
                     <div className="bar-fill" style={{ width: `${(Number(leader.points) / (Number(leader.points) + Number(second.points))) * 100}%` }} />
                     <div className="bg-white/10 flex-1 rounded-full" />
                   </div>
-                  <p className="text-xs text-zinc-500 text-center">Écart : {gap} points</p>
+                  <p className="text-xs text-zinc-500 text-center">{champ.data?.driverTitle?.decided ? `${leader.Driver.familyName} est champion du monde · ${gap} points d'avance` : `Écart : ${gap} points`}</p>
                 </button>
               ) : loading ? skeleton(1, 'h-40') : <p className="text-sm text-zinc-500">Aucune donnée pour le moment.</p>}
             </div>
@@ -796,8 +765,8 @@ if (subPage === 'stats-constructors') {
     }
 
     if (subPage === 'favorites') {
-      const driver = drivers.find(d => d.id === favDriver)
-      const team = teams.find(t => t.id === favTeam)
+      const driver = driverInfo(favDriver)
+      const team = teamById(favTeam)
       return (
         <div className="min-h-dvh w-full flex flex-col text-white">
           {nav(() => setSubPage('home'), "Tes favoris")}
@@ -806,17 +775,17 @@ if (subPage === 'stats-constructors') {
             {driver && (
               <div className="bg-zinc-950 border border-white/[0.08] rounded-3xl p-6">
                 <div className="flex items-center gap-5 mb-8">
-                  <img src={driver.photo} alt={driver.name} className="w-20 h-20 shrink-0 rounded-full object-cover object-top ring-2 ring-accent-500/60" />
+                  <img src={driver.photo} alt={driver.name} className="w-20 h-20 shrink-0 rounded-full bg-[#141516] object-cover object-top ring-1 ring-white/10" />
                   <div><p className="text-2xl font-semibold tracking-[-0.03em]">{driver.name}</p><p className="text-sm text-zinc-500 mt-1">{driver.team}</p></div>
                 </div>
-                <a href={`https://www.formula1.com/en/drivers/${driver.name.toLowerCase().replace(/ /g, '-')}.html`} target="_blank" rel="noreferrer" className="btn-ghost block w-full py-3 min-h-12 rounded-full text-center text-sm font-medium">Voir les actualités</a>
+                <a href={`https://www.formula1.com/en/drivers/${driver.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/ /g, '-')}`} target="_blank" rel="noreferrer" className="btn-ghost block w-full py-3 min-h-12 rounded-full text-center text-sm font-medium">Voir les actualités</a>
                 <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(driver.name + ' F1')}`} target="_blank" rel="noreferrer" className="btn-ghost block w-full py-3 min-h-12 mt-3 rounded-full text-center text-sm font-medium">Vidéos récentes</a>
               </div>
             )}
             {team && (
               <div className="bg-zinc-950 border border-white/[0.08] rounded-3xl p-6">
                 <div className="flex items-center gap-5 mb-8">
-                  <img src={team.logo} alt={team.name} className="w-20 h-20 object-contain" />
+                  <span className="grid size-20 shrink-0 place-items-center rounded-2xl border border-white/[0.08] bg-[#141516]"><img src={teamLogo(team)} alt={team.name} className="size-12 object-contain" /></span>
                   <p className="text-2xl font-semibold tracking-[-0.03em]">{team.name}</p>
                 </div>
                 <a href={`https://en.wikipedia.org/wiki/${encodeURIComponent(team.name.replace(' Racing', ''))}`} target="_blank" rel="noreferrer" className="btn-ghost block w-full py-3 min-h-12 rounded-full text-center text-sm font-medium">Voir les actualités</a>
@@ -857,13 +826,13 @@ if (subPage === 'stats-constructors') {
               <SectionTitle kicker="À la une" title="Explorer" />
               <div className="grid gap-6 sm:grid-cols-2">
                 {[
-                  { key: 'standings' as const, tag: 'Classements', title: 'Le championnat pilotes et constructeurs', img: BASE + 'cars/mercedes.jpeg', big: true },
-                  { key: 'calendar' as const, tag: 'Calendrier', title: 'Toutes les courses de la saison', img: (calendar[nextIdx + 1] ?? nextRace).photo },
-                  { key: 'stats' as const, tag: 'Statistiques', title: 'Chiffres, écarts et écuries', img: BASE + 'cars/ferrari.jpeg' },
-                  { key: 'favorites' as const, tag: 'Favoris', title: 'Ton pilote et ton écurie', img: drivers.find(d => d.id === favDriver)?.photo || BASE + 'cars/mclaren.jpeg' },
+                  { key: 'standings' as const, tag: 'Classements', title: 'Le championnat pilotes et constructeurs', img: '', car: 'mer', big: true },
+                  { key: 'calendar' as const, tag: 'Calendrier', title: 'Toutes les courses de la saison', img: (fullSeason[nextIdx + 1] ?? nextRace).photo },
+                  { key: 'stats' as const, tag: 'Statistiques', title: 'Chiffres, écarts et écuries', img: '', car: 'fer' },
+                  { key: 'favorites' as const, tag: 'Favoris', title: 'Ton pilote et ton écurie', img: '', car: normTeamId(favTeam) ?? 'mcl' },
                 ].map((t) => (
                   <button key={t.key} onClick={() => setSubPage(t.key)} className={`group relative overflow-hidden rounded-3xl border border-white/[0.09] bg-zinc-950 text-left transition duration-300 hover:-translate-y-1 ${t.big ? 'sm:col-span-2 aspect-[16/9] lg:aspect-[21/9]' : 'aspect-[16/10]'}`}>
-                    <img src={t.img} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-65 group-hover:opacity-100 group-hover:scale-105 transition duration-500" />
+                    {t.car && teamById(t.car) ? <div className="absolute inset-0 transition duration-500 group-hover:scale-[1.03]"><CarStage team={teamById(t.car)!} logo={false} className="h-full" /></div> : <img src={t.img} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-65 group-hover:opacity-100 group-hover:scale-105 transition duration-500" />}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#08090a] via-[#08090a]/40 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
                       <span className="inline-block chip">{t.tag}</span>
@@ -886,6 +855,7 @@ if (subPage === 'stats-constructors') {
                       <span className="w-6 text-lg font-semibold text-accent-400 tabular-nums">{i + 1}</span>
                       <span className="w-1 h-7 shrink-0 rounded-full" style={{ backgroundColor: getColor(d.Constructors[0]?.name || '') }} />
                       <span className="truncate text-base font-semibold">{d.Driver.givenName} {d.Driver.familyName}</span>
+                      {i === 0 && champ.data?.driverTitle?.decided && <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black">Champion</span>}
                     </span>
                     <span className="text-lg font-semibold tabular-nums">{d.points}</span>
                   </button>
@@ -895,12 +865,12 @@ if (subPage === 'stats-constructors') {
             <section>
               <SectionTitle kicker="À suivre" title="Prochaines courses" />
               <div className="rounded-3xl overflow-hidden border border-white/[0.09] bg-zinc-950 divide-y divide-white/[0.06]">
-                {calendar.slice(nextIdx + 1, nextIdx + 5).length === 0 && <p className="p-6 text-sm text-zinc-500">Dernière course de la saison.</p>}
-                {calendar.slice(nextIdx + 1, nextIdx + 5).map((race) => (
+                {fullSeason.slice(nextIdx + 1, nextIdx + 5).length === 0 && <p className="p-6 text-sm text-zinc-500">Dernière course de la saison.</p>}
+                {fullSeason.slice(nextIdx + 1, nextIdx + 5).map((race) => (
                   <button key={race.round} onClick={() => { setRaceFrom('calendar'); setSelectedRace(fullSeason.find((r) => r.round === race.round) ?? race); setSubPage('calendar') }} className="w-full flex items-center justify-between gap-3 px-6 min-h-[4.5rem] text-left hover:bg-white/[0.04] transition">
                     <span className="min-w-0">
                       <span className="block text-base font-semibold truncate">{race.name}</span>
-                      <span className="block text-sm text-zinc-500">{race.circuit}</span>
+                      <span className="block text-sm text-zinc-500">{race.circuit} · {race.country}</span>
                     </span>
                     <span className="text-sm text-zinc-400 text-right shrink-0">{race.date}</span>
                   </button>
@@ -924,15 +894,25 @@ if (subPage === 'stats-constructors') {
           </div>
         </TopBar>
         <div className="app-page flex-1">
-          <SectionTitle h1 kicker="Étape 1 sur 2" title="Choisis tes pilotes" desc="Touche ceux que tu veux suivre." />
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
-            {drivers.map((d) => {
+          <SectionTitle h1 kicker="Étape 1 sur 2" title="Choisis tes pilotes" desc={`Les ${grid.length} pilotes de la grille ${season}. Touche ceux que tu veux suivre.`} />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+            {grid.map((d: GridDriver) => {
               const on = selectedDrivers.includes(d.id)
+              const t = TEAMS.find((x) => x.id === d.teamId)
               return (
-                <button key={d.id} onClick={() => toggleDriver(d.id)} aria-pressed={on} className={`flex flex-col items-center rounded-3xl px-3 py-6 border transition active:scale-[0.98] hover:-translate-y-0.5 ${on ? 'border-accent-400/60 bg-accent-500/10' : 'border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.05]'}`}>
-                  <img src={d.photo} alt={d.name} className={`w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover object-top transition ${on ? 'ring-4 ring-accent-500' : 'ring-1 ring-white/10'}`} />
-                  <p className="mt-4 font-semibold text-sm text-center">{d.name}</p>
-                  <p className="text-xs text-zinc-500 mt-0.5">{d.team}</p>
+                <button key={d.id} onClick={() => toggleDriver(d.id)} aria-pressed={on} aria-label={`${d.givenName} ${d.familyName}, ${t?.name ?? ''}`} className={`group relative overflow-hidden rounded-2xl border text-left transition active:scale-[0.98] ${on ? 'border-white bg-[#17181a]' : 'border-white/[0.08] bg-[#101112] hover:border-white/25'}`}>
+                  <span className="absolute left-3 top-3 z-10 text-[11px] font-medium tabular-nums text-[#636464]">{d.number}</span>
+                  <span className={`absolute right-3 top-3 z-10 grid size-5 place-items-center rounded-full border transition ${on ? 'border-white bg-white text-black' : 'border-white/20 text-transparent'}`} aria-hidden>
+                    <svg viewBox="0 0 16 16" className="size-3" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="m3.5 8.5 3 3 6-7" /></svg>
+                  </span>
+                  <span className="block aspect-[4/5] overflow-hidden">
+                    <img src={driverPhoto(t?.slug ?? 'fallback', d.f1, 320)} alt="" loading="lazy" className={`size-full object-cover object-top transition duration-500 ${on ? '' : 'grayscale-[35%] group-hover:grayscale-0'}`} />
+                  </span>
+                  <span className="block border-t border-white/[0.06] px-3.5 py-3">
+                    <span className="block truncate text-[13px] text-[#939494]">{d.givenName}</span>
+                    <span className="block truncate text-[15px] font-medium tracking-[-0.01em]">{d.familyName}</span>
+                    <span className="mt-1.5 flex items-center gap-1.5 text-[11px] text-[#636464]"><span className="size-1.5 rounded-full" style={{ backgroundColor: t?.color }} />{t?.name}</span>
+                  </span>
                 </button>
               )
             })}
@@ -954,15 +934,26 @@ if (subPage === 'stats-constructors') {
       </TopBar>
       <div className="app-page flex-1">
         <SectionTitle h1 kicker="Étape 2 sur 2" title="Choisis ton écurie" desc="Une seule, celle de ton cœur." />
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
-          {teams.map((t) => (
-            <button key={t.id} onClick={() => { setFavTeam(t.id); localStorage.setItem(teamKey, t.id); scrollToValidate() }} aria-pressed={favTeam === t.id} className={`flex flex-col items-center gap-4 px-4 py-8 rounded-3xl border transition active:scale-[0.98] hover:-translate-y-0.5 ${favTeam === t.id ? 'border-accent-400/60 bg-accent-500/10' : 'bg-white/[0.02] border-white/[0.08] hover:bg-white/[0.05]'}`}>
-              <img src={t.logo} alt={t.name} className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-contain" />
-              <p className="font-semibold text-sm text-center">{t.name}</p>
-            </button>
-          ))}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+          {TEAMS.map((t) => {
+            const on = normTeamId(favTeam) === t.id
+            return (
+              <button key={t.id} onClick={() => { setFavTeam(t.id); localStorage.setItem(teamKey, t.id); scrollToValidate() }} aria-pressed={on} className={`group relative flex flex-col overflow-hidden rounded-2xl border text-left transition active:scale-[0.98] ${on ? 'border-white bg-[#17181a]' : 'border-white/[0.08] bg-[#101112] hover:border-white/25'}`}>
+                <span className={`absolute right-3 top-3 grid size-5 place-items-center rounded-full border transition ${on ? 'border-white bg-white text-black' : 'border-white/20 text-transparent'}`} aria-hidden>
+                  <svg viewBox="0 0 16 16" className="size-3" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="m3.5 8.5 3 3 6-7" /></svg>
+                </span>
+                <span className="grid aspect-[16/10] place-items-center">
+                  <img src={teamLogo(t)} alt="" className={`size-20 sm:size-24 object-contain transition duration-300 ${on ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'}`} />
+                </span>
+                <span className="flex items-center gap-2 border-t border-white/[0.06] px-4 py-3.5">
+                  <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: t.color }} />
+                  <span className="truncate text-[14px] font-medium">{t.name}</span>
+                </span>
+              </button>
+            )
+          })}
         </div>
-        <button ref={validateRef} disabled={!favTeam} onClick={() => setStep('done')} className="btn-primary mt-14 block w-full sm:max-w-md mx-auto min-h-14 rounded-full font-semibold disabled:opacity-35 disabled:saturate-0 disabled:shadow-none">Valider</button>
+        <button ref={validateRef} disabled={!teamById(favTeam)} onClick={() => setStep('done')} className="btn-primary mt-14 block w-full sm:max-w-md mx-auto min-h-14 rounded-full font-semibold disabled:opacity-35 disabled:saturate-0 disabled:shadow-none">Valider</button>
       </div>
     </div>
   )

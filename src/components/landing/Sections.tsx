@@ -2,10 +2,11 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { circuits } from '../../data/circuits'
 import { drivers } from '../../data/divers'
 import Reveal from './Reveal'
+import CarStage from '../CarStage'
+import { TEAMS } from '../../data/grid'
 import FooterWordmark from './FooterWordmark'
 
 const reduced = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-const BASE = import.meta.env.BASE_URL
 const TODAY = new Date().toISOString().slice(0, 10)
 
 /* Largeur et gouttières de Novex : conteneur 1240 px, 40 px de chaque côté (24 px sur mobile). */
@@ -215,10 +216,8 @@ export function Features() {
 }
 
 /* ───────── Canal+ : rangées de contenu à défilement horizontal ───────── */
-const CARS = [
-  ['Ferrari', 'ferrari'], ['Mercedes', 'mercedes'], ['McLaren', 'mclaren'], ['Red Bull', 'redbull'], ['Aston Martin', 'aston'], ['Alpine', 'alpine'],
-  ['Williams', 'williams'], ['Racing Bulls', 'racingbulls'], ['Haas', 'haas'], ['Audi', 'audi'], ['Sauber', 'sauber'], ['Cadillac', 'cadillac'],
-] as const
+// Les 11 écuries 2026, rendus officiels formula1.com (même cadrage pour toutes).
+const CARS = TEAMS
 
 function RailArrows({ target }: { target: React.RefObject<HTMLDivElement | null> }) {
   const go = (d: number) => target.current?.scrollBy({ left: d * target.current.clientWidth * 0.8, behavior: reduced() ? 'auto' : 'smooth' })
@@ -241,10 +240,10 @@ export function Rails() {
       <Reveal className={WRAP}>
         <div className="mb-5 flex items-end justify-between"><h2 className="rail-title">Les écuries de la saison</h2><RailArrows target={cars} /></div>
         <div ref={cars} className="rail">
-          {CARS.map(([name, f]) => (
-            <figure key={f} className="w-[15rem] sm:w-[18rem]">
-              <div className="rail-card aspect-[3/2] bg-black"><img src={`${BASE}cars/${f}.jpeg`} alt="" loading="lazy" className="size-full object-cover" /></div>
-              <figcaption className="rail-cap mt-2">{name}</figcaption>
+          {CARS.map((t) => (
+            <figure key={t.id} className="group w-[16rem] sm:w-[20rem]">
+              <div className="rail-card"><CarStage team={t} className="aspect-[16/10]" /></div>
+              <figcaption className="rail-cap mt-2">{t.name}</figcaption>
             </figure>
           ))}
         </div>

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRuntime, useSessionList } from './useLive'
 import { OpenF1Error, ms } from './openf1'
 import type { OFSession } from './openf1'
-import { snapshot, lapSeries, fmtElapsed } from './model'
+import { snapshot, lapSeries } from './model'
 import type { Store } from './model'
 import { Card, Tabs, FlagIcon, Empty } from './ui/common'
 import { TRACK_LABEL } from './ui/style'
@@ -22,7 +22,7 @@ type RightTab = 'rc' | 'overtakes' | 'radio' | 'weather' | 'driver'
 type MobTab = LeftTab | RightTab | 'map'
 
 const LEFT: { key: LeftTab; label: string }[] = [
-  { key: 'tower', label: 'Classement' }, { key: 'chrono', label: 'Chronos' }, { key: 'strategy', label: 'Stratégie' }, { key: 'evolution', label: 'Évolution' },
+  { key: 'tower', label: 'Classement' }, { key: 'chrono', label: 'Vitesses & chronos' }, { key: 'strategy', label: 'Stratégie' }, { key: 'evolution', label: 'Évolution' },
 ]
 const RIGHT: { key: RightTab; label: string }[] = [
   { key: 'rc', label: 'Direction' }, { key: 'overtakes', label: 'Dépassements' }, { key: 'radio', label: 'Radios' }, { key: 'weather', label: 'Météo' },
@@ -176,9 +176,9 @@ export default function LivePage() {
   const track = snap ? TRACK_LABEL[snap.track.kind] : null
   const rightTabs = sel != null ? [...RIGHT, { key: 'driver' as const, label: 'Pilote' }] : RIGHT
   const mobTabs: { key: MobTab; label: string }[] = [
-    { key: 'tower', label: 'Classement' }, { key: 'map', label: 'Carte' }, ...(sel != null ? [{ key: 'driver' as const, label: 'Pilote' }] : []),
+    { key: 'tower', label: 'Classement' }, { key: 'chrono', label: 'Vitesses' }, { key: 'map', label: 'Carte' }, ...(sel != null ? [{ key: 'driver' as const, label: 'Pilote' }] : []),
     { key: 'rc', label: 'Direction' }, { key: 'strategy', label: 'Stratégie' }, { key: 'evolution', label: 'Évolution' },
-    { key: 'chrono', label: 'Chronos' }, { key: 'overtakes', label: 'Dépass.' }, { key: 'radio', label: 'Radios' }, { key: 'weather', label: 'Météo' },
+    { key: 'overtakes', label: 'Dépass.' }, { key: 'radio', label: 'Radios' }, { key: 'weather', label: 'Météo' },
   ]
   const wide = 'w-full px-3 sm:px-5 lg:px-6'
 
@@ -246,7 +246,6 @@ export default function LivePage() {
         </span>
         <div className="min-w-0">
           <h1 className="font-semibold tracking-tight text-xl sm:text-2xl leading-tight truncate">{gpLabel(s)} {s.year} · {sessionFr(s.session_name)}</h1>
-          <p className="text-xs text-zinc-500 truncate">{s.circuit_short_name}{s.location && s.location !== s.circuit_short_name ? ` · ${s.location}` : ''}</p>
         </div>
         {snap && (
           <div className="flex items-center gap-3 sm:ml-auto flex-wrap">
@@ -303,7 +302,6 @@ export default function LivePage() {
       {store && snap && (
         <>
           {!isLive && <Controls rt={rt} lap={snap.lap} totalLaps={snap.totalLaps} onLap={stepLap} />}
-          {isLive && <div className={`${wide} py-1 text-[11px] text-zinc-500`}>Session en cours · {fmtElapsed(rt.t, store.t0)}</div>}
           {snap.rows.length === 0 ? (
             <div className={`${wide} py-4`}><Card><Empty>Aucune donnée de classement disponible pour cette session.</Empty></Card></div>
           ) : desktop ? (
@@ -313,7 +311,7 @@ export default function LivePage() {
                 <div role="tabpanel">{panel(leftTab)}</div>
               </Card>
               <div className="flex flex-col gap-3 sticky top-[72px]">
-                <Card title="Circuit" right={<span className="text-[10px] text-zinc-500 uppercase tracking-wider">Touchez un pilote</span>}>
+                <Card title="Circuit">
                   <div className="p-2">{mapEl}</div>
                 </Card>
                 <Card>

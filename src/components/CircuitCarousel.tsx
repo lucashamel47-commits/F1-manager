@@ -119,7 +119,7 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
                 st.kind === 'next' ? 'border-accent-400/70' : 'border-white/10 hover:border-white/30'
               }`}
             >
-              <div className="relative aspect-video bg-[#e9ebf5] overflow-hidden">
+              <div className="relative aspect-video bg-[#08090a] overflow-hidden">
                 {c.map ? (
                   <img src={c.map} alt="" loading="lazy" draggable={false} className="absolute inset-0 w-full h-full object-contain p-3 group-hover:scale-105 transition duration-500" />
                 ) : (
