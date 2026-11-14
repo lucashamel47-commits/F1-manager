@@ -424,4 +424,5 @@ button.bg-zinc-950:not(:disabled):hover, a.bg-zinc-950:hover { border-color: #3d
 /* Barre latérale (façon Novex) */
 .app-side { transition: width 260ms cubic-bezier(0.32, 0.72, 0, 1); overflow: hidden; }
 .app-side-content { transition: padding-left 260ms cubic-bezier(0.32, 0.72, 0, 1); }
-@media (prefers-reduced-motion: reduce) { .app-side, .app-side-content { transition-duration: 1ms; } }
+.app-sheet { transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1); }
+@media (prefers-reduced-motion: reduce) { .app-side, .app-side-content, .app-sheet { transition-duration: 1ms; } }
