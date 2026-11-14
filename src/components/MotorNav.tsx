@@ -4,7 +4,6 @@ import { LogoFull } from './Logo'
 export type NavKey = 'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'live'
 
 const items: { key: NavKey; label: string }[] = [
-  { key: 'home', label: 'Saison' },
   { key: 'live', label: 'Live' },
   { key: 'standings', label: 'Classements' },
   { key: 'calendar', label: 'Calendrier' },
@@ -28,10 +27,10 @@ export function LogoMark({ className = '' }: { className?: string }) {
   )
 }
 
-/** Logo cliquable : ramène toujours à l'écran « Choisis ton mode ». */
+/** Logo cliquable : ramène toujours à l'accueil de l'app (Live / Saison / Rappels). */
 export function LogoButton({ onClick }: { onClick: () => void }) {
   return (
-    <button onClick={onClick} className="flex items-center min-h-11 rounded-lg" aria-label="F1 Manager, choisir un mode">
+    <button onClick={onClick} className="flex items-center min-h-11 rounded-lg" aria-label="F1 Manager, retour à l'accueil">
       <LogoMark />
     </button>
   )
@@ -52,7 +51,7 @@ export default function MotorNav({ active, onNavigate, onExit, onBack, crumb, ex
       <div className="app-wrap flex items-center gap-3 h-16 lg:h-[4.5rem]">
         <button
           onClick={onExit}
-          aria-label="Changer de mode"
+          aria-label="Retour à l'accueil"
           className="-ml-2 min-h-11 min-w-11 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/5 text-xl active:text-white"
         >
           ‹

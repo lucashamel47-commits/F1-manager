@@ -65,7 +65,7 @@ export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenRem
           <Brand />
           <nav className="hidden items-center gap-1 md:flex" aria-label="Sections">
             <button onClick={onOpenLive} className="h-9 rounded-full px-3.5 text-[14px] text-[#939494] hover:text-white">Live</button>
-            <button onClick={() => onOpenSeason('home')} className="h-9 rounded-full px-3.5 text-[14px] text-[#939494] hover:text-white">Saison</button>
+            <button onClick={() => onOpenSeason('standings')} className="h-9 rounded-full px-3.5 text-[14px] text-[#939494] hover:text-white">Saison</button>
             <button onClick={onOpenReminders} className="h-9 rounded-full px-3.5 text-[14px] text-[#939494] hover:text-white">Rappels</button>
           </nav>
           <button onClick={onLogout} className="ml-auto inline-flex h-9 items-center rounded-full border border-[#2b2c2d] px-4 text-[13px] font-medium text-[#c4c5c5] hover:bg-[#161718] hover:text-white">Changer de compte</button>
@@ -134,7 +134,7 @@ export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenRem
           </div>
 
           <div className="grid gap-4">
-            <button onClick={() => onOpenSeason(drv ? 'favorites' : 'home')} className={`${card} group flex items-center gap-5 p-6 text-left transition hover:border-[#3a3b3c]`} data-home="driver">
+            <button onClick={() => onOpenSeason(drv ? 'favorites' : 'onboarding')} className={`${card} group flex items-center gap-5 p-6 text-left transition hover:border-[#3a3b3c]`} data-home="driver">
               {drv ? (
                 <>
                   <img src={driverPhoto(drvTeam?.slug ?? 'fallback', drv.f1, 240)} alt="" className="size-20 shrink-0 rounded-full border border-white/10 bg-[#17181a] object-cover object-top" />
@@ -149,7 +149,7 @@ export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenRem
                 <span className="flex-1"><span className="block text-[12px] text-[#636464]">Ton pilote</span><span className="mt-1 block text-[17px] font-medium">Choisis tes favoris</span></span>
               )}
             </button>
-            <button onClick={() => onOpenSeason(team ? 'favorites' : 'home')} className={`${card} group flex items-center gap-5 p-6 text-left transition hover:border-[#3a3b3c]`} data-home="team">
+            <button onClick={() => onOpenSeason(team ? 'favorites' : 'onboarding')} className={`${card} group flex items-center gap-5 p-6 text-left transition hover:border-[#3a3b3c]`} data-home="team">
               {team ? (
                 <>
                   <span className="grid size-20 shrink-0 place-items-center rounded-full border border-white/10 bg-[#141516]"><img src={teamLogo(team)} alt="" className="size-11 object-contain" /></span>
@@ -185,7 +185,7 @@ export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenRem
               tools={[['Classement en direct', onOpenLive], ['Suivre une voiture', onOpenLive], ['Vue pilote', onOpenLive]]}
             />
             <Entry
-              title="Saison" onOpen={() => onOpenSeason('home')}
+              title="Saison" onOpen={() => onOpenSeason('standings')}
               icon={<path d="M6 20V10M12 20V4M18 20v-7" />}
               tools={[['Classements', () => onOpenSeason('standings')], ['Calendrier', () => onOpenSeason('calendar')], ['Statistiques', () => onOpenSeason('stats')], ['Duel & positions', () => onOpenSeason('stats-duel')]]}
             />
