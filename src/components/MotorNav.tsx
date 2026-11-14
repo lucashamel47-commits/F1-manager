@@ -38,17 +38,16 @@ export function TopBar({ children, className = '' }: { children: ReactNode; clas
   )
 }
 
-/** Barre de page sous la barre latérale : « ← Retour » + fil d'Ariane, et onglets de section éventuels. */
+/** Barre de page sous la barre latérale : uniquement sur une fiche détaillée (« ‹ Classements »…), et onglets de section éventuels. */
 export default function MotorNav({ onBack, crumb, extra }: Props) {
   if (!onBack && !extra) return null
   return (
     <TopBar>
       {onBack && (
-        <div className="app-wrap flex h-14 items-center gap-3">
-          <button onClick={onBack} className="-ml-2 px-2 min-h-11 text-sm text-zinc-400 hover:text-white active:text-white">
-            ← Retour
+        <div className="app-wrap flex h-12 items-center">
+          <button onClick={onBack} className="-ml-2 inline-flex min-h-11 items-center gap-1 px-2 text-sm text-zinc-400 hover:text-white active:text-white">
+            <span aria-hidden>‹</span> {crumb ?? 'Retour'}
           </button>
-          {crumb && <span className="text-xs text-zinc-600 truncate">{crumb}</span>}
         </div>
       )}
       {extra && <div className={`app-wrap pb-3 ${onBack ? 'pt-0' : 'pt-3'}`}>{extra}</div>}

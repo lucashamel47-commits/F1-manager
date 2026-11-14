@@ -282,7 +282,7 @@ export default function HorsCourse({ onBack, onPageChange, userEmail, favDriver,
     }
 
     if (subPage === 'circuit') {
-      return raceDetail(fullSeason.find((r) => r.round === nextRace.round) ?? nextRace, 'Prochain GP', onBack, 'Circuit')
+      return raceDetail(fullSeason.find((r) => r.round === nextRace.round) ?? nextRace, 'Prochain GP', onBack, 'Accueil')
     }
 
     if (subPage === 'calendar') {
@@ -292,14 +292,14 @@ export default function HorsCourse({ onBack, onPageChange, userEmail, favDriver,
           selectedRace,
           fromStats ? 'Circuit' : 'Course',
           fromStats ? () => { setSelectedRace(null); setSubPage('stats') } : () => setSelectedRace(null),
-          fromStats ? 'Statistiques › Circuit' : 'Course',
+          fromStats ? 'Statistiques' : 'Calendrier',
           true,
         )
       }
 
       return (
         <div className="min-h-dvh w-full flex flex-col text-white">
-          {nav(onBack, "Calendrier")}
+          {nav()}
           <div className="app-page flex-1 grid content-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <div className="col-span-full flex flex-wrap items-end justify-between gap-4 mb-2 sm:mb-4">
               <SectionTitle h1 kicker="Saison 2026" title="Calendrier" className="!mb-0" />
@@ -337,7 +337,7 @@ export default function HorsCourse({ onBack, onPageChange, userEmail, favDriver,
         const nat = nationalityFR[selectedDriver.Driver.nationality] || selectedDriver.Driver.nationality
         return (
           <div className="min-h-dvh w-full flex flex-col text-white">
-            {nav(() => setSelectedDriver(null), "Pilote")}
+            {nav(() => setSelectedDriver(null), "Classements")}
             <div className="app-page flex-1 grid content-start gap-8 lg:grid-cols-3 lg:gap-10 items-start">
               <div className="text-center lg:row-span-2 lg:self-center">
                 <img src={standingPhoto(selectedDriver, 320)} alt="" className="w-28 h-28 sm:w-32 sm:h-32 rounded-full mx-auto mb-8 bg-[#17181a] border border-white/10 object-cover object-top" />
@@ -362,7 +362,7 @@ export default function HorsCourse({ onBack, onPageChange, userEmail, favDriver,
         const nat = nationalityFR[selectedConstructor.Constructor.nationality] || selectedConstructor.Constructor.nationality
         return (
           <div className="min-h-dvh w-full flex flex-col text-white">
-            {nav(() => setSelectedConstructor(null), "Écurie")}
+            {nav(() => setSelectedConstructor(null), "Classements")}
             <div className="app-page flex-1 space-y-12 content-start">
               <h1 className="text-gradient text-4xl sm:text-6xl font-medium tracking-[-0.035em] text-center leading-[1.05]">{selectedConstructor.Constructor.name}</h1>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:col-span-2">
@@ -382,7 +382,7 @@ export default function HorsCourse({ onBack, onPageChange, userEmail, favDriver,
       const max = Number(list[0]?.points) || 1
       return (
         <div className="min-h-dvh w-full flex flex-col text-white">
-          {nav(onBack, "Classements")}
+          {nav()}
           <div className="app-page flex-1">
             <SectionTitle h1 kicker={`Championnat ${champ.data?.season ?? ''}`} title="Classements" className="" />
             <div className="flex flex-wrap items-center justify-between gap-4 mb-10">
@@ -479,7 +479,7 @@ if (subPage === 'stats-duel' || subPage === 'stats-positions') {
   const duel = subPage === 'stats-duel'
   return (
     <div className="min-h-dvh w-full flex flex-col text-white pb-28 sm:pb-10">
-      {nav(onBack, duel ? 'Duel' : 'Positions', statsTabs(duel ? 'duel' : 'positions'))}
+      {nav(undefined, undefined, statsTabs(duel ? 'duel' : 'positions'))}
       <div className="app-page flex-1">
         <SectionTitle h1 title={duel ? 'Duel au tour' : 'Positions tour par tour'} />
         <Suspense fallback={<div className="h-96 animate-pulse rounded-[1.75rem] border border-[#1d1e1f] bg-[#0c0d0e]" />}>
@@ -493,7 +493,7 @@ if (subPage === 'stats-duel' || subPage === 'stats-positions') {
 if (subPage === 'stats-records') {
   return (
     <div className="min-h-dvh w-full flex flex-col text-white pb-28 sm:pb-10">
-      {nav(onBack, 'Records & Historique', statsTabs('records'))}
+      {nav(undefined, undefined, statsTabs('records'))}
       <StatsRecords />
     </div>
   )
@@ -569,7 +569,7 @@ if (subPage === 'stats-constructors') {
 
     return (
       <div className="min-h-dvh w-full flex flex-col text-white">
-        {nav(() => setSelectedTeamStats(null), selectedTeamStats.Constructor.name)}
+        {nav(() => setSelectedTeamStats(null), 'Constructeurs')}
 
         <div className="app-page flex-1">
           <div className="flex items-center justify-between gap-4">
@@ -635,7 +635,7 @@ if (subPage === 'stats-constructors') {
 
   return (
     <div className="min-h-dvh w-full flex flex-col text-white">
-      {nav(onBack, "Constructeurs", statsTabs('constructors'))}
+      {nav(undefined, undefined, statsTabs('constructors'))}
       <div className="app-page flex-1 grid content-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <SectionTitle h1 kicker="Statistiques" title="Constructeurs" desc="Le championnat par écurie. Touchez une écurie pour voir ses chiffres, ses pilotes et son aéro." className="col-span-full" />
         {liveConstructors.length === 0 && dataState === 'loading' && Array.from({ length: 8 }, (_, i) => <div key={i} className="aspect-video bg-zinc-950 border border-white/[0.06] rounded-3xl animate-pulse" aria-busy="true" />)}
@@ -689,7 +689,7 @@ if (subPage === 'stats-constructors') {
       const row = 'w-full flex items-center justify-between gap-3 bg-zinc-950 border border-white/[0.08] rounded-2xl px-5 py-4 text-left transition hover:-translate-y-0.5'
       return (
         <div className="min-h-dvh w-full flex flex-col text-white pb-28 sm:pb-10">
-          {nav(onBack, "Statistiques", statsTabs('overview'))}
+          {nav(undefined, undefined, statsTabs('overview'))}
           <div className="app-page flex-1 grid content-start gap-x-8 gap-y-16 md:grid-cols-2 lg:gap-x-12 lg:gap-y-20 items-start">
             <SectionTitle h1 kicker="Saison 2026" title="Statistiques" desc={`Le championnat en un coup d’œil : ${done} courses disputées sur ${circuits.length}. Touchez une carte pour voir le détail.`} className="col-span-full" />
 
@@ -794,7 +794,7 @@ if (subPage === 'stats-constructors') {
     if (subPage === 'live') {
       return (
         <div className="min-h-dvh w-full flex flex-col text-white">
-          {nav(onBack, 'Live')}
+          {nav()}
           <Suspense fallback={<p className="p-8 text-sm text-zinc-500">Chargement du live…</p>}><LivePage /></Suspense>
         </div>
       )
@@ -805,7 +805,7 @@ if (subPage === 'stats-constructors') {
       const team = teamById(favTeam)
       return (
         <div className="min-h-dvh w-full flex flex-col text-white">
-          {nav(onBack, "Tes favoris")}
+          {nav()}
           <div className="app-page flex-1 grid content-start gap-8 md:grid-cols-2 items-start">
             <SectionTitle h1 kicker="Ton paddock" title="Tes favoris" className="col-span-full" />
             {driver && (
@@ -843,7 +843,7 @@ if (subPage === 'stats-constructors') {
       <div className="min-h-dvh w-full flex flex-col text-white">
         <TopBar>
           <div className="app-wrap flex items-center justify-between gap-2 h-16">
-            <button onClick={onBack} className="text-sm text-zinc-400 hover:text-white min-h-11 min-w-16 text-left">← Retour</button>
+            <span className="min-w-16" aria-hidden />
             <button onClick={() => setStep('team')} className="text-sm text-zinc-400 hover:text-white min-h-11 min-w-16 text-right">Passer</button>
           </div>
         </TopBar>
@@ -887,7 +887,7 @@ if (subPage === 'stats-constructors') {
     <div className="min-h-dvh w-full flex flex-col text-white">
       <TopBar>
         <div className="app-wrap flex items-center justify-between gap-2 h-16">
-          <button onClick={() => setStep('driver')} className="text-sm text-zinc-400 hover:text-white min-h-11 min-w-16 text-left">← Retour</button>
+          <button onClick={() => setStep('driver')} className="text-sm text-zinc-400 hover:text-white min-h-11 min-w-16 text-left">‹ Étape 1</button>
           <button onClick={() => setStep('done')} className="text-sm text-zinc-400 hover:text-white min-h-11 min-w-16 text-right">Passer</button>
         </div>
       </TopBar>
