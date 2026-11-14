@@ -74,8 +74,7 @@ export default function CircuitCarousel({ nextRound, winners, winnersState, onOp
     <section aria-labelledby="circuits-title" className="col-span-full min-w-0">
       <div className="flex items-end justify-between gap-4 mb-10">
         <div className="min-w-0">
-          <p className="kicker">Calendrier</p>
-          <h2 id="circuits-title" className="text-gradient mt-5 text-[1.75rem] sm:text-[2.625rem] font-medium tracking-[-0.035em] leading-[1.1]">Les circuits</h2>
+          <h2 id="circuits-title" className="text-gradient text-[1.75rem] sm:text-[2.625rem] font-medium tracking-[-0.035em] leading-[1.1]">Les circuits</h2>
           <p className="mt-4 text-base text-zinc-400">Faites défiler les {circuits.length} Grands Prix. Touchez un circuit pour ouvrir sa fiche.</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">

@@ -4,7 +4,7 @@ import { LogoFull, LogoGlyph } from './Logo'
 /**
  * Barre latérale de l'app connectée, calquée sur celle de Novex :
  * - fixe à gauche sur iPad / ordinateur (240 px), repliable en rail d'icônes (bouton « panneau » à droite du logo, mémorisé) ;
- * - sur téléphone, rail d'icônes comme Novex ; le bouton du haut la déplie par-dessus la page (voile, toucher à côté pour fermer).
+ * - sur téléphone, barre d'onglets en bas façon iOS (Accueil, Live, Classements, Stats, Plus) ; « Plus » ouvre une feuille avec le reste.
  * Groupes repliables à titre gris + chevron, lignes icône + libellé, élément actif sur fond blanc à 9 %.
  */
 export type MenuKey = 'home' | 'live' | 'standings' | 'calendar' | 'stats' | 'duel' | 'positions' | 'favorites' | 'reminders'
@@ -20,6 +20,7 @@ const P = {
   favorites: 'm12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z',
   reminders: 'M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0',
   panel: 'M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM9 3v18',
+  more: 'M3.7 12a1.3 1.3 0 1 0 2.6 0 1.3 1.3 0 1 0-2.6 0M10.7 12a1.3 1.3 0 1 0 2.6 0 1.3 1.3 0 1 0-2.6 0M17.7 12a1.3 1.3 0 1 0 2.6 0 1.3 1.3 0 1 0-2.6 0',
   logout: 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9',
 }
 const Icon = ({ d, className = 'size-4' }: { d: string; className?: string }) => (
@@ -46,30 +47,28 @@ interface Props {
 export default function AppMenu({ active, email, onNavigate, onLogout, children }: Props) {
   const [collapsed, setCollapsed] = useState(() => localStorage.getItem('f1-sidebar-collapsed') === '1')
   const [closedGroups, setClosedGroups] = useState<Record<string, boolean>>(() => readJSON('f1-sidebar-groups', {}))
-  const [phoneOpen, setPhoneOpen] = useState(false)
+  const [sheetOpen, setSheetOpen] = useState(false)
 
   useEffect(() => { localStorage.setItem('f1-sidebar-collapsed', collapsed ? '1' : '0') }, [collapsed])
   useEffect(() => { localStorage.setItem('f1-sidebar-groups', JSON.stringify(closedGroups)) }, [closedGroups])
   useEffect(() => {
-    if (!phoneOpen) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setPhoneOpen(false) }
+    if (!sheetOpen) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSheetOpen(false) }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [phoneOpen])
+  }, [sheetOpen])
 
-  // Rail d'icônes : téléphone fermé, ou repli choisi sur iPad / ordinateur.
-  const rail = (phone: boolean) => (phone ? !phoneOpen : collapsed)
 
-  const go = (k: MenuKey) => { setPhoneOpen(false); onNavigate(k) }
+  const go = (k: MenuKey) => { setSheetOpen(false); onNavigate(k) }
 
-  const panel = (phone: boolean) => {
-    const r = rail(phone)
+  const panel = () => {
+    const r = collapsed
     return (
       <div className={`flex h-full flex-col ${r ? 'items-center px-2' : 'px-2.5'}`}>
         <div className={`flex h-14 shrink-0 items-center ${r ? 'flex-col justify-center' : 'justify-between pl-2'}`}>
           {r ? (
             <button
-              onClick={() => (phone ? setPhoneOpen(true) : setCollapsed(false))}
+              onClick={() => setCollapsed(false)}
               aria-label="Déplier le menu"
               title="Déplier le menu"
               className="grid size-10 place-items-center rounded-lg text-[#f7f8f8] hover:bg-white/[0.06]"
@@ -80,7 +79,7 @@ export default function AppMenu({ active, email, onNavigate, onLogout, children 
             <>
               <button onClick={() => go('home')} aria-label="F1 Manager, accueil" className="flex min-h-10 items-center"><LogoFull /></button>
               <button
-                onClick={() => (phone ? setPhoneOpen(false) : setCollapsed(true))}
+                onClick={() => setCollapsed(true)}
                 aria-label="Replier le menu"
                 title="Replier le menu"
                 className="grid size-9 place-items-center rounded-lg text-[#7b7c7c] hover:bg-white/[0.06] hover:text-white"
@@ -132,13 +131,13 @@ export default function AppMenu({ active, email, onNavigate, onLogout, children 
           {r ? (
             <>
               <span title={email} className="grid size-8 place-items-center rounded-full border border-[#2b2c2d] bg-[#17181a] text-[12px] font-medium uppercase text-[#d6d7d7]">{email.charAt(0) || '?'}</span>
-              <button onClick={() => { setPhoneOpen(false); onLogout() }} aria-label="Changer de compte" title="Changer de compte" className="grid size-10 place-items-center rounded-[10px] text-[#939494] hover:bg-white/[0.06] hover:text-white"><Icon d={P.logout} /></button>
+              <button onClick={() => { setSheetOpen(false); onLogout() }} aria-label="Changer de compte" title="Changer de compte" className="grid size-10 place-items-center rounded-[10px] text-[#939494] hover:bg-white/[0.06] hover:text-white"><Icon d={P.logout} /></button>
             </>
           ) : (
             <div className="flex items-center gap-2.5 px-1.5">
               <span className="grid size-8 shrink-0 place-items-center rounded-full border border-[#2b2c2d] bg-[#17181a] text-[12px] font-medium uppercase text-[#d6d7d7]" aria-hidden>{email.charAt(0) || '?'}</span>
               <span className="min-w-0 flex-1 truncate text-[13px] text-[#c4c5c5]">{email}</span>
-              <button onClick={() => { setPhoneOpen(false); onLogout() }} aria-label="Changer de compte" title="Changer de compte" className="grid size-9 shrink-0 place-items-center rounded-lg text-[#7b7c7c] hover:bg-white/[0.06] hover:text-white"><Icon d={P.logout} /></button>
+              <button onClick={() => { setSheetOpen(false); onLogout() }} aria-label="Changer de compte" title="Changer de compte" className="grid size-9 shrink-0 place-items-center rounded-lg text-[#7b7c7c] hover:bg-white/[0.06] hover:text-white"><Icon d={P.logout} /></button>
             </div>
           )}
         </div>
@@ -147,14 +146,67 @@ export default function AppMenu({ active, email, onNavigate, onLogout, children 
   }
 
   const shell = 'fixed inset-y-0 left-0 z-[60] border-r border-[#2b2c2d] bg-[#121314] pt-[env(safe-area-inset-top)] text-white'
+
+  // Téléphone : barre d'onglets en bas (façon iOS) + feuille « Plus » pour le reste.
+  const TABS: [MenuKey | 'more', string, string][] = [['home', 'Accueil', P.home], ['live', 'Live', P.live], ['standings', 'Classements', P.standings], ['stats', 'Stats', P.stats], ['more', 'Plus', P.more]]
+  const MORE: [MenuKey, string][] = [['calendar', 'Calendrier'], ['duel', 'Duel'], ['positions', 'Positions'], ['favorites', 'Favoris'], ['reminders', 'Rappels']]
+  const moreActive = MORE.some(([k]) => k === active)
+
   return (
     <>
       {/* iPad / ordinateur */}
-      <aside className={`app-side ${shell} hidden md:block ${collapsed ? 'w-16' : 'w-60'}`} aria-label="Menu">{panel(false)}</aside>
-      {/* téléphone : rail, dépliable par-dessus la page */}
-      <div aria-hidden onClick={() => setPhoneOpen(false)} className={`fixed inset-0 z-[55] bg-black/55 transition-opacity duration-300 md:hidden ${phoneOpen ? 'opacity-100' : 'pointer-events-none opacity-0'}`} />
-      <aside className={`app-side ${shell} md:hidden ${phoneOpen ? 'w-[min(16rem,80vw)] shadow-[0_0_60px_rgba(0,0,0,0.6)]' : 'w-14'}`} aria-label="Menu">{panel(true)}</aside>
-      <div className={`app-side-content pl-14 ${collapsed ? 'md:pl-16' : 'md:pl-60'}`}>{children}</div>
+      <aside className={`app-side ${shell} hidden md:block ${collapsed ? 'w-16' : 'w-60'}`} aria-label="Menu">{panel()}</aside>
+
+      {/* téléphone : barre d'onglets */}
+      <nav aria-label="Navigation" className="fixed inset-x-0 bottom-0 z-[60] border-t border-[#2b2c2d] bg-[#08090a] pb-[env(safe-area-inset-bottom)] md:hidden">
+        <div className="mx-auto grid h-[3.75rem] max-w-lg grid-cols-5">
+          {TABS.map(([k, label, icon]) => {
+            const on = k === 'more' ? moreActive || sheetOpen : active === k && !sheetOpen
+            return (
+              <button
+                key={k}
+                data-tab={k}
+                onClick={() => (k === 'more' ? setSheetOpen((o) => !o) : go(k))}
+                aria-current={on && k !== 'more' ? 'page' : undefined}
+                aria-expanded={k === 'more' ? sheetOpen : undefined}
+                className={`flex flex-col items-center justify-center gap-1 transition active:scale-95 ${on ? 'text-[#f7f8f8]' : 'text-[#6e6f70]'}`}
+              >
+                <Icon d={icon} className="size-[22px]" />
+                <span className="text-[10.5px] font-medium tracking-[-0.01em]">{label}</span>
+              </button>
+            )
+          })}
+        </div>
+      </nav>
+
+      {/* téléphone : feuille « Plus » */}
+      <div aria-hidden onClick={() => setSheetOpen(false)} className={`fixed inset-0 z-[55] bg-black/55 transition-opacity duration-300 md:hidden ${sheetOpen ? 'opacity-100' : 'pointer-events-none opacity-0'}`} />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Plus"
+        inert={!sheetOpen}
+        className={`app-sheet fixed inset-x-0 bottom-0 z-[58] rounded-t-[1.5rem] border-t border-[#2b2c2d] bg-[#101112] px-4 pb-[calc(4.5rem+env(safe-area-inset-bottom))] pt-2.5 text-white md:hidden ${sheetOpen ? 'translate-y-0' : 'translate-y-full'}`}
+      >
+        <div className="mx-auto mb-3 h-1 w-9 rounded-full bg-[#3a3b3c]" aria-hidden />
+        <div className="grid gap-px overflow-hidden rounded-2xl border border-[#1d1e1f] bg-[#1d1e1f]">
+          {MORE.map(([k, label]) => (
+            <button key={k} data-more={k} onClick={() => go(k)} aria-current={active === k ? 'page' : undefined} className={`flex min-h-[3.25rem] items-center gap-3 bg-[#141516] px-4 text-left text-[15px] font-medium ${active === k ? 'text-white' : 'text-[#c4c5c5]'}`}>
+              <Icon d={P[k]} className={`size-[18px] ${active === k ? 'text-white' : 'text-[#7b7c7c]'}`} />
+              <span className="flex-1">{label}</span>
+              <span className="text-[#4a4b4c]" aria-hidden>›</span>
+            </button>
+          ))}
+        </div>
+        <div className="mt-3 flex items-center gap-3 rounded-2xl border border-[#1d1e1f] bg-[#141516] px-4 py-3">
+          <span className="grid size-9 shrink-0 place-items-center rounded-full border border-[#2b2c2d] bg-[#1b1c1d] text-[13px] font-medium uppercase text-[#d6d7d7]" aria-hidden>{email.charAt(0) || '?'}</span>
+          <span className="min-w-0 flex-1 truncate text-[13px] text-[#c4c5c5]">{email}</span>
+          <button onClick={() => { setSheetOpen(false); onLogout() }} className="shrink-0 rounded-full border border-[#2b2c2d] px-3.5 py-2 text-[12.5px] font-medium text-[#d6d7d7]">Changer de compte</button>
+        </div>
+        <a href="#/mentions" onClick={() => setSheetOpen(false)} className="mt-3 block text-center text-[12px] text-[#6e6f70]">Mentions légales &amp; confidentialité</a>
+      </div>
+
+      <div className={`app-side-content pb-[calc(3.75rem+env(safe-area-inset-bottom))] md:pb-0 ${collapsed ? 'md:pl-16' : 'md:pl-60'}`}>{children}</div>
     </>
   )
 }
