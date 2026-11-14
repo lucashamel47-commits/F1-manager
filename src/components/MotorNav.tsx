@@ -30,6 +30,15 @@ export function LogoMark({ className = '' }: { className?: string }) {
   )
 }
 
+/** Logo cliquable : ramène toujours à l'écran « Choisis ton mode ». */
+export function LogoButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button onClick={onClick} className="flex items-center min-h-11 rounded-lg" aria-label="F1 Manager, choisir un mode">
+      <LogoMark />
+    </button>
+  )
+}
+
 /** Barre du haut : verre sombre, sans fond blanc, contenu centré à la largeur de la page. */
 export function TopBar({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
@@ -50,9 +59,7 @@ export default function MotorNav({ active, onNavigate, onExit, onBack, crumb, ex
         >
           ‹
         </button>
-        <button onClick={() => onNavigate('home')} className="flex items-center min-h-11" aria-label="F1 Manager, accueil">
-          <LogoMark />
-        </button>
+        <LogoButton onClick={onExit} />
         <span className="hidden xl:inline whitespace-nowrap pl-3 ml-1 border-l border-white/10 text-zinc-500 text-xs">Hors course</span>
         <nav className="seg hidden md:inline-flex ml-auto" aria-label="Navigation principale">
           {items.map((it) => (

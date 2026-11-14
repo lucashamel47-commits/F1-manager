@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { LogoMark, TopBar, SectionTitle } from '../components/MotorNav'
+import { LogoButton, TopBar, SectionTitle } from '../components/MotorNav'
 import { getCalendar, type Race } from '../lib/f1api'
 import { allSessions, buildIcs, countdown, formatWhen, KIND_LABEL, nextSession, type SessionKind } from '../lib/sessions'
 import { DEFAULT_PREFS, fetchRemote, LEAD_CHOICES, loadLocal, saveLocal, saveRemote, type Prefs } from '../lib/reminders'
@@ -147,7 +147,7 @@ export default function Reminders({ onBack, user }: { onBack: () => void; user: 
       <TopBar>
         <div className="app-wrap flex items-center gap-3 h-16 lg:h-[4.5rem]">
           <button onClick={onBack} aria-label="Changer de mode" className="-ml-2 min-h-11 min-w-11 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/5 text-xl active:text-white">‹</button>
-          <LogoMark />
+          <LogoButton onClick={onBack} />
           <span className="ml-auto chip">Rappels</span>
         </div>
       </TopBar>
