@@ -174,35 +174,6 @@ export default function HorsCourse({ onBack, onPageChange, userEmail, favDriver,
     else setSubPage(k)
   }
 
-  const statsTabs = (active: 'overview' | 'constructors' | 'records' | 'duel' | 'positions') => {
-    const ico = (d: string) => (
-      <svg viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d={d} /></svg>
-    )
-    const tabs = [
-      { key: 'overview' as const, label: 'Aperçu', page: 'stats' as const, icon: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z' },
-      { key: 'constructors' as const, label: 'Constructeurs', short: 'Écuries', page: 'stats-constructors' as const, icon: 'M3 15l2-5h9l4 3h3v2M6 17a2 2 0 100 .01M17 17a2 2 0 100 .01M8 17h7' },
-      { key: 'duel' as const, label: 'Duel', page: 'stats-duel' as const, icon: 'M4 18h4v-6H4zM16 18h4V6h-4zM10 18h4v-9h-4z' },
-      { key: 'positions' as const, label: 'Positions', page: 'stats-positions' as const, icon: 'M3 7l5 4 4-6 4 8 5-3M3 17h18' },
-      { key: 'records' as const, label: 'Records & Historique', short: 'Records', page: 'stats-records' as const, icon: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0zM17 5h3v2a3 3 0 01-3 3M7 5H4v2a3 3 0 003 3' },
-    ]
-    return (
-      <div className="seg" role="tablist" aria-label="Sections des statistiques">
-        {tabs.map((t) => (
-          <button
-            key={t.key}
-            role="tab"
-            aria-selected={active === t.key}
-            onClick={() => { setSelectedTeamStats(null); setSelectedRace(null); setSubPage(t.page) }}
-            className="seg-item !px-3 sm:!px-5 !text-xs sm:!text-sm"
-          >
-            {ico(t.icon)}
-            {'short' in t ? (<><span className="sm:hidden">{t.short}</span><span className="hidden sm:inline">{t.label}</span></>) : t.label}
-          </button>
-        ))}
-      </div>
-    )
-  }
-
   const navKey: NavKey =
     subPage === 'stats-constructors' || subPage === 'stats-records' || subPage === 'stats-duel' || subPage === 'stats-positions' || (subPage === 'calendar' && selectedRace && raceFrom === 'stats')
       ? 'stats'
@@ -377,7 +348,6 @@ export default function HorsCourse({ onBack, onPageChange, userEmail, favDriver,
       }
 
       const title: Title | null = standingsTab === 'drivers' ? champ.data?.driverTitle ?? null : champ.data?.constructorTitle ?? null
-      const updated = champ.data ? new Date(champ.data.updatedAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : null
       const list = standingsTab === 'drivers' ? liveStandings : liveConstructors
       const max = Number(list[0]?.points) || 1
       return (
@@ -391,9 +361,8 @@ export default function HorsCourse({ onBack, onPageChange, userEmail, favDriver,
                 <button role="tab" aria-selected={standingsTab === 'constructors'} onClick={() => setStandingsTab('constructors')} className="seg-item">Constructeurs</button>
               </div>
               {champ.data && (
-                <p className="flex items-center gap-2 text-[13px] text-[#939494]">
-                  <span className="relative flex size-2"><span className="absolute inline-flex size-full animate-ping rounded-full bg-white/40" /><span className="relative inline-flex size-2 rounded-full bg-white" /></span>
-                  En direct · après la manche {champ.data.round}/{champ.data.totalRounds}{champ.data.lastRaceName ? ` (${gpFr(champ.data.lastRaceName)})` : ''} · mis à jour à {updated}
+                <p className="text-[13px] text-[#939494]">
+                  Après la manche {champ.data.round} sur {champ.data.totalRounds}{champ.data.lastRaceName ? ` · ${gpFr(champ.data.lastRaceName)}` : ''}
                 </p>
               )}
             </div>
@@ -479,7 +448,7 @@ if (subPage === 'stats-duel' || subPage === 'stats-positions') {
   const duel = subPage === 'stats-duel'
   return (
     <div className="min-h-dvh w-full flex flex-col text-white pb-28 sm:pb-10">
-      {nav(undefined, undefined, statsTabs(duel ? 'duel' : 'positions'))}
+      {nav()}
       <div className="app-page flex-1">
         <SectionTitle h1 title={duel ? 'Duel au tour' : 'Positions tour par tour'} />
         <Suspense fallback={<div className="h-96 animate-pulse rounded-[1.75rem] border border-[#1d1e1f] bg-[#0c0d0e]" />}>
@@ -490,16 +459,7 @@ if (subPage === 'stats-duel' || subPage === 'stats-positions') {
   )
 }
 
-if (subPage === 'stats-records') {
-  return (
-    <div className="min-h-dvh w-full flex flex-col text-white pb-28 sm:pb-10">
-      {nav(undefined, undefined, statsTabs('records'))}
-      <StatsRecords />
-    </div>
-  )
-}
-
-if (subPage === 'stats-constructors') {
+if (subPage === 'stats-constructors' && selectedTeamStats) {
   if (selectedTeamStats) {
     const name = selectedTeamStats.Constructor.name.toLowerCase()
     let fournisseur = 'Red Bull Ford'
@@ -569,7 +529,7 @@ if (subPage === 'stats-constructors') {
 
     return (
       <div className="min-h-dvh w-full flex flex-col text-white">
-        {nav(() => setSelectedTeamStats(null), 'Constructeurs')}
+        {nav(() => { setSelectedTeamStats(null); setSubPage('stats') }, 'Statistiques')}
 
         <div className="app-page flex-1">
           <div className="flex items-center justify-between gap-4">
@@ -633,40 +593,9 @@ if (subPage === 'stats-constructors') {
     )
   }
 
-  return (
-    <div className="min-h-dvh w-full flex flex-col text-white">
-      {nav(undefined, undefined, statsTabs('constructors'))}
-      <div className="app-page flex-1 grid content-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <SectionTitle h1 kicker="Statistiques" title="Constructeurs" desc="Le championnat par écurie. Touchez une écurie pour voir ses chiffres, ses pilotes et son aéro." className="col-span-full" />
-        {liveConstructors.length === 0 && dataState === 'loading' && Array.from({ length: 8 }, (_, i) => <div key={i} className="aspect-video bg-zinc-950 border border-white/[0.06] rounded-3xl animate-pulse" aria-busy="true" />)}
-        {liveConstructors.length === 0 && dataState === 'error' && (
-          <div className="col-span-full flex flex-wrap items-center justify-between gap-3 border border-white/[0.08] bg-zinc-950 rounded-2xl px-5 py-4" role="alert">
-            <p className="text-sm text-zinc-300">Impossible de charger les écuries.</p>
-            <button onClick={champ.reload} className="btn-primary min-h-11 px-5 rounded-full text-sm font-semibold">Réessayer</button>
-          </div>
-        )}
-        {liveConstructors.map((t, i) => {
-          const team = teamOf(t.Constructor)
-          return (
-          <button key={t.Constructor.constructorId} onClick={() => setSelectedTeamStats(t)} className="group text-left bg-zinc-950 border border-white/[0.08] rounded-3xl overflow-hidden transition duration-300 hover:-translate-y-1 hover:border-white/20">
-            <div className="relative flex aspect-[16/10] items-center justify-center bg-[#0c0d0e]" style={team ? { background: `color-mix(in srgb, ${team.color} 8%, #0c0d0e)` } : undefined}>
-              {team && <span aria-hidden className="absolute inset-x-0 top-0 h-0.5" style={{ background: team.color }} />}
-              {team && <img src={teamLogo(team)} alt="" className="size-16 sm:size-20 object-contain transition duration-500 ease-out group-hover:scale-105" />}
-              <span className="absolute top-3 right-3 chip">P{i + 1}</span>
-            </div>
-            <div className="p-6 flex items-end justify-between gap-3">
-              <h3 className="text-lg font-semibold tracking-tight leading-tight">{t.Constructor.name}</h3>
-              <p className="text-sm text-zinc-500 shrink-0"><span className="font-semibold text-2xl text-white tabular-nums">{t.points}</span> pts <span className="ml-1 text-zinc-600 group-hover:text-white transition" aria-hidden>›</span></p>
-            </div>
-          </button>
-          )
-        })}
-      </div>
-    </div>
-  )
 }
 
-    if (subPage === 'stats') {
+    if (subPage === 'stats' || subPage === 'stats-constructors' || subPage === 'stats-records') {
       const leader = liveStandings[0]
       const second = liveStandings[1]
       const gap = leader && second ? Number(leader.points) - Number(second.points) : 0
@@ -689,7 +618,7 @@ if (subPage === 'stats-constructors') {
       const row = 'w-full flex items-center justify-between gap-3 bg-zinc-950 border border-white/[0.08] rounded-2xl px-5 py-4 text-left transition hover:-translate-y-0.5'
       return (
         <div className="min-h-dvh w-full flex flex-col text-white pb-28 sm:pb-10">
-          {nav(undefined, undefined, statsTabs('overview'))}
+          {nav()}
           <div className="app-page flex-1 grid content-start gap-x-8 gap-y-16 md:grid-cols-2 lg:gap-x-12 lg:gap-y-20 items-start">
             <SectionTitle h1 kicker="Saison 2026" title="Statistiques" desc={`Le championnat en un coup d’œil : ${done} courses disputées sur ${circuits.length}. Touchez une carte pour voir le détail.`} className="col-span-full" />
 
@@ -751,7 +680,7 @@ if (subPage === 'stats-constructors') {
             </div>
 
             <div className="min-w-0">
-              {head('Constructeurs', 'Tout voir', () => setSubPage('stats-constructors'))}
+              {head('Constructeurs', 'Toutes les écuries', () => document.getElementById('ecuries')?.scrollIntoView({ behavior: 'smooth' }))}
               {loading ? skeleton() : liveConstructors.length === 0 ? <p className="text-sm text-zinc-500">Aucune donnée pour le moment.</p> : (
                 <div className="space-y-3">
                   {liveConstructors.slice(0, 3).map((t, i) => (
@@ -786,6 +715,37 @@ if (subPage === 'stats-constructors') {
                 </ol>
               )}
             </div>
+
+            {/* Écuries (ex-onglet Constructeurs) */}
+            <section id="ecuries" className="col-span-full grid scroll-mt-6 content-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <SectionTitle kicker="Statistiques" title="Écuries" desc="Le championnat par écurie. Touchez une écurie pour voir ses chiffres, ses pilotes et son aéro." className="col-span-full" />
+              {liveConstructors.length === 0 && dataState === 'loading' && Array.from({ length: 8 }, (_, i) => <div key={i} className="aspect-video bg-zinc-950 border border-white/[0.06] rounded-3xl animate-pulse" aria-busy="true" />)}
+              {liveConstructors.length === 0 && dataState === 'error' && (
+                <div className="col-span-full flex flex-wrap items-center justify-between gap-3 border border-white/[0.08] bg-zinc-950 rounded-2xl px-5 py-4" role="alert">
+                  <p className="text-sm text-zinc-300">Impossible de charger les écuries.</p>
+                  <button onClick={champ.reload} className="btn-primary min-h-11 px-5 rounded-full text-sm font-semibold">Réessayer</button>
+                </div>
+              )}
+              {liveConstructors.map((t, i) => {
+                const team = teamOf(t.Constructor)
+                return (
+                <button key={t.Constructor.constructorId} onClick={() => { setSelectedTeamStats(t); setSubPage('stats-constructors'); window.scrollTo(0, 0) }} className="group text-left bg-zinc-950 border border-white/[0.08] rounded-3xl overflow-hidden transition duration-300 hover:-translate-y-1 hover:border-white/20">
+                  <div className="relative flex aspect-[16/10] items-center justify-center bg-[#0c0d0e]" style={team ? { background: `color-mix(in srgb, ${team.color} 8%, #0c0d0e)` } : undefined}>
+                    {team && <span aria-hidden className="absolute inset-x-0 top-0 h-0.5" style={{ background: team.color }} />}
+                    {team && <img src={teamLogo(team)} alt="" className="size-16 sm:size-20 object-contain transition duration-500 ease-out group-hover:scale-105" />}
+                    <span className="absolute top-3 right-3 chip">P{i + 1}</span>
+                  </div>
+                  <div className="p-6 flex items-end justify-between gap-3">
+                    <h3 className="text-lg font-semibold tracking-tight leading-tight">{t.Constructor.name}</h3>
+                    <p className="text-sm text-zinc-500 shrink-0"><span className="font-semibold text-2xl text-white tabular-nums">{t.points}</span> pts <span className="ml-1 text-zinc-600 group-hover:text-white transition" aria-hidden>›</span></p>
+                  </div>
+                </button>
+                )
+              })}
+            </section>
+
+            {/* Records & historique (ex-onglet) */}
+            <div className="col-span-full min-w-0"><StatsRecords embedded /></div>
           </div>
         </div>
       )

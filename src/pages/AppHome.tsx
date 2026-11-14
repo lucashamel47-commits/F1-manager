@@ -174,7 +174,7 @@ export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenRem
             <Entry
               title="Saison" onOpen={() => onOpenSeason('standings')}
               icon={<path d="M6 20V10M12 20V4M18 20v-7" />}
-              tools={[['Classements', () => onOpenSeason('standings')], ['Calendrier', () => onOpenSeason('calendar')], ['Statistiques', () => onOpenSeason('stats')], ['Duel & positions', () => onOpenSeason('stats-duel')]]}
+              tools={[['Classements', () => onOpenSeason('standings')], ['Calendrier', () => onOpenSeason('calendar')], ['Statistiques', () => onOpenSeason('stats')], ['Duel', () => onOpenSeason('stats-duel')], ['Positions', () => onOpenSeason('stats-positions')]]}
             />
             <Entry
               title="Rappels" onOpen={onOpenReminders}

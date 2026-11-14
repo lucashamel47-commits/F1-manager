@@ -7,7 +7,7 @@ import { LogoFull, LogoGlyph } from './Logo'
  * - sur téléphone, rail d'icônes comme Novex ; le bouton du haut la déplie par-dessus la page (voile, toucher à côté pour fermer).
  * Groupes repliables à titre gris + chevron, lignes icône + libellé, élément actif sur fond blanc à 9 %.
  */
-export type MenuKey = 'home' | 'live' | 'standings' | 'calendar' | 'stats' | 'duel' | 'favorites' | 'reminders'
+export type MenuKey = 'home' | 'live' | 'standings' | 'calendar' | 'stats' | 'duel' | 'positions' | 'favorites' | 'reminders'
 
 const P = {
   home: 'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
@@ -16,6 +16,7 @@ const P = {
   calendar: 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z',
   stats: 'M3 3v18h18M7 16l4-4 3 3 6-7',
   duel: 'M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2M9.5 17.5 21 6V3h-3L6.5 14.5M11 19l-6-6M8 16l-4 4M5 21l-2-2',
+  positions: 'M3 7l5 4 4-6 4 8 5-3M3 17h18',
   favorites: 'm12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z',
   reminders: 'M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0',
   panel: 'M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM9 3v18',
@@ -28,7 +29,7 @@ const Icon = ({ d, className = 'size-4' }: { d: string; className?: string }) =>
 type Group = { id: string; title: string; items: [MenuKey, string][] }
 const GROUPS: Group[] = [
   { id: 'general', title: 'Général', items: [['home', 'Accueil'], ['live', 'Live']] },
-  { id: 'season', title: 'Saison', items: [['standings', 'Classements'], ['calendar', 'Calendrier'], ['stats', 'Statistiques'], ['duel', 'Duel & positions'], ['favorites', 'Favoris']] },
+  { id: 'season', title: 'Saison', items: [['standings', 'Classements'], ['calendar', 'Calendrier'], ['stats', 'Statistiques'], ['duel', 'Duel'], ['positions', 'Positions'], ['favorites', 'Favoris']] },
   { id: 'alerts', title: 'Alertes', items: [['reminders', 'Rappels']] },
 ]
 

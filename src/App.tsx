@@ -9,7 +9,6 @@ import Reminders from './pages/Reminders'
 import NewPassword from './components/NewPassword'
 import { supabase, supabaseEnabled, APP_URL } from './lib/supabase'
 import type { Session } from '@supabase/supabase-js'
-import ChatBot from './components/ChatBot'
 import Legal from './pages/Legal'
 import { usePageFade } from './lib/motion'
 import { isPendingDeletion } from './lib/account'
@@ -182,7 +181,8 @@ function App() {
         : mode === 'notif' ? 'reminders'
           : mode === 'hors'
             ? (seasonPage === 'calendar' ? 'calendar'
-              : seasonPage === 'stats-duel' || seasonPage === 'stats-positions' ? 'duel'
+              : seasonPage === 'stats-duel' ? 'duel'
+                : seasonPage === 'stats-positions' ? 'positions'
                 : seasonPage.startsWith('stats') ? 'stats'
                   : seasonPage === 'favorites' ? 'favorites'
                     : seasonPage === 'standings' ? 'standings' : 'home')
@@ -192,12 +192,12 @@ function App() {
       if (k === 'home') setMode('select')
       else if (k === 'live') setMode('live')
       else if (k === 'reminders') setMode('notif')
-      else openSeason(k === 'duel' ? 'stats-duel' : k)
+      else openSeason(k === 'duel' ? 'stats-duel' : k === 'positions' ? 'stats-positions' : k)
       window.scrollTo(0, 0)
     }
     let screen
     if (mode === 'notif') screen = <Reminders onBack={() => setMode('select')} user={supabaseEnabled ? user : null} onDeleted={accountDeleted} />
-    else if (mode === 'live') screen = <><LiveMode onBack={() => setMode('select')} /><ChatBot /></>
+    else if (mode === 'live') screen = <LiveMode onBack={() => setMode('select')} />
     else if (mode === 'hors') {
       screen = (
         <>
@@ -212,7 +212,6 @@ function App() {
             favTeam={favTeam}
             setFavTeam={setFavTeam}
           />
-          <ChatBot />
         </>
       )
     } else {
@@ -224,7 +223,6 @@ function App() {
             onOpenLive={() => setMode('live')}
             onOpenReminders={() => setMode('notif')}
           />
-          <ChatBot />
         </>
       )
     }

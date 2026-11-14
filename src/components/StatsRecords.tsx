@@ -345,7 +345,8 @@ function Champions() {
 
 /* ------------------------------ Page ------------------------------ */
 
-export default function StatsRecords() {
+/** `embedded` : section intégrée à la page Statistiques (titre h2, sans marge de page). */
+export default function StatsRecords({ embedded = false }: { embedded?: boolean }) {
   const heroes = [
     { big: String(driverRecords.titles?.[0]?.value ?? ''), label: 'titres pilote', who: 'Hamilton · Schumacher' },
     { big: String(driverRecords.wins?.[0]?.value ?? ''), label: 'victoires', who: driverRecords.wins?.[0]?.name ?? '' },
@@ -353,8 +354,8 @@ export default function StatsRecords() {
     { big: String(constructorRecords.titles?.[0]?.value ?? ''), label: 'titres constructeurs', who: constructorRecords.titles?.[0]?.name ?? '' },
   ]
   return (
-    <div className="app-page flex-1 space-y-24 sm:space-y-32">
-      <SectionTitle h1 kicker="Statistiques" title="Records & Historique" />
+    <div id="records" className={`${embedded ? 'scroll-mt-6' : 'app-page flex-1'} space-y-24 sm:space-y-32`}>
+      <SectionTitle h1={!embedded} kicker="Statistiques" title="Records & Historique" />
 
       <dl className="grid grid-cols-2 gap-5 lg:grid-cols-4 lg:gap-6">
         {heroes.map((h) => (
