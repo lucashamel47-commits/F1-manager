@@ -4,15 +4,17 @@ import { useSyncExternalStore } from 'react'
  * Routage minimal par « hash » (compatible GitHub Pages, aucune config serveur) :
  *   #/connexion   → page de connexion
  *   #/inscription → page d'inscription
+ *   #/mentions    → mentions légales & confidentialité (connecté ou non)
  *   autre / vide  → accueil (les ancres #faq, #apercu… restent de simples ancres de la page)
  * Le bouton « Retour » du navigateur fonctionne : chaque lien ajoute une entrée d'historique.
  */
-export type Route = 'home' | 'connexion' | 'inscription'
+export type Route = 'home' | 'connexion' | 'inscription' | 'mentions'
 
 const parse = (): Route => {
   const h = window.location.hash
   if (h === '#/connexion') return 'connexion'
   if (h === '#/inscription') return 'inscription'
+  if (h === '#/mentions') return 'mentions'
   return 'home'
 }
 

@@ -309,7 +309,7 @@ export function Footer() {
           </div>
           <div className="mt-16 flex flex-col gap-2 border-t border-[#2b2c2d] pt-6 text-xs text-[#636464] sm:flex-row sm:items-center sm:justify-between">
             <p>© 2026 F1 Manager · Projet indépendant, non affilié à Formula 1.</p>
-            <p>F1 et les marques associées appartiennent à leurs propriétaires.</p>
+            <p>F1 et les marques associées appartiennent à leurs propriétaires. <a href="#/mentions" className="ml-2 text-[#939494] underline decoration-white/20 underline-offset-4 transition-colors hover:text-white">Mentions légales &amp; confidentialité</a></p>
           </div>
         </div>
       </div>
