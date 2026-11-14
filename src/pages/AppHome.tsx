@@ -5,6 +5,7 @@ import { allSessions, countdown, formatWhen, type Session } from '../lib/session
 import { useChampionship } from '../lib/championship'
 import { DRIVERS, TEAMS, driverPhoto, teamById, teamLogo } from '../data/grid'
 import type { HorsPage } from './HorsCourse'
+import { Num } from '../components/Num'
 
 interface Props {
   userEmail: string
@@ -102,7 +103,7 @@ export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenRem
                 <div className="mt-9 grid max-w-md grid-cols-4 gap-2" role="timer" aria-label="Compte à rebours">
                   {([['jours', cd.d], ['h', cd.h], ['min', cd.m], ['s', cd.s]] as const).map(([u, v]) => (
                     <div key={u} className="rounded-2xl border border-[#1d1e1f] bg-[#08090a] py-4 text-center">
-                      <p className="text-[2rem] font-medium leading-none tabular-nums tracking-[-0.04em] sm:text-[2.5rem]">{String(v).padStart(2, '0')}</p>
+                      <p className="text-[2rem] font-medium leading-none tabular-nums tracking-[-0.04em] sm:text-[2.5rem]"><span key={v} className="tick-in">{String(v).padStart(2, '0')}</span></p>
                       <p className="mt-2 text-[11px] text-[#636464]">{u}</p>
                     </div>
                   ))}
@@ -142,7 +143,7 @@ export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenRem
                     <span className="mt-1 block truncate text-[19px] font-medium tracking-[-0.02em]">{drv.givenName} {drv.familyName}</span>
                     <span className="mt-1 flex items-center gap-1.5 text-[13px] text-[#939494]"><span className="size-1.5 rounded-full" style={{ backgroundColor: drvTeam?.color }} />{drvTeam?.name}</span>
                   </span>
-                  {standing && <span className="text-right"><span className="block text-[1.75rem] font-medium leading-none tabular-nums tracking-[-0.03em]">P{standing.position}</span><span className="mt-1 block text-[12px] tabular-nums text-[#636464]">{standing.points} pts</span></span>}
+                  {standing && <span className="text-right"><span className="block text-[1.75rem] font-medium leading-none tabular-nums tracking-[-0.03em]">P{standing.position}</span><span className="mt-1 block text-[12px] tabular-nums text-[#636464]"><Num value={standing.points} /> pts</span></span>}
                 </>
               ) : (
                 <span className="flex-1"><span className="block text-[12px] text-[#636464]">Ton pilote</span><span className="mt-1 block text-[17px] font-medium">Choisis tes favoris</span></span>
@@ -156,7 +157,7 @@ export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenRem
                     <span className="block text-[12px] text-[#636464]">Ton écurie</span>
                     <span className="mt-1 block truncate text-[19px] font-medium tracking-[-0.02em]">{team.name}</span>
                   </span>
-                  {teamStanding && <span className="text-right"><span className="block text-[1.75rem] font-medium leading-none tabular-nums tracking-[-0.03em]">P{teamStanding.position}</span><span className="mt-1 block text-[12px] tabular-nums text-[#636464]">{teamStanding.points} pts</span></span>}
+                  {teamStanding && <span className="text-right"><span className="block text-[1.75rem] font-medium leading-none tabular-nums tracking-[-0.03em]">P{teamStanding.position}</span><span className="mt-1 block text-[12px] tabular-nums text-[#636464]"><Num value={teamStanding.points} /> pts</span></span>}
                 </>
               ) : (
                 <span className="flex-1"><span className="block text-[12px] text-[#636464]">Ton écurie</span><span className="mt-1 block text-[17px] font-medium">Choisis ton écurie</span></span>
@@ -186,7 +187,7 @@ export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenRem
             <Entry
               title="Saison" onOpen={() => onOpenSeason('home')}
               icon={<path d="M6 20V10M12 20V4M18 20v-7" />}
-              tools={[['Classements', () => onOpenSeason('standings')], ['Calendrier', () => onOpenSeason('calendar')], ['Statistiques', () => onOpenSeason('stats')]]}
+              tools={[['Classements', () => onOpenSeason('standings')], ['Calendrier', () => onOpenSeason('calendar')], ['Statistiques', () => onOpenSeason('stats')], ['Duel & positions', () => onOpenSeason('stats-duel')]]}
             />
             <Entry
               title="Rappels" onOpen={onOpenReminders}
@@ -195,6 +196,11 @@ export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenRem
             />
           </div>
         </section>
+
+        <footer className="mt-24 flex flex-wrap items-center justify-between gap-3 border-t border-[#1d1e1f] pt-6 text-[12px] text-[#636464]">
+          <p>App non officielle, non affiliée à Formula 1, FOM ou la FIA.</p>
+          <a href="#/mentions" className="transition-colors hover:text-white">Mentions légales &amp; confidentialité</a>
+        </footer>
       </main>
     </div>
   )

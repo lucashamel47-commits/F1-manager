@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { circuits } from '../data/circuits'
 import { LogoFull } from './Logo'
+
+const ReplayDemo = lazy(() => import('./landing/ReplayDemo'))
 
 /* ───────── Aperçu interactif de l'app (données de démonstration) ─────────
    Une fausse fenêtre d'app avec 4 onglets : classement, calendrier, live timing, stats.
@@ -30,7 +32,6 @@ const TEAMS = Object.values(
     return a
   }, {}),
 ).sort((x, y) => y.pts - x.pts)
-const TYRES = { S: '#ff5b50', M: '#ffd23f', H: '#e8e9ea' } as const
 
 const reduced = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -41,9 +42,9 @@ const ICON: Record<TabKey, string> = {
   stats: 'M4 19h16M6 16l4-5 3 3 5-7',
 }
 const TABS: { key: TabKey; label: string }[] = [
+  { key: 'live', label: 'Rejeu réel' },
   { key: 'standings', label: 'Classement' },
   { key: 'calendar', label: 'Calendrier' },
-  { key: 'live', label: 'Live timing' },
   { key: 'stats', label: 'Statistiques' },
 ]
 
@@ -158,92 +159,6 @@ function Calendar() {
   )
 }
 
-/* ───────── Live timing (animé) ───────── */
-const TRACK = 'M40 130 C20 90 60 40 120 48 S210 105 255 70 S320 20 330 70 S250 150 190 138 S100 160 40 130Z'
-function Live() {
-  const [order, setOrder] = useState(() => D.map((d) => d.id))
-  const [flash, setFlash] = useState<string | null>(null)
-  const [lap, setLap] = useState(31)
-  const [tick, setTick] = useState(0)
-  const orderRef = useRef(order)
-  const dotRefs = useRef<Record<string, SVGCircleElement | null>>({})
-  const pathRef = useRef<SVGPathElement>(null)
-  const tyre = useMemo(() => Object.fromEntries(D.map((d, i) => [d.id, (['M', 'H', 'M', 'S', 'H', 'M', 'S', 'H'] as const)[i]])), [])
-
-  useEffect(() => {
-    if (reduced()) return
-    const id = setInterval(() => {
-      setTick((t) => t + 1)
-      const o = orderRef.current
-      if (Math.random() < 0.45) return
-      const i = 1 + Math.floor(Math.random() * (o.length - 1))
-      const n = [...o]; [n[i - 1], n[i]] = [n[i], n[i - 1]]
-      orderRef.current = n
-      setOrder(n); setFlash(n[i - 1]); setTimeout(() => setFlash(null), 1200)
-    }, 2300)
-    const lapId = setInterval(() => setLap((l) => (l >= 56 ? 31 : l + 1)), 7000)
-    return () => { clearInterval(id); clearInterval(lapId) }
-  }, [])
-
-  useEffect(() => {
-    const path = pathRef.current
-    if (!path) return
-    const len = path.getTotalLength()
-    let raf = 0
-    const t0 = performance.now()
-    const frame = (t: number) => {
-      order.forEach((id, pos) => {
-        const el = dotRefs.current[id]
-        if (!el) return
-        const p = path.getPointAtLength((((t - t0) / 24000 + (order.length - pos) * 0.075) % 1) * len)
-        el.setAttribute('cx', String(p.x)); el.setAttribute('cy', String(p.y))
-      })
-      if (!reduced()) raf = requestAnimationFrame(frame)
-    }
-    raf = requestAnimationFrame(frame)
-    return () => cancelAnimationFrame(raf)
-  }, [order])
-
-  const gap = (pos: number) => (pos === 0 ? 'Leader' : `+${(pos * 1.7 + ((tick * (pos + 3)) % 9) / 10 + 0.3).toFixed(1)}`)
-  return (
-    <div className="grid lg:grid-cols-[1fr_17rem] gap-4 h-full">
-      <div className="min-w-0">
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-semibold tracking-tight flex items-center gap-2"><span className="size-1.5 rounded-full bg-white animate-pulse" aria-hidden />Course · Tour {lap}/56</p>
-          <span className="rounded-full bg-emerald-500/15 text-emerald-300 px-2.5 py-0.5 text-[10px] font-medium">Drapeau vert</span>
-        </div>
-        <div className="grid grid-cols-[1.5rem_1fr_3.5rem_2rem] items-center gap-2 px-3 pb-1 text-[10px] uppercase tracking-wider text-zinc-600"><span>P</span><span>Pilote</span><span className="text-right">Écart</span><span className="text-center">Pn</span></div>
-        <div className="relative" style={{ height: order.length * 40 }}>
-          {D.map((d) => {
-            const pos = order.indexOf(d.id)
-            return (
-              <div key={d.id} className={`absolute inset-x-0 grid grid-cols-[1.5rem_1fr_3.5rem_2rem] items-center gap-2 px-3 h-9 rounded-lg transition-[transform,background-color] duration-700 ease-out ${flash === d.id ? 'bg-emerald-400/15' : 'bg-white/[0.03]'}`} style={{ transform: `translateY(${pos * 40}px)` }}>
-                <span className="text-xs tabular-nums text-zinc-400">{pos + 1}</span>
-                <span className="flex items-center gap-2 text-[13px] font-semibold"><span className="h-4 w-1 rounded-full" style={{ background: d.color }} />{d.acr}</span>
-                <span className="text-right text-xs tabular-nums text-zinc-300">{gap(pos)}</span>
-                <span className="mx-auto grid size-5 place-items-center rounded-full border text-[9px] font-bold" style={{ color: TYRES[tyre[d.id]], borderColor: TYRES[tyre[d.id]] }}>{tyre[d.id]}</span>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-      <aside className="hidden lg:flex flex-col rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
-        <p className="kicker">Carte en direct</p>
-        <svg viewBox="0 0 370 180" className="mt-3 w-full" aria-hidden>
-          <path ref={pathRef} d={TRACK} fill="none" stroke="rgb(255 255 255 / .12)" strokeWidth="10" strokeLinecap="round" />
-          {D.map((d) => <circle key={d.id} ref={(el) => { dotRefs.current[d.id] = el }} r="5" cx="40" cy="130" fill={d.color} stroke="#0e0f11" strokeWidth="1.5" />)}
-        </svg>
-        <p className="mt-3 text-[11px] text-zinc-500">Air 24° · Piste 31° · Vent 8 km/h</p>
-        <div className="mt-3 space-y-2">
-          {['S1', 'S2', 'S3'].map((s, i) => (
-            <div key={s} className="flex items-center gap-2 text-[11px] text-zinc-400"><span className="w-5">{s}</span><span className="h-1.5 flex-1 rounded-full bg-white/[0.06] overflow-hidden"><span className="block h-full rounded-full bg-zinc-100 transition-[width] duration-700" style={{ width: `${40 + ((tick * 17 + i * 31) % 55)}%` }} /></span></div>
-          ))}
-        </div>
-      </aside>
-    </div>
-  )
-}
-
 /* ───────── Statistiques ───────── */
 function Stats() {
   const four = D.slice(0, 4)
@@ -283,7 +198,7 @@ function Stats() {
 
 /* ───────── Cadre ───────── */
 export default function AppPreview() {
-  const [tab, setTab] = useState<TabKey>('standings')
+  const [tab, setTab] = useState<TabKey>('live')
   const [auto, setAuto] = useState(true)
   const [inView, setInView] = useState(false)
   const root = useRef<HTMLDivElement>(null)
@@ -299,9 +214,9 @@ export default function AppPreview() {
 
   useEffect(() => {
     if (!auto || !inView || reduced()) return
-    const id = setInterval(() => setTab((t) => TABS[(TABS.findIndex((x) => x.key === t) + 1) % TABS.length].key), 9000)
-    return () => clearInterval(id)
-  }, [auto, inView])
+    const id = setTimeout(() => setTab((t) => TABS[(TABS.findIndex((x) => x.key === t) + 1) % TABS.length].key), tab === 'live' ? 30000 : 9000)
+    return () => clearTimeout(id)
+  }, [auto, inView, tab])
 
   const choose = (k: TabKey) => { setAuto(false); setTab(k) }
 
@@ -342,7 +257,7 @@ export default function AppPreview() {
               <div key={tab} role="tabpanel" className="animate-fadeIn">
                 {tab === 'standings' && <Standings />}
                 {tab === 'calendar' && <Calendar />}
-                {tab === 'live' && <Live />}
+                {tab === 'live' && <Suspense fallback={<div className="h-[22rem] animate-pulse rounded-2xl bg-white/[0.03]" />}><ReplayDemo active={inView} /></Suspense>}
                 {tab === 'stats' && <Stats />}
               </div>
             </div>

@@ -403,3 +403,20 @@ button.bg-zinc-950:not(:disabled):hover, a.bg-zinc-950:hover { border-color: #3d
 .rail-cap { font-family: var(--font-rail); font-size: 0.8125rem; color: #c4c5c5; }
 
 /* Pages Connexion / Inscription */
+
+/* ───────── Mouvement (v24) : discret, rapide, jamais gratuit ───────── */
+:root { --ease-out: cubic-bezier(.22,.61,.36,1); }
+@layer base {
+  button, a, summary, select { transition: color .18s var(--ease-out), background-color .18s var(--ease-out), border-color .18s var(--ease-out), opacity .18s var(--ease-out); }
+  button.rounded-full:active, a.rounded-full:active { scale: .97; }
+}
+.seg-item:active { scale: .97; }
+.seg-item { transition: color .2s var(--ease-out), background-color .25s var(--ease-out), scale .12s var(--ease-out); }
+@keyframes chart-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.chart-draw { stroke-dasharray: 1; animation: chart-draw 1s var(--ease-out) both; }
+@keyframes tick-in { from { opacity: 0; transform: translateY(-0.18em); } to { opacity: 1; transform: none; } }
+.tick-in { display: inline-block; animation: tick-in .35s var(--ease-out) both; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  button.rounded-full:active, a.rounded-full:active, .seg-item:active { scale: none; }
+}

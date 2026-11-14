@@ -8,10 +8,14 @@ import TrackMap from '../components/TrackMap'
 import { circuits, daysUntil, fmtDay, type Circuit } from '../data/circuits'
 import { getSeasonWinners, type RaceWinner } from '../lib/f1api'
 import { useGrid } from '../lib/grid'
+import { usePageFade } from '../lib/motion'
+import { Num } from '../components/Num'
 import { useChampionship, type Title } from '../lib/championship'
 import { DRIVERS, F1_PHOTO_ID, TEAMS, driverPhoto, teamById, teamByName, teamLogo, normTeamId, type GridDriver } from '../data/grid'
 
 const LivePage = lazy(() => import('../live/LivePage'))
+const LapDuel = lazy(() => import('../components/stats/LapDuel'))
+const PositionChart = lazy(() => import('../components/stats/PositionChart'))
 
 interface Props {
   onBack: () => void
@@ -23,7 +27,7 @@ interface Props {
   /** page ouverte directement depuis l'accueil de l'app (sans l'écran de bienvenue) */
   initialPage?: HorsPage
 }
-export type HorsPage = 'home' | 'standings' | 'calendar' | 'stats' | 'favorites'
+export type HorsPage = 'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'stats-duel' | 'stats-positions'
 
 
 const extras: Record<number, { history?: string; grip?: string; creator?: string }> = {
@@ -75,9 +79,10 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
   const [welcomeDone, setWelcomeDone] = useState(false)
   const [nextIdx] = useState(findNextRace)
   const nextRace = fullSeason[nextIdx]
-  const [subPage, setSubPage] = useState<'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'live' | 'circuit' | 'stats-constructors' | 'stats-records'>(initialPage ?? 'home')
+  const [subPage, setSubPage] = useState<'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'live' | 'circuit' | 'stats-constructors' | 'stats-records' | 'stats-duel' | 'stats-positions'>(initialPage ?? 'home')
   const [hidePast, setHidePast] = useState(() => localStorage.getItem('f1-hide-past') === '1')
   const toggleHidePast = () => setHidePast((v) => { localStorage.setItem('f1-hide-past', v ? '0' : '1'); return !v })
+  usePageFade(subPage)
   const champ = useChampionship()
   const liveStandings: any[] = champ.data?.drivers ?? []
   const liveConstructors: any[] = champ.data?.constructors ?? []
@@ -182,13 +187,15 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
     setSubPage(k)
   }
 
-  const statsTabs = (active: 'overview' | 'constructors' | 'records') => {
+  const statsTabs = (active: 'overview' | 'constructors' | 'records' | 'duel' | 'positions') => {
     const ico = (d: string) => (
       <svg viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d={d} /></svg>
     )
     const tabs = [
       { key: 'overview' as const, label: 'Aperçu', page: 'stats' as const, icon: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z' },
-      { key: 'constructors' as const, label: 'Constructeurs', page: 'stats-constructors' as const, icon: 'M3 15l2-5h9l4 3h3v2M6 17a2 2 0 100 .01M17 17a2 2 0 100 .01M8 17h7' },
+      { key: 'constructors' as const, label: 'Constructeurs', short: 'Écuries', page: 'stats-constructors' as const, icon: 'M3 15l2-5h9l4 3h3v2M6 17a2 2 0 100 .01M17 17a2 2 0 100 .01M8 17h7' },
+      { key: 'duel' as const, label: 'Duel', page: 'stats-duel' as const, icon: 'M4 18h4v-6H4zM16 18h4V6h-4zM10 18h4v-9h-4z' },
+      { key: 'positions' as const, label: 'Positions', page: 'stats-positions' as const, icon: 'M3 7l5 4 4-6 4 8 5-3M3 17h18' },
       { key: 'records' as const, label: 'Records & Historique', short: 'Records', page: 'stats-records' as const, icon: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0zM17 5h3v2a3 3 0 01-3 3M7 5H4v2a3 3 0 003 3' },
     ]
     return (
@@ -210,7 +217,7 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
   }
 
   const navKey: NavKey =
-    subPage === 'stats-constructors' || subPage === 'stats-records' || (subPage === 'calendar' && selectedRace && raceFrom === 'stats')
+    subPage === 'stats-constructors' || subPage === 'stats-records' || subPage === 'stats-duel' || subPage === 'stats-positions' || (subPage === 'calendar' && selectedRace && raceFrom === 'stats')
       ? 'stats'
       : subPage === 'circuit' ? 'home' : subPage
   const nav = (back?: () => void, crumb?: string, extra?: ReactNode) => (
@@ -481,6 +488,21 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
       )
     }
 
+if (subPage === 'stats-duel' || subPage === 'stats-positions') {
+  const duel = subPage === 'stats-duel'
+  return (
+    <div className="min-h-dvh w-full flex flex-col text-white pb-28 sm:pb-10">
+      {nav(() => setSubPage('home'), duel ? 'Duel' : 'Positions', statsTabs(duel ? 'duel' : 'positions'))}
+      <div className="app-page flex-1">
+        <SectionTitle h1 title={duel ? 'Duel au tour' : 'Positions tour par tour'} />
+        <Suspense fallback={<div className="h-96 animate-pulse rounded-[1.75rem] border border-[#1d1e1f] bg-[#0c0d0e]" />}>
+          {duel ? <LapDuel /> : <PositionChart />}
+        </Suspense>
+      </div>
+    </div>
+  )
+}
+
 if (subPage === 'stats-records') {
   return (
     <div className="min-h-dvh w-full flex flex-col text-white pb-28 sm:pb-10">
@@ -703,8 +725,8 @@ if (subPage === 'stats-constructors') {
               {leader && second ? (
                 <button onClick={() => setSubPage('standings')} className="group w-full text-left bg-zinc-950 border border-zinc-800 hover:border-zinc-600 active:bg-zinc-900 rounded-2xl p-5 transition">
                   <div className="flex justify-between items-end mb-8">
-                    <div><p className="text-xs text-zinc-500">{leader.Driver.familyName}</p><p className="text-gradient text-5xl font-semibold tracking-[-0.04em] mt-1">{leader.points}</p><p className="text-xs text-zinc-500 mt-1">{leader.wins} victoires</p></div>
-                    <div className="text-right"><p className="text-xs text-zinc-500">{second.Driver.familyName}</p><p className="text-5xl font-semibold tracking-[-0.04em] text-zinc-500 mt-1">{second.points}</p><p className="text-xs text-zinc-500 mt-1">{second.wins} victoires</p></div>
+                    <div><p className="text-xs text-zinc-500">{leader.Driver.familyName}</p><p className="text-gradient text-5xl font-semibold tracking-[-0.04em] mt-1"><Num value={leader.points} /></p><p className="text-xs text-zinc-500 mt-1">{leader.wins} victoires</p></div>
+                    <div className="text-right"><p className="text-xs text-zinc-500">{second.Driver.familyName}</p><p className="text-5xl font-semibold tracking-[-0.04em] text-zinc-500 mt-1"><Num value={second.points} /></p><p className="text-xs text-zinc-500 mt-1">{second.wins} victoires</p></div>
                   </div>
                   <div className="flex gap-1 h-2 rounded-full overflow-hidden bar-rail mb-4">
                     <div className="bar-fill" style={{ width: `${(Number(leader.points) / (Number(leader.points) + Number(second.points))) * 100}%` }} />

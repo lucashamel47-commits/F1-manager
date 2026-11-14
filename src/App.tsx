@@ -10,6 +10,8 @@ import NewPassword from './components/NewPassword'
 import { supabase, supabaseEnabled, APP_URL } from './lib/supabase'
 import type { Session } from '@supabase/supabase-js'
 import ChatBot from './components/ChatBot'
+import Legal from './pages/Legal'
+import { usePageFade } from './lib/motion'
 
 interface User {
   id: string
@@ -58,8 +60,10 @@ function App() {
 
   // Une fois connecté, la route #/connexion n'a plus de sens : on la retire de l'URL.
   useEffect(() => {
-    if (loggedIn) clearRoute()
-  }, [loggedIn])
+    if (loggedIn && route !== 'mentions') clearRoute()
+  }, [loggedIn]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  usePageFade(`${loggedIn}-${mode}-${route}`)
 
   // Comptes en ligne : session restaurée au démarrage, puis suivie (connexion, déconnexion, lien « mot de passe oublié »).
   useEffect(() => {
@@ -142,6 +146,8 @@ function App() {
   if (!ready) return <div className="min-h-dvh" />
 
   if (recovery) return <NewPassword onDone={() => setRecovery(false)} />
+
+  if (route === 'mentions') return <Legal />
 
   if (loggedIn && mode === 'notif') {
     return <Reminders onBack={() => setMode('select')} user={supabaseEnabled ? user : null} />
