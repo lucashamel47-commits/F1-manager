@@ -2,8 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { circuits } from '../../data/circuits'
 import { drivers } from '../../data/divers'
 import Reveal from './Reveal'
-import CarStage from '../CarStage'
-import { TEAMS } from '../../data/grid'
+import { TEAMS, teamLogo } from '../../data/grid'
 import FooterWordmark from './FooterWordmark'
 
 const reduced = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -216,8 +215,7 @@ export function Features() {
 }
 
 /* ───────── Canal+ : rangées de contenu à défilement horizontal ───────── */
-// Les 11 écuries 2026, rendus officiels formula1.com (même cadrage pour toutes).
-const CARS = TEAMS
+// Les 11 écuries 2026, présentées par leur logo officiel et leur couleur.
 
 function RailArrows({ target }: { target: React.RefObject<HTMLDivElement | null> }) {
   const go = (d: number) => target.current?.scrollBy({ left: d * target.current.clientWidth * 0.8, behavior: reduced() ? 'auto' : 'smooth' })
@@ -240,9 +238,15 @@ export function Rails() {
       <Reveal className={WRAP}>
         <div className="mb-5 flex items-end justify-between"><h2 className="rail-title">Les écuries de la saison</h2><RailArrows target={cars} /></div>
         <div ref={cars} className="rail">
-          {CARS.map((t) => (
+          {TEAMS.map((t) => (
             <figure key={t.id} className="group w-[16rem] sm:w-[20rem]">
-              <div className="rail-card"><CarStage team={t} className="aspect-[16/10]" /></div>
+              <div
+                className="rail-card relative flex aspect-[16/10] items-center justify-center"
+                style={{ background: `color-mix(in srgb, ${t.color} 8%, #141516)` }}
+              >
+                <span aria-hidden className="absolute inset-x-0 top-0 h-0.5" style={{ background: t.color }} />
+                <img src={teamLogo(t)} alt="" className="relative size-16 sm:size-[4.5rem] object-contain transition duration-500 ease-out group-hover:scale-105" />
+              </div>
               <figcaption className="rail-cap mt-2">{t.name}</figcaption>
             </figure>
           ))}
