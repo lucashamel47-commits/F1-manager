@@ -84,8 +84,6 @@ export function teamByName(name?: string | null): GridTeam | undefined {
 
 /** Logo officiel 2026 (SVG blanc, carré 96×96), hébergé avec l'app. */
 export const teamLogo = (t: GridTeam) => `${BASE}teams/${t.slug}.svg`
-/** Rendu officiel de la voiture 2026 (profil, fond transparent), hébergé avec l'app. */
-export const teamCar = (t: GridTeam) => `${BASE}cars/2026/${t.slug}.webp`
 
 /** Portrait officiel 2026 du pilote (buste recadré, fond transparent, CDN formula1.com), avec silhouette de secours. */
 export function driverPhoto(teamSlug: string, f1Id: string | undefined, w = 320) {
