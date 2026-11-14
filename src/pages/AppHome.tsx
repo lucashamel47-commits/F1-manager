@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { Brand } from '../components/landing/Sections'
 import { getCalendar } from '../lib/f1api'
 import { allSessions, countdown, formatWhen, type Session } from '../lib/sessions'
 import { useChampionship } from '../lib/championship'
@@ -12,7 +11,6 @@ interface Props {
   onOpenSeason: (page: HorsPage) => void
   onOpenLive: () => void
   onOpenReminders: () => void
-  onLogout: () => void
 }
 
 const Arrow = ({ className = 'size-4' }: { className?: string }) => (
@@ -38,7 +36,7 @@ const card = 'rounded-[1.75rem] border border-[#232425] bg-[#0c0d0e]'
  * Accueil de l'app, structure Novex : l'essentiel en haut (prochaine session + compte à rebours, état du direct,
  * ton pilote et ton écurie), puis trois grandes entrées. Les outils secondaires sont à un geste, pas tous affichés.
  */
-export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenReminders, onLogout }: Props) {
+export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenReminders }: Props) {
   const now = useTick(1000)
   const sessions = useSessions()
   const champ = useChampionship()
@@ -60,19 +58,8 @@ export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenRem
 
   return (
     <div className="min-h-dvh text-white">
-      <header className="sticky top-0 z-30 border-b border-[#1d1e1f] bg-[#08090a]/95 backdrop-blur-sm">
-        <div className="app-wrap flex h-16 items-center gap-6">
-          <Brand />
-          <nav className="hidden items-center gap-1 md:flex" aria-label="Sections">
-            <button onClick={onOpenLive} className="h-9 rounded-full px-3.5 text-[14px] text-[#939494] hover:text-white">Live</button>
-            <button onClick={() => onOpenSeason('standings')} className="h-9 rounded-full px-3.5 text-[14px] text-[#939494] hover:text-white">Saison</button>
-            <button onClick={onOpenReminders} className="h-9 rounded-full px-3.5 text-[14px] text-[#939494] hover:text-white">Rappels</button>
-          </nav>
-          <button onClick={onLogout} className="ml-auto inline-flex h-9 items-center rounded-full border border-[#2b2c2d] px-4 text-[13px] font-medium text-[#c4c5c5] hover:bg-[#161718] hover:text-white">Changer de compte</button>
-        </div>
-      </header>
 
-      <main className="app-wrap pb-28 pt-14 sm:pt-20">
+      <main className="app-wrap pb-28 pt-10 sm:pt-16">
         <h1 className="app-in max-w-[40rem] text-[2.25rem] font-[560] leading-[1.06] tracking-[-0.035em] sm:text-[3rem]">
           {live ? 'C’est en direct.' : `Salut ${first}.`}
         </h1>

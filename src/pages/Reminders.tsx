@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { LogoButton, TopBar, SectionTitle } from '../components/MotorNav'
+import { SectionTitle } from '../components/MotorNav'
 import { getCalendar, type Race } from '../lib/f1api'
 import { allSessions, buildIcs, countdown, formatWhen, KIND_LABEL, nextSession, type SessionKind } from '../lib/sessions'
 import { deleteMyAccount } from '../lib/account'
@@ -94,7 +94,7 @@ function DeleteAccount({ user, onDeleted }: { user: ReminderUser; onDeleted: () 
   )
 }
 
-export default function Reminders({ onBack, user, onDeleted }: { onBack: () => void; user: ReminderUser | null; onDeleted?: () => void }) {
+export default function Reminders({ user, onDeleted }: { onBack: () => void; user: ReminderUser | null; onDeleted?: () => void }) {
   const [prefs, setPrefs] = useState<Prefs>(loadLocal)
   const [saved, setSaved] = useState<Prefs>(loadLocal) // dernière version enregistrée en ligne
   const [calendar, setCalendar] = useState<Race[] | null>(null)
@@ -193,20 +193,13 @@ export default function Reminders({ onBack, user, onDeleted }: { onBack: () => v
 
   const unit = (v: number, u: string) => (
     <div className="flex-1 text-center">
-      <div className="text-5xl sm:text-7xl font-semibold tabular-nums tracking-[-0.05em] text-gradient">{String(v).padStart(2, '0')}</div>
+      <div className="text-5xl sm:text-7xl lg:text-5xl xl:text-6xl font-semibold tabular-nums tracking-[-0.05em] text-gradient">{String(v).padStart(2, '0')}</div>
       <div className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mt-1">{u}</div>
     </div>
   )
 
   return (
     <div className="min-h-dvh w-full text-white pb-20">
-      <TopBar>
-        <div className="app-wrap flex items-center gap-3 h-16 lg:h-[4.5rem]">
-          <button onClick={onBack} aria-label="Changer de mode" className="-ml-2 min-h-11 min-w-11 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/5 text-xl active:text-white">‹</button>
-          <LogoButton onClick={onBack} />
-          <span className="ml-auto chip">Rappels</span>
-        </div>
-      </TopBar>
 
       <main className="app-page">
       <SectionTitle h1 kicker="Rappels" title="Ne rate plus une session" desc="Compte à rebours, alertes et calendrier." />

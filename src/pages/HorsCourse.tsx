@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, lazy, Suspense, type ReactNode } from 'react'
 import { gpFr } from '../lib/i18n'
-import MotorNav, { SectionTitle, TopBar, LogoButton, type NavKey } from '../components/MotorNav'
+import MotorNav, { SectionTitle, TopBar, type NavKey } from '../components/MotorNav'
 import StatsRecords from '../components/StatsRecords'
 import { colorFor } from '../lib/teamColors'
 import CircuitCarousel from '../components/CircuitCarousel'
@@ -26,6 +26,8 @@ interface Props {
   setFavTeam: (id: string) => void
   /** page ouverte directement depuis l'accueil de l'app (sans l'écran de bienvenue) */
   initialPage?: HorsPage
+  /** Prévient l'app de la page affichée (pour surligner l'entrée du menu). */
+  onPageChange?: (page: string) => void
 }
 export type HorsPage = 'home' | 'onboarding' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'stats-duel' | 'stats-positions'
 
@@ -54,7 +56,7 @@ const findNextRace = () => {
 }
 
 
-export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver, favTeam, setFavTeam, initialPage }: Props) {
+export default function HorsCourse({ onBack, onPageChange, userEmail, favDriver, setFavDriver, favTeam, setFavTeam, initialPage }: Props) {
   const driverKey = `f1-fav-drivers-${userEmail}`
   const teamKey = `f1-fav-team-${userEmail}`
   const validateRef = useRef<HTMLButtonElement>(null)
@@ -132,6 +134,8 @@ export default function HorsCourse({ onBack, userEmail, favDriver, setFavDriver,
   useEffect(() => {
     if (step === 'done') localStorage.setItem(driverKey + '-onboarded', '1')
   }, [step, driverKey])
+
+  useEffect(() => { onPageChange?.(subPage) }, [subPage]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Il n'y a qu'un seul accueil une fois connecté (AppHome) : fin du choix des favoris ou retour « Saison » → on y revient.
   useEffect(() => {
@@ -840,7 +844,6 @@ if (subPage === 'stats-constructors') {
         <TopBar>
           <div className="app-wrap flex items-center justify-between gap-2 h-16">
             <button onClick={onBack} className="text-sm text-zinc-400 hover:text-white min-h-11 min-w-16 text-left">← Retour</button>
-            <LogoButton onClick={onBack} />
             <button onClick={() => setStep('team')} className="text-sm text-zinc-400 hover:text-white min-h-11 min-w-16 text-right">Passer</button>
           </div>
         </TopBar>
@@ -885,7 +888,6 @@ if (subPage === 'stats-constructors') {
       <TopBar>
         <div className="app-wrap flex items-center justify-between gap-2 h-16">
           <button onClick={() => setStep('driver')} className="text-sm text-zinc-400 hover:text-white min-h-11 min-w-16 text-left">← Retour</button>
-          <LogoButton onClick={onBack} />
           <button onClick={() => setStep('done')} className="text-sm text-zinc-400 hover:text-white min-h-11 min-w-16 text-right">Passer</button>
         </div>
       </TopBar>

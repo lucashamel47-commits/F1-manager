@@ -3,18 +3,11 @@ import { LogoFull } from './Logo'
 
 export type NavKey = 'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'live'
 
-const items: { key: NavKey; label: string }[] = [
-  { key: 'live', label: 'Live' },
-  { key: 'standings', label: 'Classements' },
-  { key: 'calendar', label: 'Calendrier' },
-  { key: 'stats', label: 'Statistiques' },
-  { key: 'favorites', label: 'Favoris' },
-]
 
 interface Props {
-  active: NavKey
-  onNavigate: (k: NavKey) => void
-  onExit: () => void
+  active?: NavKey
+  onNavigate?: (k: NavKey) => void
+  onExit?: () => void
   onBack?: () => void
   crumb?: string
   /** Contenu collé sous la barre (ex. onglets de section) : reste visible au défilement. */
@@ -45,59 +38,20 @@ export function TopBar({ children, className = '' }: { children: ReactNode; clas
   )
 }
 
-export default function MotorNav({ active, onNavigate, onExit, onBack, crumb, extra }: Props) {
+/** Barre de page sous la barre latérale : « ← Retour » + fil d'Ariane, et onglets de section éventuels. */
+export default function MotorNav({ onBack, crumb, extra }: Props) {
+  if (!onBack && !extra) return null
   return (
     <TopBar>
-      <div className="app-wrap flex items-center gap-3 h-16 lg:h-[4.5rem]">
-        <button
-          onClick={onExit}
-          aria-label="Retour à l'accueil"
-          className="-ml-2 min-h-11 min-w-11 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/5 text-xl active:text-white"
-        >
-          ‹
-        </button>
-        <LogoButton onClick={onExit} />
-        
-        <nav className="seg hidden md:inline-flex ml-auto" aria-label="Navigation principale">
-          {items.map((it) => (
-            <button
-              key={it.key}
-              onClick={() => onNavigate(it.key)}
-              aria-current={active === it.key ? 'page' : undefined}
-              className="seg-item !min-h-9 !px-3 lg:!px-4 !text-xs lg:!text-sm"
-            >
-              {it.key === 'live' && <span className="inline-block size-1.5 rounded-full bg-white animate-pulse" aria-hidden />}
-              {it.label}
-            </button>
-          ))}
-        </nav>
-      </div>
-      <div className="md:hidden px-3 pb-3">
-        <nav className="seg w-full" aria-label="Navigation principale">
-          {items.map((it) => (
-            <button
-              key={it.key}
-              onClick={() => onNavigate(it.key)}
-              aria-current={active === it.key ? 'page' : undefined}
-              className="seg-item flex-auto !min-h-9 !px-3 !text-xs"
-            >
-              {it.key === 'live' && <span className="inline-block size-1.5 rounded-full bg-white animate-pulse" aria-hidden />}
-              {it.label}
-            </button>
-          ))}
-        </nav>
-      </div>
       {onBack && (
-        <div className={`${extra ? 'hidden md:block' : 'block'}`}>
-          <div className="app-wrap flex items-center gap-3 pb-1">
-            <button onClick={onBack} className="-ml-2 px-2 min-h-11 text-sm text-zinc-400 hover:text-white active:text-white">
-              ← Retour
-            </button>
-            {crumb && <span className="text-xs text-zinc-600 truncate">{crumb}</span>}
-          </div>
+        <div className="app-wrap flex h-14 items-center gap-3">
+          <button onClick={onBack} className="-ml-2 px-2 min-h-11 text-sm text-zinc-400 hover:text-white active:text-white">
+            ← Retour
+          </button>
+          {crumb && <span className="text-xs text-zinc-600 truncate">{crumb}</span>}
         </div>
       )}
-      {extra && <div className="app-wrap pb-3 pt-1">{extra}</div>}
+      {extra && <div className={`app-wrap pb-3 ${onBack ? 'pt-0' : 'pt-3'}`}>{extra}</div>}
     </TopBar>
   )
 }
