@@ -12,6 +12,7 @@ import type { Session } from '@supabase/supabase-js'
 import ChatBot from './components/ChatBot'
 import Legal from './pages/Legal'
 import { usePageFade } from './lib/motion'
+import { isPendingDeletion } from './lib/account'
 
 interface User {
   id: string
@@ -49,6 +50,7 @@ function App() {
   const [horsPage, setHorsPage] = useState<HorsPage | undefined>(undefined)
   const [favDriver, setFavDriver] = useState<string | null>(null)
   const [favTeam, setFavTeam] = useState<string | null>(null)
+  const [deleted, setDeleted] = useState(false)
   const loggedIn = user !== null
 
   // Changer de page (connexion ↔ inscription ↔ accueil) efface l'ancien message d'erreur ; on revient en haut de page.
@@ -68,7 +70,16 @@ function App() {
   // Comptes en ligne : session restaurée au démarrage, puis suivie (connexion, déconnexion, lien « mot de passe oublié »).
   useEffect(() => {
     if (!supabase) return
-    const toUser = (s: Session | null): User | null => (s?.user ? { id: s.user.id, email: s.user.email ?? '' } : null)
+    // Un compte en attente de suppression (voir lib/account.ts) ne peut plus se reconnecter.
+    const toUser = (s: Session | null): User | null => {
+      if (!s?.user) return null
+      if (isPendingDeletion(s.user)) {
+        supabase?.auth.signOut({ scope: 'local' })
+        setMessage('Ce compte a été supprimé.')
+        return null
+      }
+      return { id: s.user.id, email: s.user.email ?? '' }
+    }
     supabase.auth.getSession().then(({ data }) => {
       setUser(toUser(data.session))
       setReady(true)
@@ -143,6 +154,18 @@ function App() {
     setFavTeam(null)
   }
 
+  // Après « Supprimer mon compte » : retour à l'accueil, avec une courte confirmation.
+  const accountDeleted = () => {
+    setUser(null)
+    setMode('select')
+    setFavDriver(null)
+    setFavTeam(null)
+    clearRoute()
+    window.scrollTo(0, 0)
+    setDeleted(true)
+    setTimeout(() => setDeleted(false), 6000)
+  }
+
   if (!ready) return <div className="min-h-dvh" />
 
   if (recovery) return <NewPassword onDone={() => setRecovery(false)} />
@@ -150,7 +173,7 @@ function App() {
   if (route === 'mentions') return <Legal />
 
   if (loggedIn && mode === 'notif') {
-    return <Reminders onBack={() => setMode('select')} user={supabaseEnabled ? user : null} />
+    return <Reminders onBack={() => setMode('select')} user={supabaseEnabled ? user : null} onDeleted={accountDeleted} />
   }
 
   if (loggedIn && mode === 'live') {
@@ -212,7 +235,16 @@ function App() {
     )
   }
 
-  return <Home />
+  return (
+    <>
+      <Home />
+      {deleted && (
+        <div role="status" className="app-in fixed inset-x-0 bottom-6 z-50 flex justify-center px-6">
+          <p className="rounded-full border border-[#2b2c2d] bg-[#121314] px-5 py-3 text-sm text-[#d6d7d7] shadow-[0_8px_30px_rgba(0,0,0,0.5)]">Ton compte a bien été supprimé. À bientôt !</p>
+        </div>
+      )}
+    </>
+  )
 }
 
 export default App
