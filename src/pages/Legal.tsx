@@ -55,9 +55,9 @@ export default function Legal() {
 
           <Block id="suppression" title="Supprimer tes données">
             <p><strong>Rappels :</strong> désactive-les à tout moment dans Rappels.</p>
-            <p><strong>Compte :</strong> écris à <a href={`mailto:${CONTACT}?subject=Suppression%20de%20mon%20compte%20F1%20Manager`}>{CONTACT}</a> depuis l’adresse de ton compte. Le compte et tous tes réglages de rappel sont supprimés sous 30 jours.</p>
+            <p><strong>Compte :</strong> supprime-le toi-même, directement dans l’app : <strong>Rappels › Supprimer mon compte</strong>. Ton compte, tes réglages et ton journal de rappels sont effacés définitivement, sans démarche ni délai d’attente.</p>
             <p><strong>Sur ton appareil :</strong> effacer les données du site dans ton navigateur retire tes favoris.</p>
-            <p>Tu peux aussi demander l’accès ou la correction de tes données à la même adresse, et saisir la CNIL si besoin.</p>
+            <p>Pour toute question, ou pour demander l’accès ou la correction de tes données, écris à <a href={`mailto:${CONTACT}`}>{CONTACT}</a>. Tu peux aussi saisir la CNIL si besoin.</p>
           </Block>
         </div>
         <p className="mt-6 text-[12px] text-[#636464]">Mis à jour le 14 novembre 2026.</p>
