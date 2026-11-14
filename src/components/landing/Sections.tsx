@@ -4,6 +4,7 @@ import { drivers } from '../../data/divers'
 import Reveal from './Reveal'
 import { TEAMS, teamLogo } from '../../data/grid'
 import FooterWordmark from './FooterWordmark'
+import { LogoFull, LogoGlyph } from '../Logo'
 
 const reduced = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 const TODAY = new Date().toISOString().slice(0, 10)
@@ -11,13 +12,10 @@ const TODAY = new Date().toISOString().slice(0, 10)
 /* Largeur et gouttières de Novex : conteneur 1240 px, 40 px de chaque côté (24 px sur mobile). */
 const WRAP = 'mx-auto w-full max-w-[82.5rem] px-6 lg:px-10'
 
-/** Marque : petite pastille blanche « F1 » + nom. */
+/** Marque : symbole géométrique + nom. */
 export function Brand({ className = '' }: { className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-2 ${className}`}>
-      <span className="rounded-[5px] bg-white px-1.5 py-1 text-[12px] font-bold leading-none tracking-tight text-[#0a0a0a]">F1</span>
-      <span className="text-[15px] font-medium tracking-[-0.02em]">Manager</span>
-    </span>
+    <LogoFull size="sm" className={className} />
   )
 }
 
@@ -294,7 +292,7 @@ export function Footer() {
       <div className="border-t border-[#2b2c2d]">
         <div className={`${WRAP} pb-7 pt-[72px]`}>
           <div className="grid gap-12 sm:grid-cols-2 md:grid-cols-[6rem_repeat(4,1fr)]">
-            <a href="#top" aria-label="F1 Manager, haut de page" className="md:-mt-0.5"><span className="inline-block rounded-[6px] bg-white px-2 py-1.5 text-[15px] font-bold leading-none text-[#0a0a0a]">F1</span></a>
+            <a href="#top" aria-label="F1 Manager, haut de page" className="md:-mt-0.5"><LogoGlyph className="h-6 w-auto text-white" /></a>
             <nav aria-label="Produit"><p className={h}>Produit</p><ul>
               <li><a className={a} href="#apercu">Aperçu</a></li><li><a className={a} href="#fonctionnalites">Fonctionnalités</a></li><li><a className={a} href="#faq">FAQ</a></li>
             </ul></nav>

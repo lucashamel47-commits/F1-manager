@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { circuits } from '../data/circuits'
+import { LogoGlyph } from './Logo'
 
 /* ───────── Aperçu interactif de l'app (données de démonstration) ─────────
    Une fausse fenêtre d'app avec 4 onglets : classement, calendrier, live timing, stats.
@@ -321,7 +322,7 @@ export default function AppPreview() {
           <div className="flex min-h-[26rem] md:min-h-[32rem]">
             {/* barre latérale */}
             <nav role="tablist" aria-label="Sections de l'aperçu" aria-orientation="vertical" className="hidden md:flex w-48 shrink-0 flex-col gap-1 border-r border-white/[0.07] p-3">
-              <div className="flex items-center gap-2 px-2 pb-3 pt-1"><span className="bg-white text-black font-bold px-1.5 py-0.5 rounded text-[11px] leading-none">F1</span><span className="text-sm font-semibold tracking-tight">Manager</span></div>
+              <div className="flex items-center gap-2 px-2 pb-3 pt-1"><LogoGlyph className="h-[12px] w-auto text-white" /><span className="text-sm font-semibold tracking-[-0.03em]">F1 Manager</span></div>
               {TABS.map((t) => (
                 <button key={t.key} role="tab" aria-selected={tab === t.key} onClick={() => choose(t.key)} className={`flex items-center gap-2.5 rounded-xl px-3 min-h-10 text-[13px] text-left transition ${tab === t.key ? 'bg-[#222324] text-white' : 'text-zinc-400 hover:bg-white/[0.05] hover:text-white'}`}>
                   <Icon k={t.key} />{t.label}

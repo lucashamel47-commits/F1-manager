@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { LogoFull } from './Logo'
 
 export type NavKey = 'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'live'
 
@@ -23,10 +24,7 @@ interface Props {
 
 export function LogoMark({ className = '' }: { className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-2.5 ${className}`}>
-      <span className="grid h-7 place-items-center rounded-lg bg-white text-[#0a0a0a] px-2 text-[13px] font-bold leading-none tracking-tight">F1</span>
-      <span className="text-[1.05rem] font-semibold leading-none tracking-[-0.02em]">Manager</span>
-    </span>
+    <LogoFull className={className} />
   )
 }
 
