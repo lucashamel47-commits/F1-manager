@@ -8,6 +8,7 @@ import { Card, Tabs, FlagIcon, Empty } from './ui/common'
 import { TRACK_LABEL } from './ui/style'
 import Tower from './ui/Tower'
 import LiveMap from './ui/LiveMap'
+import FollowView from './ui/FollowView'
 import Chrono from './ui/Chrono'
 import DriverPanel from './ui/DriverPanel'
 import Controls from './ui/Controls'
@@ -116,9 +117,10 @@ export default function LivePage() {
   const [rightTab, setRightTab] = useState<RightTab>('rc')
   const [mobTab, setMobTab] = useState<MobTab>('tower')
   const [sel, setSel] = useState<number | null>(null)
+  const [follow, setFollow] = useState(false)
   const sessKey = active?.session.session_key
   const [prevKey, setPrevKey] = useState(sessKey)
-  if (prevKey !== sessKey) { setPrevKey(sessKey); setSel(null) }
+  if (prevKey !== sessKey) { setPrevKey(sessKey); setSel(null); setFollow(false) }
 
   const select = useCallback((n: number) => {
     setSel(n); rt.setWatch(n)
@@ -173,6 +175,17 @@ export default function LivePage() {
   ) : null
 
   const isLive = active?.mode === 'live'
+  const followBtn = (
+    <button onClick={() => { setFollow(true); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="min-h-9 px-3.5 rounded-full bg-white text-[#08090a] text-[12px] font-semibold inline-flex items-center gap-1.5">
+      <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="12" r="3" /><path d="M12 2v4M12 18v4M2 12h4M18 12h4" /></svg>
+      Suivre une voiture
+    </button>
+  )
+  const followEl = follow && store && snap && snap.rows.length > 0 ? (
+    <div className="w-full px-3 sm:px-5 lg:px-6 pt-3">
+      <FollowView loc={rt.loc} car={rt.car} now={rt.now} snap={snap} t={rt.t} selected={sel} onSelect={(n) => { setSel(n); rt.setWatch(n) }} version={rt.version} isLive={isLive} onClose={() => setFollow(false)} />
+    </div>
+  ) : null
   const track = snap ? TRACK_LABEL[snap.track.kind] : null
   const rightTabs = sel != null ? [...RIGHT, { key: 'driver' as const, label: 'Vue pilote' }] : RIGHT
   const mobTabs: { key: MobTab; label: string }[] = [
@@ -266,6 +279,7 @@ export default function LivePage() {
         <div className={`flex gap-2 ${snap ? '' : 'sm:ml-auto'}`}>
           {isLive && lastRace && <button onClick={() => start(lastRace)} className={toolbarBtn}>Rejouer</button>}
           {chosen && liveSession && chosen.session.session_key !== liveSession.session_key && <button onClick={() => setChosen(null)} className={`${toolbarBtn} border-accent-500`}>Retour au direct</button>}
+          {!desktop && snap && snap.rows.length > 0 && !follow && <button onClick={() => setFollow(true)} className={toolbarBtn}>Suivre</button>}
           <button onClick={() => setPicker(true)} className={toolbarBtn}>Sessions</button>
           {chosen && !liveSession && <button onClick={() => { setChosen(null); closeDriver() }} className={toolbarBtn} aria-label="Quitter le rejeu">Fermer</button>}
         </div>
@@ -302,6 +316,7 @@ export default function LivePage() {
       {store && snap && (
         <>
           {!isLive && <Controls rt={rt} lap={snap.lap} totalLaps={snap.totalLaps} onLap={stepLap} />}
+          {followEl}
           {snap.rows.length === 0 ? (
             <div className={`${wide} py-4`}><Card><Empty>Aucune donnée de classement disponible pour cette session.</Empty></Card></div>
           ) : desktop ? (
@@ -311,7 +326,7 @@ export default function LivePage() {
                 <div role="tabpanel">{panel(leftTab)}</div>
               </Card>
               <div className="flex flex-col gap-3 sticky top-[72px]">
-                <Card title="Circuit">
+                <Card title="Circuit" right={follow ? undefined : followBtn}>
                   <div className="p-2">{mapEl}</div>
                 </Card>
                 <Card>
@@ -325,7 +340,7 @@ export default function LivePage() {
               <div className={wide}>
                 <Card>
                   <Tabs tabs={mobTabs} value={mobTab} onChange={setMobTab} label="Sections du live" />
-                  <div role="tabpanel">{mobTab === 'map' ? <div className="p-2">{mapEl}</div> : panel(mobTab)}</div>
+                  <div role="tabpanel">{mobTab === 'map' ? <div className="p-2">{!follow && <div className="flex justify-end px-2 pb-2">{followBtn}</div>}{mapEl}</div> : panel(mobTab)}</div>
                 </Card>
               </div>
             </div>
