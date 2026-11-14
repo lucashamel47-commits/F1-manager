@@ -4,7 +4,7 @@ import { LogoFull } from './Logo'
 export type NavKey = 'home' | 'standings' | 'calendar' | 'stats' | 'favorites' | 'live'
 
 const items: { key: NavKey; label: string }[] = [
-  { key: 'home', label: 'Accueil' },
+  { key: 'home', label: 'Saison' },
   { key: 'live', label: 'Live' },
   { key: 'standings', label: 'Classements' },
   { key: 'calendar', label: 'Calendrier' },
@@ -58,7 +58,7 @@ export default function MotorNav({ active, onNavigate, onExit, onBack, crumb, ex
           ‹
         </button>
         <LogoButton onClick={onExit} />
-        <span className="hidden xl:inline whitespace-nowrap pl-3 ml-1 border-l border-white/10 text-zinc-500 text-xs">Hors course</span>
+        
         <nav className="seg hidden md:inline-flex ml-auto" aria-label="Navigation principale">
           {items.map((it) => (
             <button
@@ -67,7 +67,7 @@ export default function MotorNav({ active, onNavigate, onExit, onBack, crumb, ex
               aria-current={active === it.key ? 'page' : undefined}
               className="seg-item !min-h-9 !px-3 lg:!px-4 !text-xs lg:!text-sm"
             >
-              {it.key === 'live' && <span className="inline-block size-1.5 rounded-full bg-red-500 animate-pulse" aria-hidden />}
+              {it.key === 'live' && <span className="inline-block size-1.5 rounded-full bg-white animate-pulse" aria-hidden />}
               {it.label}
             </button>
           ))}
@@ -82,7 +82,7 @@ export default function MotorNav({ active, onNavigate, onExit, onBack, crumb, ex
               aria-current={active === it.key ? 'page' : undefined}
               className="seg-item flex-auto !min-h-9 !px-3 !text-xs"
             >
-              {it.key === 'live' && <span className="inline-block size-1.5 rounded-full bg-red-500 animate-pulse" aria-hidden />}
+              {it.key === 'live' && <span className="inline-block size-1.5 rounded-full bg-white animate-pulse" aria-hidden />}
               {it.label}
             </button>
           ))}

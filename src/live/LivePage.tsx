@@ -74,6 +74,7 @@ function Banner({ tone, children, action }: { tone: 'warn' | 'err'; children: Re
 
 function issueText(e: OpenF1Error | Error): string {
   if (e instanceof OpenF1Error) {
+    if (e.kind === 'feed') return `Direct officiel F1 : ${e.message}`
     if (e.kind === 'auth') return 'Accès refusé (401) : les données en direct d’OpenF1 pendant une session sont réservées aux abonnés. L’accès gratuit ne couvre que les sessions terminées — vous pouvez rejouer une session passée.'
     if (e.kind === 'rate') return 'Limite de requêtes OpenF1 atteinte (429). Nouvel essai automatique dans quelques secondes.'
     if (e.kind === 'network') return navigator.onLine ? 'OpenF1 est injoignable pour le moment. Nouvel essai automatique.' : 'Vous êtes hors connexion : seules les sessions déjà consultées sont disponibles.'
@@ -88,6 +89,8 @@ export default function LivePage() {
   const list = useSessionList(years)
   const now = useNow(1000)
   const sim = useMemo(() => new URLSearchParams(window.location.search).get('livesim'), [])
+  // lien de test : ?f1live=<session_key> ouvre cette session en direct via le flux officiel F1 (même si elle est terminée)
+  const f1test = useMemo(() => new URLSearchParams(window.location.search).get('f1live'), [])
   const [chosen, setChosen] = useState<Chosen | null>(null)
   const [picker, setPicker] = useState(false)
   const [pickerYear, setPickerYear] = useState(thisYear)
@@ -101,7 +104,8 @@ export default function LivePage() {
 
   // lien de test : ?livesim=<session_key> joue une session passée comme si elle était en direct
   const simSession = sim ? sessions.find((s) => String(s.session_key) === sim) ?? null : null
-  const active: Chosen | null = chosen ?? (simSession ? { session: simSession, mode: 'live' } : liveSession ? { session: liveSession, mode: 'live' } : null)
+  const f1Session = f1test ? sessions.find((s) => String(s.session_key) === f1test) ?? null : null
+  const active: Chosen | null = chosen ?? (simSession ? { session: simSession, mode: 'live' } : f1Session ? { session: f1Session, mode: 'live' } : liveSession ? { session: liveSession, mode: 'live' } : null)
   const rt = useRuntime(active?.session ?? null, active?.mode ?? 'replay', !!simSession && !chosen)
 
   const start = useCallback((s: OFSession, mode: 'live' | 'replay' = 'replay') => { setChosen({ session: s, mode }); setPicker(false) }, [])
@@ -243,7 +247,7 @@ export default function LivePage() {
           </section>
         )}
         {!next && list.status === 'ok' && <section className={wide}><Card><Empty>Aucune session à venir au calendrier pour le moment.</Empty></Card></section>}
-        <p className={`app-wrap mt-6 text-xs text-zinc-500 max-w-3xl`}>Données : OpenF1 (api.openf1.org). Les données en direct pendant une session nécessitent un abonnement OpenF1 ; les sessions terminées sont gratuites et mises en cache sur cet appareil.</p>
+        <p className={`app-wrap mt-6 text-xs text-zinc-500 max-w-3xl`}>Direct : flux officiel F1 Live Timing, gratuit (classement, écarts, pneus, direction de course, météo ; positions sur la carte estimées). Rejeux : OpenF1, gratuits et mis en cache sur cet appareil.</p>
         {picker && <Picker sessions={sessions} loading={list.status === 'loading'} year={pickerYear} years={[thisYear, thisYear - 1, thisYear - 2, thisYear - 3]} onYear={onYear} onPick={(s) => start(s)} onClose={() => setPicker(false)} current={null} now={now} />}
       </main>
     )
@@ -308,7 +312,9 @@ export default function LivePage() {
       )}
       {isLive && rt.status === 'ready' && snap && !rt.liveIssue && (
         <div className={`${wide} py-1.5 text-[11px] text-zinc-500 tabular-nums border-b border-zinc-900`}>
-          {rt.lastUpdate ? `Dernière mise à jour : ${new Date(rt.lastUpdate).toLocaleTimeString('fr-FR')}` : 'En attente des premières données…'} · actualisation toutes les ~4,5 s
+          {rt.source === 'f1'
+            ? <>Direct officiel F1 (gratuit) · {rt.lastUpdate ? `mis à jour à ${new Date(rt.lastUpdate).toLocaleTimeString('fr-FR')}` : 'en attente des données…'} · positions sur la carte estimées, télémétrie réservée à F1 TV</>
+            : <>{rt.lastUpdate ? `Dernière mise à jour : ${new Date(rt.lastUpdate).toLocaleTimeString('fr-FR')}` : 'En attente des premières données…'} · actualisation toutes les ~4,5 s</>}
           {snap.rows.length === 0 && ' · aucune donnée reçue pour l’instant (le direct peut être retardé ou restreint)'}
         </div>
       )}

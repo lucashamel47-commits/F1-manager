@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getSessions, OpenF1Error, ms } from './openf1'
 import type { OFSession } from './openf1'
 import { loadStore, startLivePolling, LocationStore, CarDataStore, isSettled } from './data'
+import { startF1Live, sessionFromFeed, referenceOutline } from './f1live'
+import { emptyStore } from './model'
 import type { Progress } from './data'
 import type { Store } from './model'
 
@@ -30,6 +32,8 @@ export interface Runtime {
   setWatch: (n: number | null) => void
   version: number
   reload: () => void
+  /** origine des données du direct : flux officiel F1 (gratuit) ou OpenF1 */
+  source: 'f1' | 'openf1' | null
 }
 
 export function useSessionList(years: number[]) {
@@ -69,6 +73,7 @@ export function useRuntime(session: OFSession | null, mode: 'live' | 'replay', s
   const [watch, setWatch] = useState<number | null>(null)
   const [reloadKey, setReloadKey] = useState(0)
   const [objs, setObjs] = useState<{ store: Store; loc: LocationStore; car: CarDataStore } | null>(null)
+  const [source, setSource] = useState<'f1' | 'openf1' | null>(null)
 
   const storeRef = useRef<Store | null>(null)
   const locRef = useRef<LocationStore | null>(null)
@@ -100,6 +105,36 @@ export function useRuntime(session: OFSession | null, mode: 'live' | 'replay', s
     ;(async () => {
       try {
         const sim = mode === 'live' && simulate
+        setSource(null)
+        // 1) direct gratuit : flux officiel F1 Live Timing (WebSocket, sans compte)
+        if (mode === 'live' && !sim) {
+          const store = emptyStore(session)
+          const loc = new LocationStore(session.session_key, store.t0, false)
+          const car = new CarDataStore(session.session_key, false)
+          const h = startF1Live({
+            store, loc, now,
+            onUpdate: () => { if (alive) { setVersion((v) => v + 1); setLastUpdate(Date.now()) } },
+            onOk: () => alive && setLiveIssue(null),
+            onError: (e) => alive && setLiveIssue(new OpenF1Error('feed', e.message)),
+          })
+          stopPoll = h.stop
+          const st = await h.ready.catch(() => null)
+          if (!alive) return
+          const fs = st ? sessionFromFeed(st) : null
+          if (st && fs && fs.session_key === session.session_key) {
+            storeRef.current = store; locRef.current = loc; carRef.current = car
+            setObjs({ store, loc, car })
+            setT(now())
+            setSource('f1')
+            setStatus('ready')
+            setVersion((v) => v + 1)
+            referenceOutline(session, ac.signal).then((o) => { if (alive && o) { loc.outline = o; loc.version++; setVersion((v) => v + 1) } }).catch(() => {})
+            return
+          }
+          // flux muet ou encore sur une autre session : repli sur OpenF1
+          h.stop(); stopPoll = null
+          setLiveIssue(null)
+        }
         if (sim) clock.current.simOffset = Date.now() - (ms(session.date_start) + 14 * 60_000)
         const store = await loadStore(session, { onProgress: (p) => alive && setProgress(p), signal: ac.signal, until: sim ? now() : undefined })
         if (!alive) return
@@ -108,6 +143,7 @@ export function useRuntime(session: OFSession | null, mode: 'live' | 'replay', s
         const car = new CarDataStore(session.session_key, settled)
         storeRef.current = store; locRef.current = loc; carRef.current = car
         setObjs({ store, loc, car })
+        setSource(mode === 'live' ? 'openf1' : null)
         if (mode === 'replay') {
           clock.current.anchorT = store.t0
           setT(store.t0)
@@ -183,7 +219,7 @@ export function useRuntime(session: OFSession | null, mode: 'live' | 'replay', s
 
   return useMemo(() => ({
     mode, status, progress, error, store: objs?.store ?? null, loc: objs?.loc ?? null, car: objs?.car ?? null,
-    t, now, playing, speed, play, pause, setSpeed, seek, liveIssue, lastUpdate, watch, setWatch, version,
+    t, now, playing, speed, play, pause, setSpeed, seek, liveIssue, lastUpdate, watch, setWatch, version, source,
     reload: () => setReloadKey((k) => k + 1),
-  }), [mode, status, progress, error, t, now, playing, speed, play, pause, setSpeed, seek, liveIssue, lastUpdate, watch, version, objs])
+  }), [mode, status, progress, error, t, now, playing, speed, play, pause, setSpeed, seek, liveIssue, lastUpdate, watch, version, objs, source])
 }

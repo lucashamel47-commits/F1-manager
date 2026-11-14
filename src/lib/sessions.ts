@@ -1,3 +1,4 @@
+import { gpFr, countryFr } from './i18n'
 // Sessions d'un week-end de F1 (essais, qualifs, sprint, course) à partir du calendrier Jolpica,
 // + export .ics. Aucune dépendance, tout se passe dans le navigateur.
 import type { Race } from './f1api'
@@ -35,9 +36,9 @@ const FIELDS: { key: string; label: string; kind: SessionKind; minutes: number }
   { key: 'Qualifying', label: 'Qualifications', kind: 'quali', minutes: 60 },
 ]
 
-/** « GP Melbourne » : la ville est plus parlante que « Australian Grand Prix » en français. */
+/** « Brazilian Grand Prix » → « GP du Brésil ». */
 export function gpName(race: Race): string {
-  return 'GP ' + (race.Circuit.Location.locality || race.raceName.replace(/\s*Grand Prix.*$/i, '')).trim()
+  return gpFr(race.raceName)
 }
 
 function parse(date?: string, time?: string): Date | null {
@@ -51,7 +52,7 @@ export function sessionsOf(race: Race): Session[] {
     round: Number(race.round),
     gp: gpName(race),
     circuit: race.Circuit.circuitName,
-    place: `${race.Circuit.Location.locality}, ${race.Circuit.Location.country}`,
+    place: `${race.Circuit.Location.locality}, ${countryFr(race.Circuit.Location.country)}`,
   }
   const out: Session[] = []
   for (const f of FIELDS) {

@@ -118,7 +118,9 @@ export default function DriverView({ store, car, n, t, color, issue }: { store: 
   if (!cur) {
     return (
       <div className="rounded-2xl border border-[#2b2c2d] bg-[#0c0d0e] p-5 text-sm text-zinc-500">
-        {issue?.kind === 'auth'
+        {store.live
+          ? 'Pendant le direct, la télémétrie (vitesse, freinage, force G) est réservée à F1 TV. Elle sera disponible en rejeu gratuit quelques heures après la session.'
+          : issue?.kind === 'auth'
           ? 'La télémétrie en direct demande un abonnement OpenF1. Lance un rejeu pour voir la vue pilote.'
           : car ? 'Chargement de la télémétrie du pilote…' : 'Pas de télémétrie disponible pour cette session.'}
       </div>

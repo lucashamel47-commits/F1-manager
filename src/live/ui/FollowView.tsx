@@ -241,12 +241,28 @@ export default function FollowView({ loc, car, now, snap, t, selected, onSelect,
         const txt = k.on ? `P${k.r.pos}  ${k.r.acr}` : k.r.acr
         const tw = ctx.measureText(txt).width + 14, th = 20
         const gap = k.on ? 14 : R + 5
-        const cands: [number, number][] = [[k.x + gap, k.y - th / 2], [k.x - gap - tw, k.y - th / 2], [k.x - tw / 2, k.y - gap - th], [k.x - tw / 2, k.y + gap], [k.x + gap * 0.7, k.y - gap * 0.7 - th], [k.x - gap * 0.7 - tw, k.y + gap * 0.7]]
-        const ok = cands.find(([x, y]) => x > 2 && y > 2 && x + tw < w - 2 && y + th < h - 2 && placed.every(([a, b, c2, d]) => x >= c2 || x + tw <= a || y >= d || y + th <= b))
+        const g2 = gap * 2.4
+        // positions proches d'abord, puis plus loin (reliées à la voiture par un trait fin)
+        const cands: [number, number][] = [
+          [k.x + gap, k.y - th / 2], [k.x - gap - tw, k.y - th / 2], [k.x - tw / 2, k.y - gap - th], [k.x - tw / 2, k.y + gap],
+          [k.x + gap * 0.7, k.y - gap * 0.7 - th], [k.x - gap * 0.7 - tw, k.y + gap * 0.7], [k.x + gap * 0.7, k.y + gap * 0.7], [k.x - gap * 0.7 - tw, k.y - gap * 0.7 - th],
+          [k.x + g2, k.y - g2 - th / 2], [k.x - g2 - tw, k.y - g2 - th / 2], [k.x + g2, k.y + g2 - th / 2], [k.x - g2 - tw, k.y + g2 - th / 2],
+          [k.x - tw / 2, k.y - g2 - th], [k.x - tw / 2, k.y + g2],
+        ]
+        const inside = ([x, y]: [number, number]) => x > 2 && y > 2 && x + tw < w - 2 && y + th < h - 2
+        const free = ([x, y]: [number, number]) => placed.every(([a, b, c2, d]) => x >= c2 || x + tw <= a || y >= d || y + th <= b)
+        // la voiture suivie garde toujours son étiquette ; les autres la perdent s'il n'y a plus de place (priorité à l'ordre de course)
+        const ok = cands.find((q) => inside(q) && free(q)) ?? (k.on ? cands.find(inside) : undefined)
         if (!ok) continue
         const [x, y] = ok
         placed.push([x - 3, y - 3, x + tw + 3, y + th + 3])
         count++
+        const far = Math.hypot(x + tw / 2 - k.x, y + th / 2 - k.y) > gap + tw / 2 + 4
+        if (far) {
+          const lx = Math.max(x, Math.min(x + tw, k.x)), ly = Math.max(y, Math.min(y + th, k.y))
+          ctx.globalAlpha = 0.5; ctx.lineWidth = 1; ctx.strokeStyle = k.on ? '#ffffff' : k.r.color
+          ctx.beginPath(); ctx.moveTo(k.x, k.y); ctx.lineTo(lx, ly); ctx.stroke()
+        }
         ctx.globalAlpha = k.r.out ? 0.4 : 1
         ctx.beginPath(); ctx.roundRect(x, y, tw, th, th / 2)
         ctx.fillStyle = k.on ? '#ffffff' : 'rgba(8,9,10,0.86)'; ctx.fill()

@@ -32,6 +32,8 @@ export interface Store {
   version: number
   /** données tronquées (simulation du direct) : le nombre de tours total est inconnu */
   partial: boolean
+  /** direct gratuit (flux F1 Live Timing) : indicateurs fournis directement par le flux */
+  live?: { source: 'f1'; flags: Map<number, { inPit: boolean; out: boolean }>; totalLaps: number | null; status: string; track: string }
 }
 
 export const isRaceType = (s: OFSession) => /race|sprint$/i.test(s.session_name) && !/qualif|shootout/i.test(s.session_name)
@@ -282,7 +284,8 @@ export function snapshot(s: Store, t: number): Snapshot {
     const tyre = stint ? { compound: stint.compound, age: stint.age0 + Math.max(0, lapNo - stint.from) } : null
     const pits = s.pits.filter((p) => p.n === n && p.t <= t)
     const lastPit = pits[pits.length - 1]
-    const inPit = !!lastPit && t - lastPit.t < (lastPit.lane ?? 22) * 1000
+    const lf = s.live?.flags.get(n)
+    const inPit = lf ? lf.inPit : !!lastPit && t - lastPit.t < (lastPit.lane ?? 22) * 1000
     // position / écarts
     let pos = 0, gap = '—', int = '—'
     if (timingMode === 'race') {
@@ -298,7 +301,7 @@ export function snapshot(s: Store, t: number): Snapshot {
       } else if (pos === 1) gap = 'Leader'
     }
     const res = s.results.find((r) => r.n === n)
-    const out = !!res && (res.dnf || res.dns || res.dsq) && t >= s.t1 - 60_000
+    const out = lf ? lf.out : !!res && (res.dnf || res.dns || res.dsq) && t >= s.t1 - 60_000
     rows.push({ n, acr: d?.name_acronym ?? String(n), name: d?.full_name ?? String(n), team: d?.team_name ?? '', color: teamColor(d), pos, gap, int, last: lastV, lastState, best, bestOverall: !!bestLap && best != null && best <= bestLap.v + 1e-9, sectors, tyre, pits: pits.length, speedTrap: trap.get(n) ?? null, i1: i1m.get(n) ?? null, i2: i2m.get(n) ?? null, pbSec: (pb.get(n) ?? []).map((v) => (Number.isFinite(v) ? v : null)), lapNo, inPit, out })
   }
 
@@ -324,7 +327,8 @@ export function snapshot(s: Store, t: number): Snapshot {
   let totalLaps: number | null = null
   if (s.isRace) {
     const fromRes = Math.max(0, ...s.results.map((r) => r.laps ?? 0))
-    if (fromRes > 0) totalLaps = fromRes
+    if (s.live?.totalLaps) totalLaps = s.live.totalLaps
+    else if (fromRes > 0) totalLaps = fromRes
     else if (!s.partial && s.t1 < Date.now() - 3600_000) { for (const arr of s.laps.values()) for (const l of arr) totalLaps = Math.max(totalLaps ?? 0, l.lap) }
   }
   if (totalLaps) lap = Math.min(lap, totalLaps)
@@ -335,7 +339,7 @@ export function snapshot(s: Store, t: number): Snapshot {
   const ri = lastIdx(s.radio, t, (r) => r.t)
   return {
     rows, lap, totalLaps, timingMode,
-    track: trackStatus(s.rc, t),
+    track: liveTrack(s, trackStatus(s.rc, t)),
     weather: s.weather[wi] ?? s.weather[0] ?? null,
     feed: s.rc.slice(Math.max(0, fi - 79), fi + 1).reverse(),
     overtakes: s.overtakes.slice(Math.max(0, oi - 39), oi + 1).reverse(),
@@ -376,4 +380,13 @@ export function lapSeries(s: Store): LapSeries {
     gap.set(n, g)
   }
   return { laps, pos, gap }
+}
+
+/** Direct F1 : l'état de piste vient directement du flux (TrackStatus), plus fiable que la relecture des messages. */
+function liveTrack(s: Store, fromRc: { kind: TrackKind; yellowSectors: number[] }): { kind: TrackKind; yellowSectors: number[] } {
+  const code = s.live?.track
+  if (!code) return fromRc
+  const map: Record<string, TrackKind> = { '1': 'GREEN', '2': 'YELLOW', '4': 'SC', '5': 'RED', '6': 'VSC', '7': 'VSC' }
+  const kind = /finished|finalised|ends/i.test(s.live?.status ?? '') ? 'CHEQUERED' : map[code] ?? fromRc.kind
+  return { kind, yellowSectors: code === '1' ? [] : fromRc.yellowSectors }
 }

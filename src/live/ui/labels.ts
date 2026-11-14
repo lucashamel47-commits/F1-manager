@@ -2,7 +2,7 @@ import type { OFSession } from '../openf1'
 
 const SESSION_FR: Record<string, string> = {
   'Practice 1': 'Essais libres 1', 'Practice 2': 'Essais libres 2', 'Practice 3': 'Essais libres 3',
-  Qualifying: 'Qualifications', Sprint: 'Sprint', 'Sprint Qualifying': 'Qualifs Sprint', 'Sprint Shootout': 'Shootout Sprint', Race: 'Course',
+  Qualifying: 'Qualifications', Sprint: 'Sprint', 'Sprint Qualifying': 'Qualifs Sprint', 'Sprint Shootout': 'Shootout Sprint', Race: 'Course', 'Day 1': 'Jour 1', 'Day 2': 'Jour 2', 'Day 3': 'Jour 3',
 }
 export const SESSION_SHORT: Record<string, string> = {
   'Practice 1': 'EL1', 'Practice 2': 'EL2', 'Practice 3': 'EL3', Qualifying: 'Qualifs', Sprint: 'Sprint', 'Sprint Qualifying': 'Q. Sprint', 'Sprint Shootout': 'Q. Sprint', Race: 'Course',
