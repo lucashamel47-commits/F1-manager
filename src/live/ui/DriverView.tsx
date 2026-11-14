@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react'
 import type { CarDataStore, CarSample } from '../data'
 import type { Store } from '../model'
 import { OpenF1Error } from '../openf1'
+import { carAt } from './telemetry'
 
 /*
  * « Vue pilote » : HUD façon volant / cockpit, alimenté par OpenF1 car_data (≈ 4 mesures par seconde).
@@ -33,18 +34,6 @@ function gSeries(s: CarSample[]): { t: number; g: number }[] {
     const w = raw.slice(Math.max(0, i - 1), i + 2)
     return { t: p.t, g: w.reduce((x, y) => x + y.g, 0) / w.length }
   })
-}
-
-/** Valeur interpolée au temps t (animation fluide entre deux mesures). */
-function at(s: CarSample[], t: number): CarSample | null {
-  if (!s.length) return null
-  let i = s.length - 1
-  while (i > 0 && s[i].t > t) i--
-  const a = s[i], b = s[i + 1]
-  if (!b || b.t <= a.t || t <= a.t) return a
-  const k = Math.min(1, (t - a.t) / (b.t - a.t))
-  const mix = (x: number, y: number) => x + (y - x) * k
-  return { ...a, speed: Math.round(mix(a.speed, b.speed)), rpm: Math.round(mix(a.rpm, b.rpm)), thr: Math.round(mix(a.thr, b.thr)) }
 }
 
 const fmtG = (g: number) => `${Math.abs(g).toFixed(1).replace('.', ',')} G`
@@ -110,7 +99,7 @@ export default function DriverView({ store, car, n, t, color, issue }: { store: 
 
   const win = car?.window(n, t - 30_000, t + 1500) ?? []
   const past = win.filter((s) => s.t <= t)
-  const cur = at(win, t)
+  const cur = carAt(win, t)
   const stale = !cur || t - (past[past.length - 1]?.t ?? 0) > 6000
   const gPts = gSeries(win).filter((p) => p.t <= t)
   const gNow = gPts.length ? gPts[gPts.length - 1].g : 0
