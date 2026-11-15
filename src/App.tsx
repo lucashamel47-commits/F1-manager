@@ -18,6 +18,7 @@ import SupportForm from './components/SupportForm'
 interface User {
   id: string
   email: string
+  name?: string
 }
 
 /** Sans Supabase : ancien mode local (comptes dans le navigateur). */
@@ -46,6 +47,7 @@ function App() {
   const keepMessage = useRef(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
@@ -87,7 +89,8 @@ function App() {
         setMessage('Ce compte a été supprimé.')
         return null
       }
-      return { id: s.user.id, email: s.user.email ?? '' }
+      const first = s.user.user_metadata?.first_name
+      return { id: s.user.id, email: s.user.email ?? '', name: typeof first === 'string' && first.trim() ? first.trim() : undefined }
     }
     supabase.auth.getSession().then(({ data }) => {
       setUser(toUser(data.session))
@@ -102,7 +105,8 @@ function App() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email || !password) return setMessage('Remplis les champs')
+    if (!email.trim() || !password) return setMessage('Remplis ton email et ton mot de passe.')
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return setMessage('Entre un email valide.')
 
     if (supabase) {
       if (!isLogin && password.length < 6) return setMessage('6 caractères minimum pour le mot de passe.')
@@ -112,7 +116,7 @@ function App() {
         const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
         if (error) setMessage(authError(error.message))
       } else {
-        const { data, error } = await supabase.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo: APP_URL } })
+        const { data, error } = await supabase.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo: APP_URL, data: name.trim() ? { first_name: name.trim().slice(0, 40) } : undefined } })
         if (error) setMessage(authError(error.message))
         else if (data.user && data.user.identities?.length === 0) setMessage('Cet email a déjà un compte. Connecte-toi.')
         else if (!data.session) {
@@ -225,6 +229,7 @@ function App() {
         <>
           <AppHome
             userEmail={user?.email ?? ''}
+            userName={user?.name}
             onOpenSeason={openSeason}
             onOpenLive={() => setMode('live')}
             onOpenReminders={() => setMode('notif')}
@@ -248,6 +253,8 @@ function App() {
         setEmail={setEmail}
         password={password}
         setPassword={setPassword}
+        name={name}
+        setName={setName}
         message={message}
         showConfetti={showConfetti}
         onSubmit={handleSubmit}

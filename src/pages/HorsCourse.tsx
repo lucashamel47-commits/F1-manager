@@ -837,7 +837,7 @@ if (subPage === 'stats-constructors' && selectedTeamStats) {
               )
             })}
           </div>
-          <button ref={validateRef} disabled={selectedDrivers.length === 0} onClick={() => setStep('team')} className="btn-primary mt-14 block w-full sm:max-w-md mx-auto min-h-14 rounded-full font-semibold disabled:opacity-35 disabled:saturate-0 disabled:shadow-none">Valider ({selectedDrivers.length})</button>
+          <button ref={validateRef} disabled={selectedDrivers.length === 0} onClick={() => setStep('team')} className="btn-primary mt-14 block w-full sm:max-w-[320px] mx-auto h-11 rounded-full text-[14px] font-[510] disabled:opacity-35 disabled:saturate-0 disabled:shadow-none">Valider ({selectedDrivers.length})</button>
         </div>
       </div>
     )
@@ -878,7 +878,7 @@ if (subPage === 'stats-constructors' && selectedTeamStats) {
             )
           })}
         </div>
-        <button ref={validateRef} disabled={!teamById(favTeam)} onClick={() => setStep('done')} className="btn-primary mt-14 block w-full sm:max-w-md mx-auto min-h-14 rounded-full font-semibold disabled:opacity-35 disabled:saturate-0 disabled:shadow-none">Valider</button>
+        <button ref={validateRef} disabled={!teamById(favTeam)} onClick={() => setStep('done')} className="btn-primary mt-14 block w-full sm:max-w-[320px] mx-auto h-11 rounded-full text-[14px] font-[510] disabled:opacity-35 disabled:saturate-0 disabled:shadow-none">Valider</button>
       </div>
     </div>
   )

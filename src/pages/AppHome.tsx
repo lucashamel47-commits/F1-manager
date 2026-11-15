@@ -8,6 +8,7 @@ import { Num } from '../components/Num'
 
 interface Props {
   userEmail: string
+  userName?: string
   onOpenSeason: (page: HorsPage) => void
   onOpenLive: () => void
   onOpenReminders: () => void
@@ -36,7 +37,7 @@ const card = 'rounded-[1.75rem] border border-[#232425] bg-[#0c0d0e]'
  * Accueil de l'app, structure Novex : l'essentiel en haut (prochaine session + compte à rebours, état du direct,
  * ton pilote et ton écurie), puis trois grandes entrées. Les outils secondaires sont à un geste, pas tous affichés.
  */
-export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenReminders }: Props) {
+export default function AppHome({ userEmail, userName, onOpenSeason, onOpenLive, onOpenReminders }: Props) {
   const now = useTick(1000)
   const sessions = useSessions()
   const champ = useChampionship()
@@ -54,7 +55,7 @@ export default function AppHome({ userEmail, onOpenSeason, onOpenLive, onOpenRem
 
   const cd = next ? countdown(next.start.getTime() - now) : null
   const local = userEmail.split('@')[0].split(/[._-]/)[0] ?? ''
-  const first = local.charAt(0).toUpperCase() + local.slice(1)
+  const first = userName || local.charAt(0).toUpperCase() + local.slice(1)
 
   return (
     <div className="min-h-dvh text-white">
