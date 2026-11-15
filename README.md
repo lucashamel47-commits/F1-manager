@@ -45,6 +45,7 @@ F1 Manager est une PWA : installable sur l'écran d'accueil, plein écran, avec 
 - Déployé gratuitement sur **GitHub Pages** : https://lucashamel47-commits.github.io/F1-manager/
 - Le workflow `.github/workflows/deploy.yml` se lance uniquement à chaque mise à jour de `main`
   (réglage unique : *Settings → Pages → Source : GitHub Actions*).
-- Le chemin de base `/F1-manager/` est fourni par la variable `VITE_BASE` au build ; en local, tout reste à `/`.
+- Le chemin de base `/F1-manager/` est fourni par la variable `VITE_BASE` au build GitHub Pages.
+  En local et sur **Vercel**, le build reste à la racine (`/`) : ne pas définir `VITE_BASE` (Vercel pose déjà `VERCEL=1`).
 - Installation sur iPad / iPhone : ouvrir l'URL dans **Safari → Partager → Sur l'écran d'accueil**.
 - Les icônes viennent de `assets-src/logo.svg` (PNG générés dans `public/`).
