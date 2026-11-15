@@ -13,6 +13,7 @@ import Legal from './pages/Legal'
 import { usePageFade } from './lib/motion'
 import { isPendingDeletion } from './lib/account'
 import AppMenu, { type MenuKey } from './components/AppMenu'
+import SupportForm from './components/SupportForm'
 
 interface User {
   id: string
@@ -32,6 +33,11 @@ const authError = (m: string): string => {
   if (/rate limit|too many/i.test(m)) return 'Trop de tentatives. Réessaie dans quelques minutes.'
   if (/password/i.test(m)) return '6 caractères minimum pour le mot de passe.'
   return 'Une erreur est survenue. Réessaie.'
+}
+
+const PAGE_LABEL: Record<MenuKey, string> = {
+  home: 'Accueil', live: 'Live', standings: 'Classements', calendar: 'Calendrier', stats: 'Statistiques',
+  duel: 'Duel', positions: 'Positions', favorites: 'Favoris', reminders: 'Rappels',
 }
 
 function App() {
@@ -229,6 +235,7 @@ function App() {
     return (
       <AppMenu active={active} email={user?.email ?? ''} onNavigate={navigate} onLogout={logout}>
         {screen}
+        <SupportForm email={user?.email ?? ''} page={PAGE_LABEL[active]} />
       </AppMenu>
     )
   }
@@ -253,6 +260,7 @@ function App() {
   return (
     <>
       <Home />
+      <SupportForm page="Page d'accueil (non connecté)" />
       {deleted && (
         <div role="status" className="app-in fixed inset-x-0 bottom-6 z-50 flex justify-center px-6">
           <p className="rounded-full border border-[#2b2c2d] bg-[#121314] px-5 py-3 text-sm text-[#d6d7d7] shadow-[0_8px_30px_rgba(0,0,0,0.5)]">Ton compte a bien été supprimé. À bientôt !</p>

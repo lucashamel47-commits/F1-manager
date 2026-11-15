@@ -1,0 +1,47 @@
+name: Messages « Écrire au support »
+
+# Toutes les 10 min : envoie à f1.managerrappel@gmail.com les messages laissés dans l'app (bouton « Écrire au support »).
+# Gratuit (dépôt public). Utilise les secrets déjà en place pour les rappels (Supabase service_role + Gmail SMTP).
+on:
+  schedule:
+    - cron: '3,13,23,33,43,53 * * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Simulation : affiche ce qui partirait, sans rien envoyer'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: send-support
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    env:
+      SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      GMAIL_USER: ${{ secrets.GMAIL_USER }}
+      GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+    steps:
+      - name: Configuration absente
+        if: env.SUPABASE_URL == '' || env.SUPABASE_SERVICE_ROLE_KEY == '' || env.GMAIL_USER == '' || env.GMAIL_APP_PASSWORD == ''
+        run: echo "Support non configuré (VITE_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, GMAIL_USER ou GMAIL_APP_PASSWORD manquant)."
+      - uses: actions/checkout@v4
+        if: env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' && env.GMAIL_USER != '' && env.GMAIL_APP_PASSWORD != ''
+      - uses: actions/setup-node@v4
+        if: env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' && env.GMAIL_USER != '' && env.GMAIL_APP_PASSWORD != ''
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+        if: env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' && env.GMAIL_USER != '' && env.GMAIL_APP_PASSWORD != ''
+      - run: node scripts/send-support.mjs
+        if: env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' && env.GMAIL_USER != '' && env.GMAIL_APP_PASSWORD != ''
+        env:
+          DRY_RUN: ${{ inputs.dry_run && '1' || '' }}

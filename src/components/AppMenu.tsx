@@ -1,5 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { LogoFull, LogoGlyph } from './Logo'
+import SupportIcon from './SupportIcon'
+import { openSupport } from '../lib/support'
 
 /**
  * Barre latérale de l'app connectée, calquée sur celle de Novex :
@@ -129,6 +131,13 @@ export default function AppMenu({ active, email, onNavigate, onLogout, children 
 
         <div className={`mt-3 w-full shrink-0 border-t border-[#2b2c2d] pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 ${r ? 'flex flex-col items-center gap-1' : ''}`}>
           {r ? (
+            <button onClick={openSupport} aria-label="Écrire au support" title="Écrire au support" data-support className="mb-1 grid size-10 place-items-center rounded-[10px] text-[#c4c5c5] hover:bg-white/[0.06] hover:text-white"><SupportIcon /></button>
+          ) : (
+            <button onClick={openSupport} data-support className="mb-3 flex h-9 w-full items-center justify-center gap-2 rounded-full bg-[#f7f8f8] text-[13.5px] font-medium tracking-[-0.01em] text-[#08090a] transition hover:bg-white">
+              <SupportIcon />Écrire au support
+            </button>
+          )}
+          {r ? (
             <>
               <span title={email} className="grid size-8 place-items-center rounded-full border border-[#2b2c2d] bg-[#17181a] text-[12px] font-medium uppercase text-[#d6d7d7]">{email.charAt(0) || '?'}</span>
               <button onClick={() => { setSheetOpen(false); onLogout() }} aria-label="Changer de compte" title="Changer de compte" className="grid size-10 place-items-center rounded-[10px] text-[#939494] hover:bg-white/[0.06] hover:text-white"><Icon d={P.logout} /></button>
@@ -198,6 +207,9 @@ export default function AppMenu({ active, email, onNavigate, onLogout, children 
             </button>
           ))}
         </div>
+        <button onClick={() => { setSheetOpen(false); openSupport() }} data-support className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#f7f8f8] text-[15px] font-medium text-[#08090a]">
+          <SupportIcon className="size-[18px]" />Écrire au support
+        </button>
         <div className="mt-3 flex items-center gap-3 rounded-2xl border border-[#1d1e1f] bg-[#141516] px-4 py-3">
           <span className="grid size-9 shrink-0 place-items-center rounded-full border border-[#2b2c2d] bg-[#1b1c1d] text-[13px] font-medium uppercase text-[#d6d7d7]" aria-hidden>{email.charAt(0) || '?'}</span>
           <span className="min-w-0 flex-1 truncate text-[13px] text-[#c4c5c5]">{email}</span>
