@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Script d’icônes (scripts/build-icons.py)
+__pycache__/
+*.pyc

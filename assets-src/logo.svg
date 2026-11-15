@@ -1,1 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#08090A"/><g fill="#F7F8F8" transform="translate(214.5 193.4) scale(1.1419)"><polygon points="0,0 521,0 521,131 131,131"/><polygon points="0,108 131,239 131,226 262,357 131,357 131,558 0,558"/><polygon points="239,226 390,226 521,357 370,357"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" fill="#08090A"/>
+  <g fill="#F7F8F8" transform="translate(214.5 193.4) scale(1.1419)">
+    <polygon points="0,0 521,0 521,131 131,131"/>
+    <polygon points="0,108 131,239 131,226 262,357 131,357 131,558 0,558"/>
+    <polygon points="239,226 390,226 521,357 370,357"/>
+  </g>
+</svg>
