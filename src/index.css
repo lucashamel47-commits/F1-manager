@@ -87,8 +87,12 @@
 .kicker { font-size: 11px; font-weight: 510; letter-spacing: 0.06em; text-transform: uppercase; color: #636464; }
 
 /* Boutons Novex : pilule, 44 px, 15 px / 500. Principal = blanc sur noir ; secondaire = surface sombre + bordure --border-loud. */
-.btn-primary { background: #fff; color: #0a0a0a; font-weight: 500; }
-.btn-primary:hover { background: #e4e5e5; }
+.btn-primary { background: var(--accent, #fff); color: var(--accent-on, #0a0a0a); font-weight: 500; }
+.btn-primary:hover { filter: brightness(0.92); }
+html[data-accent="bleu"] { --accent: #2563EB; --accent-on: #ffffff; }
+html[data-accent="violet"] { --accent: #8B5CF6; --accent-on: #ffffff; }
+html[data-accent="ambre"] { --accent: #F59E0B; --accent-on: #0a0a0a; }
+html { --accent: #ffffff; --accent-on: #0a0a0a; }
 .btn-ghost { background: #161718; color: #d6d7d7; border: 1px solid #3d3e3f; font-weight: 500; }
 .btn-ghost:hover { background: #222324; color: #fff; }
 

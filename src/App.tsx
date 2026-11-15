@@ -14,6 +14,7 @@ import { usePageFade } from './lib/motion'
 import { isPendingDeletion } from './lib/account'
 import AppMenu, { type MenuKey } from './components/AppMenu'
 import SupportForm from './components/SupportForm'
+import Settings from './pages/Settings'
 
 interface User {
   id: string
@@ -73,8 +74,13 @@ function App() {
 
   // Une fois connecté, la route #/connexion n'a plus de sens : on la retire de l'URL.
   useEffect(() => {
-    if (loggedIn && route !== 'mentions') clearRoute()
+    if (loggedIn && route !== 'mentions' && route !== 'parametres') clearRoute()
   }, [loggedIn]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Les paramètres ne sont accessibles qu'une fois connecté.
+  useEffect(() => {
+    if (ready && !loggedIn && route === 'parametres') replaceRoute('connexion')
+  }, [ready, loggedIn, route])
 
   usePageFade(`${loggedIn}-${mode}-${route}`)
 
@@ -198,15 +204,30 @@ function App() {
                     : seasonPage === 'standings' ? 'standings' : 'home')
             : 'home'
     const openSeason = (p: HorsPage) => { setHorsPage(p); setSeasonNav((n) => n + 1); setMode('hors') }
+    const leaveSettings = () => { if (route === 'parametres') clearRoute() }
     const navigate = (k: MenuKey) => {
+      leaveSettings()
       if (k === 'home') setMode('select')
       else if (k === 'live') setMode('live')
       else if (k === 'reminders') setMode('notif')
       else openSeason(k === 'duel' ? 'stats-duel' : k === 'positions' ? 'stats-positions' : k)
       window.scrollTo(0, 0)
     }
+    const openSettings = () => { window.location.hash = '#/parametres'; window.scrollTo(0, 0) }
+    const openReminders = () => { leaveSettings(); setMode('notif'); window.scrollTo(0, 0) }
     let screen
-    if (mode === 'notif') screen = <Reminders onBack={() => setMode('select')} user={supabaseEnabled ? user : null} onDeleted={accountDeleted} />
+    if (route === 'parametres') {
+      screen = (
+        <Settings
+          user={user}
+          onNameChange={(name) => setUser((u) => u ? { ...u, name } : u)}
+          onLogout={() => { leaveSettings(); logout() }}
+          onDeleted={supabaseEnabled ? accountDeleted : undefined}
+          onOpenReminders={openReminders}
+          onBack={leaveSettings}
+        />
+      )
+    } else if (mode === 'notif') screen = <Reminders onBack={() => setMode('select')} user={supabaseEnabled ? user : null} />
     else if (mode === 'live') screen = <LiveMode onBack={() => setMode('select')} />
     else if (mode === 'hors') {
       screen = (
@@ -238,9 +259,18 @@ function App() {
       )
     }
     return (
-      <AppMenu active={active} email={user?.email ?? ''} onNavigate={navigate} onLogout={logout}>
+      <AppMenu
+        active={active}
+        email={user?.email ?? ''}
+        name={user?.name}
+        settingsOpen={route === 'parametres'}
+        onNavigate={navigate}
+        onOpenSettings={openSettings}
+        onCloseSettings={leaveSettings}
+        onLogout={logout}
+      >
         {screen}
-        <SupportForm email={user?.email ?? ''} page={PAGE_LABEL[active]} />
+        <SupportForm email={user?.email ?? ''} page={route === 'parametres' ? 'Paramètres' : PAGE_LABEL[active]} />
       </AppMenu>
     )
   }
