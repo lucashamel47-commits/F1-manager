@@ -224,6 +224,7 @@ function App() {
           onLogout={() => { leaveSettings(); logout() }}
           onDeleted={supabaseEnabled ? accountDeleted : undefined}
           onOpenReminders={openReminders}
+          onBack={leaveSettings}
         />
       )
     } else if (mode === 'notif') screen = <Reminders onBack={() => setMode('select')} user={supabaseEnabled ? user : null} />
@@ -265,6 +266,7 @@ function App() {
         settingsOpen={route === 'parametres'}
         onNavigate={navigate}
         onOpenSettings={openSettings}
+        onCloseSettings={leaveSettings}
         onLogout={logout}
       >
         {screen}

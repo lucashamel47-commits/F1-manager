@@ -25,7 +25,7 @@ export default function DeleteAccount({ user, onDeleted }: { user: DeleteAccount
   }
   if (!open) {
     return (
-      <div className="mt-10 flex justify-center">
+      <div className="mt-6 flex justify-start">
         <button onClick={() => setOpen(true)} className="min-h-11 px-4 rounded-full text-[13px] font-medium text-[#7d7e7e] hover:text-[#d6d7d7] hover:bg-white/[0.04]">
           Supprimer mon compte
         </button>

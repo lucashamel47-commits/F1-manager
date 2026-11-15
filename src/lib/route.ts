@@ -5,7 +5,7 @@ import { useSyncExternalStore } from 'react'
  *   #/connexion      → page de connexion
  *   #/inscription    → page d'inscription
  *   #/mentions       → mentions légales & confidentialité (connecté ou non)
- *   #/parametres     → paramètres du compte (connecté ; sections : /profil, /compte, /rappels, /preferences, /support)
+ *   #/parametres     → réglages (connecté ; sections : /compte, /securite, /apparence, /rappels, /contact)
  *   autre / vide     → accueil (les ancres #faq, #apercu… restent de simples ancres de la page)
  * Le bouton « Retour » du navigateur fonctionne : chaque lien ajoute une entrée d'historique.
  */

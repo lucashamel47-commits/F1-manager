@@ -4,7 +4,9 @@ import './index.css'
 import App from './App.tsx'
 import PwaStatus from './components/PwaStatus.tsx'
 import { initSpotlight } from './lib/spotlight'
+import { initAccent } from './lib/accent'
 
+initAccent()
 initSpotlight()
 
 createRoot(document.getElementById('root')!).render(
