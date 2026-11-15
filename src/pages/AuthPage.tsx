@@ -1,11 +1,39 @@
-import { Brand } from '../components/landing/Sections'
+import type { ReactNode } from 'react'
+import { LogoGlyph } from '../components/Logo'
 import AuthCard, { type AuthProps } from '../components/AuthForm'
 
-/** Page dédiée connexion / inscription : logo, formulaire, lien pour passer de l'un à l'autre, retour à l'accueil. */
+/**
+ * Coque des pages d'accès, structure Novex (sign-in / sign-up) : une colonne de 320 px centrée,
+ * logo, titre court, petit « ← Retour », formulaire, lien pour basculer. Pas d'aperçu ni de visuel à côté.
+ */
+export function AuthShell({ title, back = true, children, footer }: { title: string; back?: boolean; children: ReactNode; footer?: ReactNode }) {
+  return (
+    <div className="auth-page flex min-h-dvh flex-col bg-[#08090a] text-[#f7f8f8]">
+      <main className="flex flex-1 items-center justify-center px-6 py-16">
+        <div className="app-in w-full max-w-[320px]">
+          <a href="#/" aria-label="F1 Manager, retour à l'accueil" className="mx-auto grid size-9 place-items-center">
+            <LogoGlyph className="h-[30px] w-auto" />
+          </a>
+          <h1 className="mt-7 text-center text-[20px] font-[510] leading-6 tracking-[-0.01em]">{title}</h1>
+          {back && (
+            <a href="#/" className="mt-7 inline-flex min-h-8 items-center text-[13px] text-[#636464] transition-colors hover:text-[#f7f8f8]">← Retour à l'accueil</a>
+          )}
+          <div className={back ? 'mt-1.5' : 'mt-8'}>{children}</div>
+          {footer && <p className="mt-9 text-center text-[13px] text-[#636464]">{footer}</p>}
+        </div>
+      </main>
+      <footer className="pb-6 text-center">
+        <a href="#/mentions" className="inline-flex min-h-9 items-center px-3 text-[12px] text-[#636464] transition-colors hover:text-[#939494]">Mentions légales & confidentialité</a>
+      </footer>
+    </div>
+  )
+}
+
+/** Pages Connexion / Inscription. */
 export default function AuthPage(props: AuthProps & { showConfetti: boolean }) {
   const { isLogin, showConfetti } = props
   return (
-    <div className="auth-page flex min-h-dvh flex-col text-white">
+    <>
       {showConfetti && (
         <div className="pointer-events-none fixed inset-0 z-50">
           {Array.from({ length: 20 }).map((_, i) => (
@@ -17,24 +45,18 @@ export default function AuthPage(props: AuthProps & { showConfetti: boolean }) {
           ))}
         </div>
       )}
-      <header className="mx-auto flex h-16 w-full max-w-[82.5rem] items-center justify-between px-6 lg:px-10">
-        <a href="#/" aria-label="F1 Manager, retour à l'accueil">
-          <Brand />
-        </a>
-        <a href="#/" className="inline-flex h-8 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-medium text-[#939494] transition hover:text-white">
-          <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
-          Retour à l'accueil
-        </a>
-      </header>
-      <main className="flex flex-1 flex-col items-center justify-center px-4 pb-20 pt-6 sm:px-6">
-        <AuthCard {...props} />
-        <p className="mt-6 text-sm text-zinc-400">
+      <AuthShell
+        key={isLogin ? 'login' : 'signup'}
+        title={isLogin ? 'Connexion à F1 Manager' : 'Créer un compte F1 Manager'}
+        footer={<>
           {isLogin ? 'Pas encore de compte ? ' : 'Déjà un compte ? '}
-          <a href={isLogin ? '#/inscription' : '#/connexion'} className="font-medium text-white underline underline-offset-4 decoration-white/30 transition hover:decoration-white">
-            {isLogin ? 'Créer un compte' : 'Se connecter'}
+          <a href={isLogin ? '#/inscription' : '#/connexion'} className="text-[#939494] transition-colors hover:text-[#f7f8f8]">
+            {isLogin ? 'S’inscrire' : 'Se connecter'}
           </a>
-        </p>
-      </main>
-    </div>
+        </>}
+      >
+        <AuthCard {...props} />
+      </AuthShell>
+    </>
   )
 }
