@@ -187,7 +187,8 @@ export default function LivePage() {
   )
   const followEl = follow && store && snap && snap.rows.length > 0 ? (
     <div className="w-full px-3 sm:px-5 lg:px-6 pt-3">
-      <FollowView loc={rt.loc} car={rt.car} now={rt.now} snap={snap} t={rt.t} selected={sel} onSelect={(n) => { setSel(n); rt.setWatch(n) }} version={rt.version} isLive={isLive} onClose={() => setFollow(false)} />
+      <FollowView loc={rt.loc} car={rt.car} now={rt.now} snap={snap} t={rt.t} selected={sel} onSelect={(n) => { setSel(n); rt.setWatch(n) }} version={rt.version} isLive={isLive} onClose={() => setFollow(false)}
+        playback={isLive ? undefined : { playing: rt.playing, toggle: rt.playing ? rt.pause : rt.play, speed: rt.speed, speeds: [1, 10, 50], setSpeed: rt.setSpeed }} />
     </div>
   ) : null
   const track = snap ? TRACK_LABEL[snap.track.kind] : null
