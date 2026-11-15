@@ -41,12 +41,15 @@ const readJSON = <T,>(k: string, d: T): T => { try { const v = localStorage.getI
 interface Props {
   active: MenuKey
   email: string
+  name?: string
+  settingsOpen?: boolean
   onNavigate: (k: MenuKey) => void
+  onOpenSettings: () => void
   onLogout: () => void
   children: ReactNode
 }
 
-export default function AppMenu({ active, email, onNavigate, onLogout, children }: Props) {
+export default function AppMenu({ active, email, name, settingsOpen, onNavigate, onOpenSettings, onLogout, children }: Props) {
   const [collapsed, setCollapsed] = useState(() => localStorage.getItem('f1-sidebar-collapsed') === '1')
   const [closedGroups, setClosedGroups] = useState<Record<string, boolean>>(() => readJSON('f1-sidebar-groups', {}))
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -62,6 +65,10 @@ export default function AppMenu({ active, email, onNavigate, onLogout, children 
 
 
   const go = (k: MenuKey) => { setSheetOpen(false); onNavigate(k) }
+  const openSettings = () => { setSheetOpen(false); onOpenSettings() }
+  const initial = (name || email).charAt(0) || '?'
+  const profileOn = 'flex items-center rounded-[10px] transition hover:bg-white/[0.04] hover:text-white'
+  const profileActive = settingsOpen ? 'bg-[#f7f8f8]/[0.09] text-[#f7f8f8]' : 'text-[#c4c5c5]'
 
   const panel = () => {
     const r = collapsed
@@ -108,7 +115,7 @@ export default function AppMenu({ active, email, onNavigate, onLogout, children 
                   </button>
                 )}
                 {!shut && g.items.map(([k, label]) => {
-                  const on = active === k
+                  const on = !settingsOpen && active === k
                   return (
                     <button
                       key={k}
@@ -139,13 +146,20 @@ export default function AppMenu({ active, email, onNavigate, onLogout, children 
           )}
           {r ? (
             <>
-              <span title={email} className="grid size-8 place-items-center rounded-full border border-[#2b2c2d] bg-[#17181a] text-[12px] font-medium uppercase text-[#d6d7d7]">{email.charAt(0) || '?'}</span>
+              <button type="button" data-profile onClick={openSettings} aria-label="Paramètres" title={name || email} aria-current={settingsOpen ? 'page' : undefined} className={`grid size-10 place-items-center rounded-[10px] ${settingsOpen ? 'bg-[#f7f8f8]/[0.09]' : 'hover:bg-white/[0.06]'}`}>
+                <span className="grid size-8 place-items-center rounded-full border border-[#2b2c2d] bg-[#17181a] text-[12px] font-medium uppercase text-[#d6d7d7]">{initial}</span>
+              </button>
               <button onClick={() => { setSheetOpen(false); onLogout() }} aria-label="Changer de compte" title="Changer de compte" className="grid size-10 place-items-center rounded-[10px] text-[#939494] hover:bg-white/[0.06] hover:text-white"><Icon d={P.logout} /></button>
             </>
           ) : (
-            <div className="flex items-center gap-2.5 px-1.5">
-              <span className="grid size-8 shrink-0 place-items-center rounded-full border border-[#2b2c2d] bg-[#17181a] text-[12px] font-medium uppercase text-[#d6d7d7]" aria-hidden>{email.charAt(0) || '?'}</span>
-              <span className="min-w-0 flex-1 truncate text-[13px] text-[#c4c5c5]">{email}</span>
+            <div className="flex items-center gap-0.5">
+              <button type="button" data-profile onClick={openSettings} aria-label="Paramètres" aria-current={settingsOpen ? 'page' : undefined} className={`flex min-w-0 flex-1 items-center gap-2.5 px-1.5 py-1.5 text-left ${profileOn} ${profileActive}`}>
+                <span className="grid size-8 shrink-0 place-items-center rounded-full border border-[#2b2c2d] bg-[#17181a] text-[12px] font-medium uppercase text-[#d6d7d7]" aria-hidden>{initial}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[13px] text-[#f7f8f8]">{name || email}</span>
+                  {name && <span className="block truncate text-[11px] text-[#7b7c7c]">{email}</span>}
+                </span>
+              </button>
               <button onClick={() => { setSheetOpen(false); onLogout() }} aria-label="Changer de compte" title="Changer de compte" className="grid size-9 shrink-0 place-items-center rounded-lg text-[#7b7c7c] hover:bg-white/[0.06] hover:text-white"><Icon d={P.logout} /></button>
             </div>
           )}
@@ -170,7 +184,7 @@ export default function AppMenu({ active, email, onNavigate, onLogout, children 
       <nav aria-label="Navigation" className="fixed inset-x-0 bottom-0 z-[60] border-t border-[#2b2c2d] bg-[#08090a] pb-[env(safe-area-inset-bottom)] md:hidden">
         <div className="mx-auto grid h-[3.75rem] max-w-lg grid-cols-5">
           {TABS.map(([k, label, icon]) => {
-            const on = k === 'more' ? moreActive || sheetOpen : active === k && !sheetOpen
+            const on = settingsOpen && !sheetOpen ? false : k === 'more' ? moreActive || sheetOpen : active === k && !sheetOpen
             return (
               <button
                 key={k}
@@ -210,9 +224,15 @@ export default function AppMenu({ active, email, onNavigate, onLogout, children 
         <button onClick={() => { setSheetOpen(false); openSupport() }} data-support className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#f7f8f8] text-[15px] font-medium text-[#08090a]">
           <SupportIcon className="size-[18px]" />Écrire au support
         </button>
-        <div className="mt-3 flex items-center gap-3 rounded-2xl border border-[#1d1e1f] bg-[#141516] px-4 py-3">
-          <span className="grid size-9 shrink-0 place-items-center rounded-full border border-[#2b2c2d] bg-[#1b1c1d] text-[13px] font-medium uppercase text-[#d6d7d7]" aria-hidden>{email.charAt(0) || '?'}</span>
-          <span className="min-w-0 flex-1 truncate text-[13px] text-[#c4c5c5]">{email}</span>
+        <div className="mt-3 flex items-center gap-1 rounded-2xl border border-[#1d1e1f] bg-[#141516] pr-2">
+          <button type="button" data-profile onClick={openSettings} aria-label="Paramètres" className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3 text-left">
+            <span className="grid size-9 shrink-0 place-items-center rounded-full border border-[#2b2c2d] bg-[#1b1c1d] text-[13px] font-medium uppercase text-[#d6d7d7]" aria-hidden>{initial}</span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[14px] font-medium text-[#f7f8f8]">{name || 'Paramètres'}</span>
+              <span className="block truncate text-[12px] text-[#7b7c7c]">{email}</span>
+            </span>
+            <span className="text-[#4a4b4c]" aria-hidden>›</span>
+          </button>
           <button onClick={() => { setSheetOpen(false); onLogout() }} className="shrink-0 rounded-full border border-[#2b2c2d] px-3.5 py-2 text-[12.5px] font-medium text-[#d6d7d7]">Changer de compte</button>
         </div>
         <a href="#/mentions" onClick={() => setSheetOpen(false)} className="mt-3 block text-center text-[12px] text-[#6e6f70]">Mentions légales &amp; confidentialité</a>
