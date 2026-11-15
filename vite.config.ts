@@ -3,8 +3,10 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// En production sur GitHub Pages l'app vit sous /F1-manager/ (voir .github/workflows/deploy.yml).
-const base = process.env.VITE_BASE ?? '/'
+// Chemin de base de l'app :
+// - Vercel et local : « / » (Vercel définit VERCEL=1 ; on n'impose pas de sous-chemin).
+// - GitHub Pages : « /F1-manager/ », fourni par VITE_BASE dans .github/workflows/deploy.yml.
+const base = process.env.VITE_BASE || '/'
 // Version jointe aux messages du support : commit (GitHub Actions) + date du build.
 const appVersion = `${(process.env.GITHUB_SHA ?? 'local').slice(0, 7)} · ${new Date().toISOString().slice(0, 10)}`
 

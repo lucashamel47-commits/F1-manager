@@ -25,6 +25,7 @@ Ne jamais mettre la clé `service_role` ni le mot de passe d'application Gmail d
 Supabase › **Authentication** :
 
 - **URL Configuration** › *Site URL* = `https://lucashamel47-commits.github.io/F1-manager/` et ajoute la même adresse dans *Redirect URLs*. (Indispensable pour les liens de confirmation et « mot de passe oublié ».)
+- Si l'app est aussi sur **Vercel**, ajoute l'URL de production (et éventuellement les previews `https://*.vercel.app`) dans *Redirect URLs*. L'app envoie déjà `emailRedirectTo` / `redirectTo` vers l'origine courante (`APP_URL`) : sans cette entrée, les emails de confirmation et de réinitialisation seraient refusés, ou renverraient vers GitHub Pages.
 - **Sign In / Providers › Email** : *Email* activé. Deux options :
   - **Simple (pour démarrer)** : désactive *Confirm email*. Les gens s'inscrivent et entrent directement. Contre : pas de vérification de l'adresse, et pas de mot de passe oublié par email.
   - **Plus tard (vraie app)** : réactive *Confirm email* **et** configure un SMTP personnalisé dans Supabase › Authentication › SMTP Settings (tu peux y mettre le même Gmail : `smtp.gmail.com`, port `465`, identifiant = le Gmail, mot de passe = le mot de passe d'application). Sans SMTP personnalisé, Supabase n'envoie des emails qu'aux membres de ton équipe Supabase : les autres utilisateurs ne recevraient jamais le lien de confirmation.
