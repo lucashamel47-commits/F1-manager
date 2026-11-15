@@ -1,3 +1,5 @@
+import SupportIcon from '../SupportIcon'
+import { openSupport } from '../../lib/support'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { circuits } from '../../data/circuits'
 import { drivers } from '../../data/divers'
@@ -301,6 +303,7 @@ export function Footer() {
             </ul></nav>
             <nav aria-label="Compte"><p className={h}>Compte</p><ul>
               <li><a className={a} href="#/inscription">Créer un compte</a></li><li><a className={a} href="#/connexion">Se connecter</a></li>
+              <li><button type="button" className={`${a} gap-1.5`} onClick={openSupport} data-support><SupportIcon className="size-3.5" />Écrire au support</button></li>
             </ul></nav>
             <nav aria-label="Données"><p className={h}>Données</p><ul>
               <li><a className={a} href="https://openf1.org" target="_blank" rel="noopener noreferrer">OpenF1</a></li>
