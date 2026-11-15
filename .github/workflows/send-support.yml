@@ -1,6 +1,7 @@
 name: Messages « Écrire au support »
 
 # Toutes les 10 min : envoie à f1.managerrappel@gmail.com les messages laissés dans l'app (bouton « Écrire au support »).
+# Chaque message est aussi archivé en JSON dans le bucket Supabase Storage PRIVÉ « support-archive » (créé si absent).
 # Gratuit (dépôt public). Utilise les secrets déjà en place pour les rappels (Supabase service_role + Gmail SMTP).
 on:
   schedule:
