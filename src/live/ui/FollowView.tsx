@@ -28,10 +28,28 @@ const lerpAngle = (a: number, b: number, k: number) => {
 }
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v))
 
-export default function FollowView({ loc, car, now, snap, t, selected, onSelect, version, isLive, onClose }: {
+/** Commandes du rejeu reprises dans le plein écran téléphone (la barre du rejeu de la page est masquée dessous). */
+export interface FollowPlayback { playing: boolean; toggle: () => void; speed: number; speeds: number[]; setSpeed: (s: number) => void }
+
+/** Téléphone (< 768 px de large, ou paysage peu haut) : le suivi passe en plein écran. */
+const COMPACT_MQ = '(max-width: 767px), (max-height: 500px) and (pointer: coarse)'
+const useCompact = () => {
+  const [c, setC] = useState(() => typeof window !== 'undefined' && window.matchMedia(COMPACT_MQ).matches)
+  useEffect(() => {
+    const m = window.matchMedia(COMPACT_MQ)
+    const on = () => setC(m.matches)
+    m.addEventListener('change', on)
+    return () => m.removeEventListener('change', on)
+  }, [])
+  return c
+}
+
+export default function FollowView({ loc, car, now, snap, t, selected, onSelect, version, isLive, onClose, playback }: {
   loc: LocationStore | null; car: CarDataStore | null; now: () => number; snap: Snapshot; t: number
   selected: number | null; onSelect: (n: number) => void; version: number; isLive: boolean; onClose: () => void
+  playback?: FollowPlayback
 }) {
+  const compact = useCompact()
   const wrapRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [mode, setMode] = useState<Mode>('fixe')
@@ -40,11 +58,18 @@ export default function FollowView({ loc, car, now, snap, t, selected, onSelect,
   const [hasPos, setHasPos] = useState<boolean | null>(null)
 
   const rowsRef = useRef<Row[]>(snap.rows)
-  const st = useRef({ mode, following, selected, zoom: 1, ovZoom: 1, pan: [0, 0] as [number, number], heading: 0 })
+  const st = useRef({ mode, following, selected, compact, zoom: 1, ovZoom: 1, pan: [0, 0] as [number, number], heading: 0 })
   const cam = useRef<Cam>({ cx: 0, cy: 0, s: 1, rot: 0, ready: false })
   const hits = useRef<Hit[]>([])
   useEffect(() => { rowsRef.current = snap.rows })
-  useEffect(() => { st.current.mode = mode; st.current.following = following; st.current.selected = selected })
+  useEffect(() => { st.current.mode = mode; st.current.following = following; st.current.selected = selected; st.current.compact = compact })
+  // plein écran téléphone : la page dessous ne défile plus
+  useEffect(() => {
+    if (!compact) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [compact])
   // nouvelle voiture choisie : on repart en suivi
   const [prevSel, setPrevSel] = useState(selected)
   if (prevSel !== selected) { setPrevSel(selected); if (selected != null) setFollowing(true) }
@@ -114,6 +139,10 @@ export default function FollowView({ loc, car, now, snap, t, selected, onSelect,
       const S = st.current, c = cam.current
       const tt = now()
       const base = Math.min(w, h)
+      // téléphone : tout un peu plus gros, et la voiture un peu sous le centre (le bandeau d'infos est en haut)
+      const big = S.compact ? 1.3 : 1
+      const oy = S.compact && S.following && S.selected != null ? Math.min(40, h * 0.06) : 0
+      const cyS = h / 2 + oy
       // cible de la caméra
       let tx: number, ty: number, ts_: number, trot = 0
       const me = S.selected != null ? pos(S.selected, tt) : null
@@ -140,7 +169,7 @@ export default function FollowView({ loc, car, now, snap, t, selected, onSelect,
       const cos = Math.cos(c.rot), sin = Math.sin(c.rot)
       const proj = (x: number, y: number): [number, number] => {
         const X = (x - c.cx) * c.s, Y = (-y - c.cy) * c.s
-        return [w / 2 + X * cos - Y * sin, h / 2 + X * sin + Y * cos]
+        return [w / 2 + X * cos - Y * sin, cyS + X * sin + Y * cos]
       }
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
@@ -150,7 +179,7 @@ export default function FollowView({ loc, car, now, snap, t, selected, onSelect,
       // tracé : bande d'asphalte + bords
       if (track) {
         ctx.save()
-        ctx.translate(w / 2, h / 2); ctx.rotate(c.rot); ctx.scale(c.s, c.s); ctx.translate(-c.cx, -c.cy)
+        ctx.translate(w / 2, cyS); ctx.rotate(c.rot); ctx.scale(c.s, c.s); ctx.translate(-c.cx, -c.cy)
         ctx.lineJoin = 'round'; ctx.lineCap = 'round'
         const band = Math.max(150, 7 / c.s)
         ctx.strokeStyle = 'rgba(255,255,255,0.16)'; ctx.lineWidth = band + 2.5 / c.s; ctx.stroke(track.path)
@@ -179,7 +208,7 @@ export default function FollowView({ loc, car, now, snap, t, selected, onSelect,
           if (prev) {
             const f = 1 - i / TRAIL_STEPS
             ctx.strokeStyle = col; ctx.globalAlpha = 0.05 + f * f * 0.9
-            ctx.lineWidth = 1.5 + f * 3.5
+            ctx.lineWidth = (1.5 + f * 3.5) * big
             ctx.beginPath(); ctx.moveTo(prev[0], prev[1]); ctx.lineTo(q[0], q[1]); ctx.stroke()
           }
           prev = q
@@ -198,7 +227,7 @@ export default function FollowView({ loc, car, now, snap, t, selected, onSelect,
       }
       hits.current = cars.map((k) => ({ n: k.r.n, x: k.x, y: k.y }))
       const near = S.following && me
-      const R = near ? 7 : 5
+      const R = (near ? 7 : 5) * big
       for (const k of cars) {
         if (k.on) continue
         ctx.globalAlpha = k.r.out ? 0.3 : S.selected != null ? 0.85 : 1
@@ -210,6 +239,7 @@ export default function FollowView({ loc, car, now, snap, t, selected, onSelect,
       const mine = cars.find((k) => k.on)
       if (mine) {
         const a = S.heading + c.rot
+        ctx.save(); ctx.translate(mine.x, mine.y); ctx.scale(big, big); ctx.translate(-mine.x, -mine.y)
         ctx.beginPath(); ctx.arc(mine.x, mine.y, 17, 0, Math.PI * 2)
         ctx.fillStyle = 'rgba(255,255,255,0.06)'; ctx.fill()
         ctx.lineWidth = 1.25; ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.stroke()
@@ -221,10 +251,11 @@ export default function FollowView({ loc, car, now, snap, t, selected, onSelect,
         ctx.beginPath(); ctx.arc(mine.x, mine.y, 8.5, 0, Math.PI * 2)
         ctx.fillStyle = mine.r.color; ctx.fill()
         ctx.lineWidth = 2.5; ctx.strokeStyle = '#ffffff'; ctx.stroke()
+        ctx.restore()
       }
 
       // étiquettes sans chevauchement (glouton : voiture suivie puis ordre de course)
-      ctx.font = `600 11px ${FONT}`
+      ctx.font = `600 ${S.compact ? 12.5 : 11}px ${FONT}`
       ctx.textBaseline = 'middle'
       const placed: [number, number, number, number][] = cars.map((k) => [k.x - R - 1, k.y - R - 1, k.x + R + 1, k.y + R + 1])
       // zones couvertes par le HUD et les commandes : pas d'étiquette dessous
@@ -239,8 +270,8 @@ export default function FollowView({ loc, car, now, snap, t, selected, onSelect,
       for (const k of order) {
         if (count >= maxLabels) break
         const txt = k.on ? `P${k.r.pos}  ${k.r.acr}` : k.r.acr
-        const tw = ctx.measureText(txt).width + 14, th = 20
-        const gap = k.on ? 14 : R + 5
+        const tw = ctx.measureText(txt).width + 14, th = S.compact ? 23 : 20
+        const gap = k.on ? 14 * big : R + 5
         const g2 = gap * 2.4
         // positions proches d'abord, puis plus loin (reliées à la voiture par un trait fin)
         const cands: [number, number][] = [
@@ -359,7 +390,28 @@ export default function FollowView({ loc, car, now, snap, t, selected, onSelect,
   const ghost = `${pill} bg-[#08090a]/85 border border-white/[0.12] text-zinc-200 hover:bg-[#161718]`
 
   return (
-    <section className="bg-[#08090a] border border-white/10 rounded-3xl overflow-hidden" aria-label="Suivre une voiture">
+    <section
+      className={compact
+        ? 'fixed inset-0 z-[65] flex flex-col bg-[#08090a] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]'
+        : 'bg-[#08090a] border border-white/10 rounded-3xl overflow-hidden'}
+      aria-label="Suivre une voiture"
+      aria-modal={compact || undefined}
+      role={compact ? 'dialog' : undefined}
+    >
+      {compact ? (
+        <header className="flex shrink-0 items-center gap-2 px-2 py-1.5 border-b border-white/[0.07]">
+          <button onClick={onClose} className="size-11 grid place-items-center rounded-full text-zinc-300 active:bg-white/[0.08]" aria-label="Fermer le suivi">
+            <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+          </button>
+          <h2 className="min-w-0 flex-1 truncate text-[15px] font-semibold tracking-tight">Suivre {me ? me.acr : 'une voiture'}</h2>
+          {isLive && <span className="rounded-full bg-white text-[#08090a] text-[10px] font-semibold uppercase tracking-[0.14em] px-2.5 py-1">Direct</span>}
+          <div role="radiogroup" aria-label="Orientation de la caméra" className="inline-flex p-1 rounded-full bg-[#141516] border border-white/[0.08]">
+            {([['fixe', 'Fixe'], ['embarquee', 'Embarquée']] as const).map(([k, l]) => (
+              <button key={k} role="radio" aria-checked={mode === k} aria-label={k === 'fixe' ? 'Carte fixe' : 'Caméra embarquée'} onClick={() => setMode(k)} className={`min-h-9 px-3 rounded-full text-[12.5px] font-medium transition-colors ${mode === k ? 'bg-white text-[#08090a]' : 'text-zinc-400'}`}>{l}</button>
+            ))}
+          </div>
+        </header>
+      ) : (
       <header className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 py-3 border-b border-white/[0.07]">
         <div className="flex items-center gap-3 min-w-0">
           <h2 className="text-[15px] font-semibold tracking-tight">Suivre une voiture</h2>
@@ -376,12 +428,32 @@ export default function FollowView({ loc, car, now, snap, t, selected, onSelect,
           </button>
         </div>
       </header>
+      )}
 
-      <div ref={wrapRef} className="relative h-[60dvh] sm:h-[64dvh] lg:h-[min(70dvh,760px)] min-h-[22rem]">
+      <div ref={wrapRef} className={compact ? 'relative min-h-0 flex-1' : 'relative h-[60dvh] sm:h-[64dvh] lg:h-[min(70dvh,760px)] min-h-[22rem]'}>
         <canvas ref={canvasRef} data-follow-canvas className="absolute inset-0 block select-none [touch-action:none] cursor-crosshair" role="img" aria-label={me ? `Caméra centrée sur ${me.name}` : 'Carte du circuit : touchez une voiture pour la suivre'} />
 
+        {/* HUD compact (téléphone) : un seul bandeau en haut, la voiture reste dégagée */}
+        {me && compact && (
+          <div data-overlay className="absolute left-2 right-2 top-2 sm:right-auto sm:min-w-[22rem] flex items-center gap-3 rounded-2xl bg-[#08090a]/90 border border-white/[0.12] pl-2.5 pr-2 py-2 pointer-events-none">
+            <span className="h-9 w-1 shrink-0 rounded-full" style={{ backgroundColor: me.color }} />
+            <div className="min-w-0 flex-1">
+              <p className="flex items-baseline gap-2 leading-tight"><span className="text-[17px] font-semibold tabular-nums">P{me.pos}</span><span className="truncate text-[15px] font-semibold">{me.acr}</span></p>
+              <p className="truncate text-[12px] tabular-nums text-zinc-400">{me.pos === 1 ? (snap.timingMode === 'race' ? 'En tête' : 'Meilleur temps') : `${ahead?.acr ?? ''} ${me.int}`.trim()} · Tour {me.lapNo || '—'}</p>
+            </div>
+            <div className="text-right">
+              <p className={`text-[24px] font-semibold leading-none tabular-nums tracking-[-0.03em] ${telStale ? 'text-zinc-600' : ''}`}>{tel && !telStale ? tel.speed : '—'}</p>
+              <p className="mt-0.5 text-[10px] uppercase tracking-[0.14em] text-zinc-500">km/h</p>
+            </div>
+            <div className="size-10 shrink-0 grid place-items-center rounded-xl border border-white/[0.12] bg-[#111213]">
+              <span className="text-[20px] font-semibold tabular-nums leading-none" aria-label="Rapport engagé">{tel && !telStale ? (tel.gear === 0 ? 'N' : tel.gear) : '—'}</span>
+            </div>
+            {me.tyre && <TyreDot c={me.tyre.compound} size={20} />}
+          </div>
+        )}
+
         {/* HUD */}
-        {me && (
+        {me && !compact && (
           <div data-overlay className="absolute left-3 top-3 sm:left-4 sm:top-4 w-[min(17.5rem,calc(100%-1.5rem))] rounded-2xl bg-[#08090a]/90 border border-white/[0.1] overflow-hidden pointer-events-none">
             <div className="flex items-center gap-3 px-4 pt-3.5 pb-3">
               <span className="w-1 self-stretch rounded-full" style={{ backgroundColor: me.color }} />
@@ -425,7 +497,7 @@ export default function FollowView({ loc, car, now, snap, t, selected, onSelect,
 
         {/* messages */}
         {(selected == null || hasPos === false || !bounds) && (
-          <div className="absolute inset-x-0 bottom-20 flex justify-center px-4 pointer-events-none">
+          <div className={`absolute inset-x-0 flex justify-center px-4 pointer-events-none ${compact ? 'bottom-16' : 'bottom-20'}`}>
             <p className="max-w-md text-center text-[13px] leading-snug text-zinc-300 bg-[#08090a]/90 border border-white/[0.1] rounded-full px-5 py-2.5">
               {!bounds ? 'Chargement des positions des voitures…'
                 : selected == null ? 'Touchez une voiture sur la carte ou choisissez un pilote ci-dessous.'
@@ -437,20 +509,34 @@ export default function FollowView({ loc, car, now, snap, t, selected, onSelect,
         )}
 
         {/* commandes */}
-        <div data-overlay className="absolute right-3 bottom-3 sm:right-4 sm:bottom-4 flex items-center gap-2">
+        {compact && playback && (
+          <div data-overlay className="absolute left-2 bottom-2 flex items-center gap-2">
+            <button onClick={playback.toggle} aria-label={playback.playing ? 'Pause' : 'Lecture'} className="size-11 grid place-items-center rounded-full bg-white text-[#08090a] active:scale-95">
+              {playback.playing
+                ? <svg viewBox="0 0 24 24" className="size-5" fill="currentColor" aria-hidden><path d="M6 5h4v14H6zM14 5h4v14h-4z" /></svg>
+                : <svg viewBox="0 0 24 24" className="size-5" fill="currentColor" aria-hidden><path d="M7 4l13 8-13 8z" /></svg>}
+            </button>
+            <button
+              onClick={() => { const i = playback.speeds.indexOf(playback.speed); playback.setSpeed(playback.speeds[(i + 1) % playback.speeds.length]) }}
+              aria-label={`Vitesse ×${playback.speed}, toucher pour changer`}
+              className="min-h-11 min-w-14 px-3 rounded-full bg-[#08090a]/85 border border-white/[0.12] text-[13px] font-semibold tabular-nums text-zinc-100"
+            >×{playback.speed}</button>
+          </div>
+        )}
+        <div data-overlay className={`absolute flex items-center gap-2 ${compact ? 'right-2 bottom-2' : 'right-3 bottom-3 sm:right-4 sm:bottom-4'}`}>
           {isFollowing ? (
-            <button onClick={overview} className={ghost}>
+            <button onClick={overview} className={compact ? 'size-11 grid place-items-center rounded-full bg-[#08090a]/85 border border-white/[0.12] text-zinc-200' : ghost} aria-label="Vue d’ensemble">
               <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>
-              Vue d’ensemble
+              {!compact && 'Vue d’ensemble'}
             </button>
           ) : selected != null && me ? (
-            <button onClick={follow} className={`${pill} bg-white text-[#08090a] font-semibold`}>Suivre {me.acr}</button>
+            <button onClick={follow} className={`${pill} bg-white text-[#08090a] font-semibold`}>{compact ? me.acr : `Suivre ${me.acr}`}</button>
           ) : null}
           <div className="inline-flex rounded-full bg-[#08090a]/85 border border-white/[0.12] overflow-hidden">
             <button onClick={() => zoomStep(1 / 1.4)} className="size-11 grid place-items-center text-zinc-200 hover:bg-[#161718]" aria-label="Dézoomer">
               <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14" /></svg>
             </button>
-            <span className="min-w-12 grid place-items-center text-[11px] tabular-nums text-zinc-500 border-x border-white/[0.08]" aria-live="polite">×{zoomUi.toFixed(1).replace('.', ',')}</span>
+            <span className={`${compact ? 'hidden' : 'grid'} min-w-12 place-items-center text-[11px] tabular-nums text-zinc-500 border-x border-white/[0.08]`} aria-live="polite">×{zoomUi.toFixed(1).replace('.', ',')}</span>
             <button onClick={() => zoomStep(1.4)} className="size-11 grid place-items-center text-zinc-200 hover:bg-[#161718]" aria-label="Zoomer">
               <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
             </button>
@@ -459,7 +545,7 @@ export default function FollowView({ loc, car, now, snap, t, selected, onSelect,
       </div>
 
       {/* choix du pilote */}
-      <div className="flex gap-2 overflow-x-auto px-4 sm:px-5 py-3 border-t border-white/[0.07] [scrollbar-width:none]" role="listbox" aria-label="Choisir le pilote à suivre">
+      <div className={`flex gap-2 overflow-x-auto border-t border-white/[0.07] [scrollbar-width:none] ${compact ? 'shrink-0 px-2 py-2' : 'px-4 sm:px-5 py-3'}`} role="listbox" aria-label="Choisir le pilote à suivre">
         {rows.map((r) => {
           const on = r.n === selected
           return (
