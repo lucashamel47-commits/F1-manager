@@ -72,10 +72,40 @@ function App() {
     window.scrollTo(0, 0)
   }, [route])
 
-  // Une fois connecté, la route #/connexion n'a plus de sens : on la retire de l'URL.
+  // Lien partagé #/duel ou #/live : on le mémorise si la personne n'est pas encore connectée.
   useEffect(() => {
-    if (loggedIn && route !== 'mentions' && route !== 'parametres') clearRoute()
+    if (loggedIn) return
+    if (route === 'duel' || route === 'live') {
+      try { sessionStorage.setItem('f1-open-view', route) } catch { /* ignore */ }
+    }
+  }, [loggedIn, route])
+
+  // Une fois connecté, #/connexion n'a plus de sens. On conserve #/duel, #/live, mentions et paramètres.
+  useEffect(() => {
+    if (!loggedIn) return
+    let dest: string | null = null
+    try {
+      dest = sessionStorage.getItem('f1-open-view')
+      if (dest) sessionStorage.removeItem('f1-open-view')
+    } catch { /* ignore */ }
+    if ((dest === 'duel' || dest === 'live') && route !== dest) {
+      window.location.hash = `#/${dest}`
+      return
+    }
+    if (route === 'duel' || route === 'live' || route === 'mentions' || route === 'parametres') return
+    clearRoute()
   }, [loggedIn]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Ouvre la vue correspondant au hash (lien partagé ou navigation).
+  useEffect(() => {
+    if (!loggedIn) return
+    if (route === 'duel') {
+      setHorsPage('stats-duel')
+      setMode('hors')
+    } else if (route === 'live') {
+      setMode('live')
+    }
+  }, [loggedIn, route])
 
   // Les paramètres ne sont accessibles qu'une fois connecté.
   useEffect(() => {
@@ -203,13 +233,26 @@ function App() {
                   : seasonPage === 'favorites' ? 'favorites'
                     : seasonPage === 'standings' ? 'standings' : 'home')
             : 'home'
-    const openSeason = (p: HorsPage) => { setHorsPage(p); setSeasonNav((n) => n + 1); setMode('hors') }
+    const setViewHash = (h: 'duel' | 'live' | null) => {
+      if (h) {
+        if (window.location.hash !== `#/${h}`) window.location.hash = `#/${h}`
+      } else if (window.location.hash === '#/duel' || window.location.hash === '#/live') {
+        clearRoute()
+      }
+    }
+    const openSeason = (p: HorsPage) => {
+      setHorsPage(p)
+      setSeasonNav((n) => n + 1)
+      setMode('hors')
+      setViewHash(p === 'stats-duel' ? 'duel' : null)
+    }
+    const openLive = () => { setMode('live'); setViewHash('live') }
     const leaveSettings = () => { if (route === 'parametres') clearRoute() }
     const navigate = (k: MenuKey) => {
       leaveSettings()
-      if (k === 'home') setMode('select')
-      else if (k === 'live') setMode('live')
-      else if (k === 'reminders') setMode('notif')
+      if (k === 'home') { setMode('select'); setViewHash(null) }
+      else if (k === 'live') openLive()
+      else if (k === 'reminders') { setMode('notif'); setViewHash(null) }
       else openSeason(k === 'duel' ? 'stats-duel' : k === 'positions' ? 'stats-positions' : k)
       window.scrollTo(0, 0)
     }
@@ -252,7 +295,7 @@ function App() {
             userEmail={user?.email ?? ''}
             userName={user?.name}
             onOpenSeason={openSeason}
-            onOpenLive={() => setMode('live')}
+            onOpenLive={openLive}
             onOpenReminders={() => setMode('notif')}
           />
         </>

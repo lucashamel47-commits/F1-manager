@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
+import NextSessionLine from './NextSessionLine'
 
 /** Hero calqué sur Novex : titre aligné à gauche (44 px / 560 / -0.035 em), sous-titre gris 16 px, bouton pilule blanc 44 px. Aucun fond décoratif. */
 export default function Hero({ ctas }: { ctas: ReactNode }) {
@@ -18,6 +19,9 @@ export default function Hero({ ctas }: { ctas: ReactNode }) {
         <p className={`mt-5 max-w-xl text-base leading-6 tracking-[-0.011em] text-[#939494] ${reveal(100)}`}>
           Classements, calendrier, statistiques et live timing de la Formule 1, avec des rappels avant chaque session.
         </p>
+        <div className={`mt-6 ${reveal(150)}`}>
+          <NextSessionLine />
+        </div>
         <div className={reveal(200)}>{ctas}</div>
       </div>
     </section>

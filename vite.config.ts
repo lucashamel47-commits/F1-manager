@@ -41,9 +41,11 @@ export default defineConfig({
       },
       workbox: {
         // Coquille de l'app (JS, CSS, HTML, icônes) en précache → démarrage hors ligne.
+        // Supabase, OpenF1 et le direct F1 (livetiming.formula1.com) sont sur d'autres domaines : jamais précachés.
         globPatterns: ['**/*.{js,css,html,svg,png,jpeg,ico,webmanifest,woff2}', 'replay/*.json'],
         maximumFileSizeToCacheInBytes: 1024 * 1024,
         navigateFallback: `${base}index.html`,
+        navigateFallbackDenylist: [/^\/api\//],
         cleanupOutdatedCaches: true,
         clientsClaim: true, // le SW prend la main dès la 1re visite (la mise à jour, elle, attend le clic de l'utilisateur)
         runtimeCaching: [
@@ -58,8 +60,8 @@ export default defineConfig({
             },
           },
           {
-            // Plans de circuits, photos de GP et de pilotes (formula1.com) : cache d'abord.
-            urlPattern: ({ url }) => url.hostname === 'media.formula1.com' || url.hostname.endsWith('.formula1.com'),
+            // Photos et plans uniquement. Pas livetiming.formula1.com (flux live).
+            urlPattern: ({ url }) => url.hostname === 'media.formula1.com',
             handler: 'CacheFirst',
             options: {
               cacheName: 'f1-images',

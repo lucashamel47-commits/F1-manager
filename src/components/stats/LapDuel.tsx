@@ -4,6 +4,8 @@ import type { OFDriver, OFLap, OFSession } from '../../live/openf1'
 import { color, fmt, fmtDelta, loadSession, useMeetings, useSessionData, panel, useWidth, type Meeting, type SessionData } from './data'
 import { PillSelect, SessionPicker, Skeleton, State } from './ui'
 import { Num } from '../Num'
+import ShareButton from '../ShareButton'
+import { sessionFr, gpLabel } from '../../live/ui/labels'
 
 const KINDS = ['Race', 'Sprint', 'Qualifying', 'Sprint Qualifying']
 
@@ -69,6 +71,12 @@ function Duel({ data, session }: { data: SessionData; session: OFSession }) {
         {picker(a, setA, b, A.c, 'Pilote 1')}
         <span className="text-[13px] text-[#636464]">vs</span>
         {picker(b, setB, a, B.c, 'Pilote 2')}
+        <ShareButton
+          title="Duel F1 Manager"
+          text={`Duel ${A.d.name_acronym} vs ${B.d.name_acronym} · ${sessionFr(session.session_name)} ${gpLabel(session)} — sur F1 Manager`}
+          hash="#/duel"
+          className="sm:ml-auto"
+        />
       </div>
 
       {/* meilleurs tours + secteurs */}
