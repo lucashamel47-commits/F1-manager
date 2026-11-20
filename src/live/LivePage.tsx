@@ -16,6 +16,7 @@ import Picker from './ui/Picker'
 import { PositionChart, GapChart, StrategyChart, PitList } from './ui/Charts'
 import { RaceControlFeed, OvertakesFeed, RadioFeed, WeatherPanel } from './ui/Feeds'
 import { sessionFr, gpLabel, fmtDateFr } from './ui/labels'
+import ShareButton from '../components/ShareButton'
 
 type Chosen = { session: OFSession; mode: 'live' | 'replay' }
 type LeftTab = 'tower' | 'chrono' | 'strategy' | 'evolution'
@@ -285,6 +286,12 @@ export default function LivePage() {
           {isLive && lastRace && <button onClick={() => start(lastRace)} className={toolbarBtn}>Rejouer</button>}
           {chosen && liveSession && chosen.session.session_key !== liveSession.session_key && <button onClick={() => setChosen(null)} className={`${toolbarBtn} border-accent-500`}>Retour au direct</button>}
           {!desktop && snap && snap.rows.length > 0 && !follow && <button onClick={() => setFollow(true)} className={toolbarBtn}>Suivre</button>}
+          <ShareButton
+            title="Rejeu F1 Manager"
+            text={`${isLive ? 'Live' : 'Rejeu'} · ${gpLabel(s)} ${s.year} · ${sessionFr(s.session_name)} — sur F1 Manager`}
+            hash="#/live"
+            className="border-[#3d3e3f]"
+          />
           <button onClick={() => setPicker(true)} className={toolbarBtn}>Sessions</button>
           {chosen && !liveSession && <button onClick={() => { setChosen(null); closeDriver() }} className={toolbarBtn} aria-label="Quitter le rejeu">Fermer</button>}
         </div>

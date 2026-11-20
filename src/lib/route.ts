@@ -6,10 +6,12 @@ import { useSyncExternalStore } from 'react'
  *   #/inscription    → page d'inscription
  *   #/mentions       → mentions légales & confidentialité (connecté ou non)
  *   #/parametres     → réglages (connecté ; sections : /compte, /securite, /apparence, /rappels, /contact)
+ *   #/duel           → duel au tour (connecté)
+ *   #/live           → live / rejeu (connecté)
  *   autre / vide     → accueil (les ancres #faq, #apercu… restent de simples ancres de la page)
  * Le bouton « Retour » du navigateur fonctionne : chaque lien ajoute une entrée d'historique.
  */
-export type Route = 'home' | 'connexion' | 'inscription' | 'mentions' | 'parametres'
+export type Route = 'home' | 'connexion' | 'inscription' | 'mentions' | 'parametres' | 'duel' | 'live'
 
 const parse = (): Route => {
   const h = window.location.hash
@@ -17,6 +19,8 @@ const parse = (): Route => {
   if (h === '#/inscription') return 'inscription'
   if (h === '#/mentions') return 'mentions'
   if (h === '#/parametres' || h.startsWith('#/parametres/')) return 'parametres'
+  if (h === '#/duel' || h.startsWith('#/duel?')) return 'duel'
+  if (h === '#/live' || h.startsWith('#/live?') || h.startsWith('#/live/')) return 'live'
   return 'home'
 }
 
