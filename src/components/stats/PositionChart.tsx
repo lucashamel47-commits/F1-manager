@@ -2,7 +2,7 @@
 import { useMemo, useState } from 'react'
 import type { OFSession } from '../../live/openf1'
 import { emptyStore, merge, lapSeries, lastIdx } from '../../live/model'
-import { color, loadPositions, loadSession, useMeetings, useSessionData, panel, useWidth, type Meeting } from './data'
+import { color, firstReadyMeeting, loadPositions, loadSession, useMeetings, useSessionData, panel, useWidth, type Meeting } from './data'
 import { SessionPicker, Skeleton, State } from './ui'
 
 const KINDS = ['Race', 'Sprint']
@@ -34,12 +34,12 @@ async function loadRace(s: OFSession, sig: AbortSignal) {
 export default function PositionChart() {
   const { meetings, error } = useMeetings(KINDS)
   const [pick, setPick] = useState<{ meeting: Meeting; session: OFSession } | null>(null)
-  const first = meetings?.[0]
+  const first = firstReadyMeeting(meetings)
   const meeting = pick?.meeting ?? first ?? null
   const session = pick?.session ?? (first ? first.sessions.find((s) => s.session_name === 'Race') ?? first.sessions[0] : null)
   const pickMeeting = (m: Meeting) => setPick({ meeting: m, session: m.sessions.find((s) => s.session_name === 'Race') ?? m.sessions[0] })
   const setSession = (s: OFSession) => setPick({ meeting: meeting!, session: s })
-  const { data, error: dErr, loading } = useSessionData(session, loadRace)
+  const { data, error: dErr, loading, message } = useSessionData(session, loadRace)
 
   if (error) return <State>Impossible de charger la saison. Vérifie ta connexion.</State>
   if (!meetings) return <Skeleton h="h-[36rem]" />
@@ -47,7 +47,7 @@ export default function PositionChart() {
   return (
     <div className="grid gap-6">
       <SessionPicker meetings={meetings} meeting={meeting} session={session} onMeeting={pickMeeting} onSession={setSession} />
-      {dErr ? <State>Données indisponibles pour cette course.</State> : loading || !data ? <Skeleton h="h-[36rem]" /> : data.laps < 2 ? <State>Pas encore de tours pour cette course.</State> : <Chart key={session?.session_key} lines={data.lines} laps={data.laps} />}
+      {dErr ? <State>{message ?? 'Données indisponibles pour cette course.'}</State> : loading || !data ? <Skeleton h="h-[36rem]" label="Chargement des tours…" /> : data.laps < 2 ? <State>Pas encore de tours pour cette course.</State> : <Chart key={session?.session_key} lines={data.lines} laps={data.laps} />}
     </div>
   )
 }
@@ -87,8 +87,10 @@ function Chart({ lines, laps }: { lines: Line[]; laps: number }) {
           {focused ? <><span style={{ color: focused.c }}>●</span> {focused.name} · {lap != null ? `${lap === 0 ? 'Grille' : `Tour ${lap}`} : P${posAt(focused, lap) ?? '—'}` : `P${focused.grid ?? '—'} → ${focused.finish ? `P${focused.finish}` : 'abandon'}`}</> : lap != null ? (lap === 0 ? 'Grille de départ' : `Tour ${lap}`) : 'Touchez une ligne ou un pilote'}
         </p>
       </div>
-      <div ref={ref} className="w-full" onPointerLeave={() => { setHov(null); setLap(null) }}>
-        {W > 0 && (
+      <div ref={ref} className="w-full min-h-[20rem]" onPointerLeave={() => { setHov(null); setLap(null) }}>
+        {W <= 0 ? (
+          <div className="grid h-[20rem] place-items-center text-[13px] text-[#636464]">Chargement du graphique…</div>
+        ) : (
           <svg width={W} height={H} className="block touch-none select-none" onPointerMove={move} onPointerDown={move} role="img" aria-label="Évolution des positions de chaque pilote">
             {Array.from({ length: N }, (_, i) => i + 1).map((p) => (
               <g key={p}>

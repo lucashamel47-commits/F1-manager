@@ -1,7 +1,7 @@
 /* Duel au tour : deux pilotes, une session, tour par tour (temps, écart en piste, secteurs du meilleur tour). */
 import { useMemo, useState } from 'react'
 import type { OFDriver, OFLap, OFSession } from '../../live/openf1'
-import { color, fmt, fmtDelta, loadSession, useMeetings, useSessionData, panel, useWidth, type Meeting, type SessionData } from './data'
+import { color, firstReadyMeeting, fmt, fmtDelta, loadSession, useMeetings, useSessionData, panel, useWidth, type Meeting, type SessionData } from './data'
 import { PillSelect, SessionPicker, Skeleton, State } from './ui'
 import { Num } from '../Num'
 import ShareButton from '../ShareButton'
@@ -27,12 +27,12 @@ function side(d: OFDriver, laps: OFLap[]): Side {
 export default function LapDuel() {
   const { meetings, error } = useMeetings(KINDS)
   const [pick, setPick] = useState<{ meeting: Meeting; session: OFSession } | null>(null)
-  const first = meetings?.[0]
+  const first = firstReadyMeeting(meetings)
   const meeting = pick?.meeting ?? first ?? null
   const session = pick?.session ?? (first ? first.sessions.find((s) => s.session_name === 'Race') ?? first.sessions.at(-1)! : null)
   const setSession = (s: OFSession) => setPick({ meeting: meeting!, session: s })
   const pickMeeting = (m: Meeting) => { setPick({ meeting: m, session: m.sessions.find((s) => s.session_name === session?.session_name) ?? m.sessions.find((s) => s.session_name === 'Race') ?? m.sessions.at(-1)! }) }
-  const { data, error: dErr, loading } = useSessionData(session, loadSession)
+  const { data, error: dErr, loading, message } = useSessionData(session, loadSession)
 
   if (error) return <State>Impossible de charger la saison. Vérifie ta connexion.</State>
   if (!meetings) return <Skeleton h="h-96" />
@@ -40,7 +40,7 @@ export default function LapDuel() {
   return (
     <div className="grid gap-6">
       <SessionPicker meetings={meetings} meeting={meeting} session={session} onMeeting={pickMeeting} onSession={setSession} />
-      {dErr ? <State>Données indisponibles pour cette session.</State> : loading || !data || !session ? <Skeleton h="h-[32rem]" /> : <Duel key={session.session_key} data={data} session={session} />}
+      {dErr ? <State>{message ?? 'Données indisponibles pour cette session.'}</State> : loading || !data || !session ? <Skeleton h="h-[32rem]" label="Chargement des tours…" /> : <Duel key={session.session_key} data={data} session={session} />}
     </div>
   )
 }

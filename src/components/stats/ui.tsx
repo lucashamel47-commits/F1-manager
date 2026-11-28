@@ -42,4 +42,8 @@ export function State({ children, retry }: { children: ReactNode; retry?: () => 
   )
 }
 
-export const Skeleton = ({ h = 'h-64' }: { h?: string }) => <div className={`${h} animate-pulse rounded-[1.75rem] border border-[#1d1e1f] bg-[#0c0d0e]`} aria-busy="true" aria-label="Chargement" />
+export const Skeleton = ({ h = 'h-64', label = 'Chargement' }: { h?: string; label?: string }) => (
+  <div className={`${h} ${panel} grid place-items-center px-6 text-center text-[14px] text-[#636464]`} aria-busy="true" aria-label={label}>
+    <p>{label}</p>
+  </div>
+)
