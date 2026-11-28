@@ -1,10 +1,11 @@
 /** Sections des réglages (#/parametres/…). */
-export type SettingsSection = 'compte' | 'securite' | 'apparence' | 'rappels' | 'contact'
+export type SettingsSection = 'compte' | 'securite' | 'apparence' | 'favoris' | 'rappels' | 'contact'
 
 export const SETTINGS_SECTIONS: { id: SettingsSection; label: string }[] = [
   { id: 'compte', label: 'Compte' },
   { id: 'securite', label: 'Sécurité' },
   { id: 'apparence', label: 'Apparence' },
+  { id: 'favoris', label: 'Favoris' },
   { id: 'rappels', label: 'Rappels' },
   { id: 'contact', label: 'Contact' },
 ]
