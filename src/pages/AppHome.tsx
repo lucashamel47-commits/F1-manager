@@ -4,6 +4,8 @@ import { allSessions, countdown, formatWhen, type Session } from '../lib/session
 import { useChampionship } from '../lib/championship'
 import { DRIVERS, TEAMS, driverPhoto, teamById, teamLogo } from '../data/grid'
 import type { HorsPage } from './HorsCourse'
+import { useFavorites } from '../lib/favorites'
+import { useLastRace } from '../lib/lastRace'
 import { Num } from '../components/Num'
 
 interface Props {
@@ -45,10 +47,11 @@ export default function AppHome({ userEmail, userName, onOpenSeason, onOpenLive,
   const next = useMemo(() => sessions?.find((s) => s.start.getTime() > now) ?? null, [sessions, now])
   const weekend = useMemo(() => (next && sessions ? sessions.filter((s) => s.round === next.round) : []), [sessions, next])
 
-  // favoris enregistrés pendant l'accueil « Saison »
-  const favIds: string[] = useMemo(() => { try { return JSON.parse(localStorage.getItem(`f1-fav-drivers-${userEmail}`) ?? '[]') } catch { return [] } }, [userEmail])
-  const team = teamById(localStorage.getItem(`f1-fav-team-${userEmail}`))
-  const drv = DRIVERS.find((d) => d.id === favIds[0])
+  // favoris du compte (Réglages › Favoris) : mis à jour dès qu'ils changent
+  const fav = useFavorites(userEmail)
+  const team = teamById(fav.teamId)
+  const last = useLastRace(Boolean(fav.driverId || fav.teamId))
+  const drv = DRIVERS.find((d) => d.id === fav.driverId)
   const drvTeam = drv ? TEAMS.find((t) => t.id === drv.teamId) : undefined
   const standing = drv ? champ.data?.drivers.find((x: { Driver: { code?: string } }) => x.Driver.code === drv.code) : undefined
   const teamStanding = team ? champ.data?.constructors.find((x: { Constructor: { constructorId: string } }) => x.Constructor.constructorId === team.ref) : undefined
@@ -130,6 +133,7 @@ export default function AppHome({ userEmail, userName, onOpenSeason, onOpenLive,
                     <span className="block text-[12px] text-[#636464]">Ton pilote</span>
                     <span className="mt-1 block truncate text-[19px] font-medium tracking-[-0.02em]">{drv.givenName} {drv.familyName}</span>
                     <span className="mt-1 flex items-center gap-1.5 text-[13px] text-[#939494]"><span className="size-1.5 rounded-full" style={{ backgroundColor: drvTeam?.color }} />{drvTeam?.name}</span>
+                    {drv && last?.byDriver[drv.code] && <span className="mt-1 block truncate text-[12px] text-[#636464]">{last.name} · {last.byDriver[drv.code].pos}</span>}
                   </span>
                   {standing && <span className="text-right"><span className="block text-[1.75rem] font-medium leading-none tabular-nums tracking-[-0.03em]">P{standing.position}</span><span className="mt-1 block text-[12px] tabular-nums text-[#636464]"><Num value={standing.points} /> pts</span></span>}
                 </>
@@ -144,6 +148,7 @@ export default function AppHome({ userEmail, userName, onOpenSeason, onOpenLive,
                   <span className="min-w-0 flex-1">
                     <span className="block text-[12px] text-[#636464]">Ton écurie</span>
                     <span className="mt-1 block truncate text-[19px] font-medium tracking-[-0.02em]">{team.name}</span>
+                    {last?.byConstructor[team.ref] && <span className="mt-1 block text-[12px] text-[#636464]">{last.name} · {last.byConstructor[team.ref].join(', ')}</span>}
                   </span>
                   {teamStanding && <span className="text-right"><span className="block text-[1.75rem] font-medium leading-none tabular-nums tracking-[-0.03em]">P{teamStanding.position}</span><span className="mt-1 block text-[12px] tabular-nums text-[#636464]"><Num value={teamStanding.points} /> pts</span></span>}
                 </>

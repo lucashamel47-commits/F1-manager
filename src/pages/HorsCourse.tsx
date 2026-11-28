@@ -1,3 +1,4 @@
+import { queuePush } from '../lib/favorites'
 import { useState, useEffect, useRef, lazy, Suspense, type ReactNode } from 'react'
 import { gpFr } from '../lib/i18n'
 import MotorNav, { SectionTitle, TopBar, type NavKey } from '../components/MotorNav'
@@ -151,7 +152,7 @@ export default function HorsCourse({ onBack, onPageChange, userEmail, favDriver,
   const toggleDriver = (id: string) => {
     setSelectedDrivers(prev => {
       const next = prev.includes(id) ? prev.filter(d => d !== id) : [...prev, id]
-      localStorage.setItem(driverKey, JSON.stringify(next))
+      localStorage.setItem(driverKey, JSON.stringify(next)); queuePush(userEmail)
       if (next.length > 0) setFavDriver(next[0])
       return next
     })
@@ -863,7 +864,7 @@ if (subPage === 'stats-constructors' && selectedTeamStats) {
           {TEAMS.map((t) => {
             const on = normTeamId(favTeam) === t.id
             return (
-              <button key={t.id} onClick={() => { setFavTeam(t.id); localStorage.setItem(teamKey, t.id); scrollToValidate() }} aria-pressed={on} className={`group relative flex flex-col overflow-hidden rounded-2xl border text-left transition active:scale-[0.98] ${on ? 'border-white bg-[#17181a]' : 'border-white/[0.08] bg-[#101112] hover:border-white/25'}`}>
+              <button key={t.id} onClick={() => { setFavTeam(t.id); localStorage.setItem(teamKey, t.id); queuePush(userEmail); scrollToValidate() }} aria-pressed={on} className={`group relative flex flex-col overflow-hidden rounded-2xl border text-left transition active:scale-[0.98] ${on ? 'border-white bg-[#17181a]' : 'border-white/[0.08] bg-[#101112] hover:border-white/25'}`}>
                 <span className={`absolute right-3 top-3 grid size-5 place-items-center rounded-full border transition ${on ? 'border-white bg-white text-black' : 'border-white/20 text-transparent'}`} aria-hidden>
                   <svg viewBox="0 0 16 16" className="size-3" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="m3.5 8.5 3 3 6-7" /></svg>
                 </span>

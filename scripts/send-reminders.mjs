@@ -113,7 +113,17 @@ ${lines.map((l) => `<tr><td style="padding:10px 28px 0;font-size:16px;line-heigh
   return { html, text: `${title}\n\n${lines.map((l) => l.replace(/<[^>]+>/g, '')).join('\n')}\n\n${APP_URL}\n\nPour arrêter les rappels : app › Rappels › désactive les rappels par email.` }
 }
 
-function reminderMail(p, s, lead) {
+/** Pilote favori de l'inscrit (métadonnées du compte, voir src/lib/favorites.ts). Jamais bloquant : sans favori ou en cas d'erreur, pas de ligne en plus. */
+async function favoriteDriver(userId) {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${encodeURIComponent(userId)}`, { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } })
+    if (!res.ok) return ''
+    const name = (await res.json()).user_metadata?.fav_driver_name
+    return typeof name === 'string' ? name.replace(/[\r\n]+/g, ' ').trim().slice(0, 60) : ''
+  } catch { return '' }
+}
+
+function reminderMail(p, s, lead, driver = '') {
   const left = Math.max(1, Math.round((s.start - NOW) / MIN))
   const title = `${s.label} · ${s.gp} — dans ${delai(Math.min(left, lead))}`
   return {
@@ -121,6 +131,7 @@ function reminderMail(p, s, lead) {
     ...template(title, [
       `<b>${esc(s.label)}</b> — ${esc(s.gp)} (${esc(s.place)})`,
       `Début <b>${esc(jour(s.start, p.tz))} à ${esc(heure(s.start, p.tz))}</b> (heure : ${esc(safeTz(p.tz))}).`,
+      ...(driver ? [`Ton pilote favori : <b>${esc(driver)}</b>.`] : []),
     ]),
   }
 }
@@ -160,7 +171,7 @@ for (const p of subs) {
         if (DRY) { console.log(`[dry-run] ${p.email} ← ${s.label} · ${s.gp} (−${lead} min)`); sent++; continue }
         if (!(await claim(p.user_id, s.id, lead))) { skipped++; continue }
         try {
-          await send(p.email, reminderMail(p, s, lead))
+          await send(p.email, reminderMail(p, s, lead, await favoriteDriver(p.user_id)))
           sent++
           console.log(`envoyé : ${s.label} · ${s.gp} (−${lead} min)`)
         } catch (e) {

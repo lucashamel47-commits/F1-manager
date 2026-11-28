@@ -3,7 +3,8 @@ import { AuthMessage } from '../components/AuthForm'
 import DeleteAccount from '../components/DeleteAccount'
 import { openSupport } from '../lib/support'
 import { supabase, supabaseEnabled } from '../lib/supabase'
-import { DRIVERS, TEAMS } from '../data/grid'
+import { DRIVERS, TEAMS, driverPhoto, teamById, teamLogo } from '../data/grid'
+import { useFavorites, writeFavorites } from '../lib/favorites'
 import { ACCENTS, applyAccent, readAccent, type AccentId } from '../lib/accent'
 import { SETTINGS_SECTIONS, goSettings, isSettingsIndex, readSettingsSection, type SettingsSection } from '../lib/settings'
 
@@ -47,7 +48,8 @@ export default function Settings({ user, onNameChange, onLogout, onDeleted, onOp
     <Card title={SETTINGS_SECTIONS.find((s) => s.id === active)?.label ?? 'Compte'}>
       {active === 'compte' && <Compte user={user} onNameChange={onNameChange} onLogout={onLogout} />}
       {active === 'securite' && <Securite user={user} onDeleted={onDeleted} />}
-      {active === 'apparence' && <Apparence email={user.email} />}
+      {active === 'apparence' && <Apparence />}
+      {active === 'favoris' && <Favoris email={user.email} />}
       {active === 'rappels' && <Rappels onOpenReminders={onOpenReminders} />}
       {active === 'contact' && <Contact />}
     </Card>
@@ -226,36 +228,11 @@ function Securite({ user, onDeleted }: { user: Props['user']; onDeleted?: () => 
   )
 }
 
-function Apparence({ email }: { email: string }) {
-  const uid = useId()
-  const driverKey = `f1-fav-drivers-${email}`
-  const teamKey = `f1-fav-team-${email}`
-  const readDriver = () => {
-    try {
-      const parsed = JSON.parse(localStorage.getItem(driverKey) ?? '[]') as string[]
-      return parsed[0] ?? ''
-    } catch { return '' }
-  }
-  const [driver, setDriver] = useState(readDriver)
-  const [team, setTeam] = useState(() => localStorage.getItem(teamKey) ?? '')
+function Apparence() {
   const [hidePast, setHidePast] = useState(() => localStorage.getItem('f1-hide-past') === '1')
   const [accent, setAccent] = useState<AccentId>(readAccent)
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
 
-  const pickDriver = (id: string) => {
-    setDriver(id)
-    if (id) {
-      localStorage.setItem(driverKey, JSON.stringify([id]))
-      localStorage.setItem(`${driverKey}-onboarded`, '1')
-    } else localStorage.setItem(driverKey, '[]')
-  }
-  const pickTeam = (id: string) => {
-    setTeam(id)
-    if (id) {
-      localStorage.setItem(teamKey, id)
-      localStorage.setItem(`${driverKey}-onboarded`, '1')
-    } else localStorage.removeItem(teamKey)
-  }
   const pickAccent = (id: AccentId) => { setAccent(id); applyAccent(id) }
 
   return (
@@ -282,18 +259,6 @@ function Apparence({ email }: { email: string }) {
             )
           })}
         </div>
-      </Row>
-      <Row label="Pilote favori">
-        <Select id={`${uid}-drv`} value={driver} onChange={pickDriver}>
-          <option value="">Aucun</option>
-          {DRIVERS.map((d) => <option key={d.id} value={d.id}>{d.givenName} {d.familyName}</option>)}
-        </Select>
-      </Row>
-      <Row label="Écurie favorite">
-        <Select id={`${uid}-team`} value={team} onChange={pickTeam}>
-          <option value="">Aucune</option>
-          {TEAMS.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
-        </Select>
       </Row>
       <Row label="Masquer les courses passées" sub="Dans le calendrier de la saison." last>
         <Toggle on={hidePast} onClick={() => { setHidePast((v) => { localStorage.setItem('f1-hide-past', v ? '0' : '1'); return !v }) }} />
@@ -322,6 +287,37 @@ function Contact() {
       </p>
       <button type="button" onClick={openSupport} data-support className="btn-primary mt-6 h-10 rounded-full px-5 text-[13px]">Écrire au support</button>
       <a href="#/mentions" className="mt-6 block text-[13px] text-[#7d7e7e] transition hover:text-[#d6d7d7]">Mentions légales &amp; confidentialité</a>
+    </div>
+  )
+}
+
+function Favoris({ email }: { email: string }) {
+  const uid = useId()
+  const fav = useFavorites(email)
+  const drv = DRIVERS.find((d) => d.id === fav.driverId)
+  const drvTeam = drv ? teamById(drv.teamId) : undefined
+  const team = teamById(fav.teamId)
+  return (
+    <div>
+      <p className="px-6 pt-5 text-[13px] leading-relaxed text-[#7d7e7e]">Ton pilote et ton écurie apparaissent sur l'accueil, avec leur place au championnat et leur dernier résultat. Ton choix est enregistré sur ton compte : tu le retrouves sur tous tes appareils.</p>
+      <Row label="Pilote favori" sub={drvTeam?.name}>
+        <div className="flex items-center gap-3">
+          {drv && <img src={driverPhoto(drvTeam?.slug ?? 'fallback', drv.f1, 120)} alt="" className="size-10 rounded-full border border-white/10 bg-[#17181a] object-cover object-top" />}
+          <Select id={`${uid}-drv`} value={fav.driverId} onChange={(id) => writeFavorites(email, { driverId: id })}>
+            <option value="">Aucun</option>
+            {DRIVERS.map((d) => <option key={d.id} value={d.id}>{d.givenName} {d.familyName}</option>)}
+          </Select>
+        </div>
+      </Row>
+      <Row label="Écurie favorite" last>
+        <div className="flex items-center gap-3">
+          {team && <span className="grid size-10 place-items-center rounded-full border border-white/10 bg-[#141516]"><img src={teamLogo(team)} alt="" className="size-6 object-contain" /></span>}
+          <Select id={`${uid}-team`} value={fav.teamId} onChange={(id) => writeFavorites(email, { teamId: id })}>
+            <option value="">Aucune</option>
+            {TEAMS.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+          </Select>
+        </div>
+      </Row>
     </div>
   )
 }

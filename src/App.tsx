@@ -7,6 +7,7 @@ import HorsCourse, { type HorsPage } from './pages/HorsCourse'
 import LiveMode from './pages/LiveMode'
 import Reminders from './pages/Reminders'
 import NewPassword from './components/NewPassword'
+import { pullFavorites } from './lib/favorites'
 import { supabase, supabaseEnabled, APP_URL } from './lib/supabase'
 import type { Session } from '@supabase/supabase-js'
 import Legal from './pages/Legal'
@@ -138,6 +139,10 @@ function App() {
     })
     return () => data.subscription.unsubscribe()
   }, [])
+
+  // Favoris (pilote, écurie) : repris depuis le compte à la connexion pour les retrouver sur tous les appareils.
+  const userEmail = user?.email
+  useEffect(() => { if (userEmail && supabaseEnabled) void pullFavorites(userEmail) }, [userEmail])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

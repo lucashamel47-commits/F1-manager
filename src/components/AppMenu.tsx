@@ -30,6 +30,7 @@ const P = {
   compte: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z',
   securite: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
   apparence: 'M12 22a10 10 0 1 1 0-20c5.5 0 10 4.5 10 10a4 4 0 0 1-4 4h-1.5a1.5 1.5 0 0 0-1.1 2.5c.2.3.3.7.3 1.1 0 1.2-.9 2.4-2.1 2.4z|M7.2 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2z|M10.5 7.8a1 1 0 1 0 0-2 1 1 0 0 0 0 2z|M15.5 7.8a1 1 0 1 0 0-2 1 1 0 0 0 0 2z|M17.8 11.2a1 1 0 1 0 0-2 1 1 0 0 0 0 2z',
+  favoris: 'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z',
   contact: 'M21 15a4 4 0 0 1-4 4H8l-5 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z',
   back: 'M19 12H5M12 19l-7-7 7-7',
   chevDown: 'm6 9 6 6 6-6',
@@ -39,6 +40,7 @@ const SETTING_ICON: Record<SettingsSection, string> = {
   compte: P.compte,
   securite: P.securite,
   apparence: P.apparence,
+  favoris: P.favoris,
   rappels: P.reminders,
   contact: P.contact,
 }
